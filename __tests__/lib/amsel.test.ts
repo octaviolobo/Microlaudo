@@ -72,10 +72,10 @@ describe('evaluateAmsel', () => {
   });
 
   it('conta cada critério individualmente (identifica qual critério ativa cada positivo)', () => {
-    const singleFields: Array<keyof Pick<
+    const singleFields: (keyof Pick<
       AmselCriteria,
       'homogeneous_discharge' | 'whiff_test' | 'clue_cells_20' | 'ph_above_45'
-    >> = ['homogeneous_discharge', 'whiff_test', 'clue_cells_20', 'ph_above_45'];
+    >)[] = ['homogeneous_discharge', 'whiff_test', 'clue_cells_20', 'ph_above_45'];
 
     for (const field of singleFields) {
       const result = evaluateAmsel(makeCriteria({ [field]: true }));

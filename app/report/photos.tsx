@@ -5,16 +5,18 @@ import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
-import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
 import { uploadReportImage, deleteReportImage, listReportImages, getSignedImageUrl } from '@/services/images';
 import { AppError } from '@/lib/errors';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
+
+import { stepStyles as s } from './_stepStyles';
+
 import type { ReportImageRow } from '@/types/database';
 
-const SLOTS: Array<1 | 2 | 3> = [1, 2, 3];
+const SLOTS: (1 | 2 | 3)[] = [1, 2, 3];
 
 export function PhotosScreen() {
   const { t } = useTranslation('report');

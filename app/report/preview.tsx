@@ -3,7 +3,6 @@ import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet, Platform }
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Button, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
@@ -15,6 +14,9 @@ import { evaluateAmsel } from '@/lib/amsel';
 import { AppError } from '@/lib/errors';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 import { FINDINGS_FIELDS } from '@/constants/findings-options';
+
+import { stepStyles as s } from './_stepStyles';
+
 import type { ReportRow } from '@/types/database';
 
 const FIELD_LABEL_KEYS: Record<string, string> = {

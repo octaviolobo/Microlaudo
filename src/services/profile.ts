@@ -1,5 +1,7 @@
-import { supabase } from './supabase';
 import { AppError, ErrorCodes } from '@/lib/errors';
+
+import { supabase } from './supabase';
+
 import type { DoctorRow } from '@/types/database';
 
 export type ProfileUpdateInput = {

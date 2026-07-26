@@ -65,7 +65,7 @@ export function DatePickerInput({
   const cells = useMemo(() => {
     const total = daysInMonth(viewYear, viewMonth);
     const leading = firstWeekdayOfMonth(viewYear, viewMonth);
-    const list: Array<number | null> = Array.from({ length: leading }, () => null);
+    const list: (number | null)[] = Array.from({ length: leading }, () => null);
     for (let day = 1; day <= total; day += 1) list.push(day);
     return list;
   }, [viewYear, viewMonth]);

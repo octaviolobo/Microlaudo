@@ -3,14 +3,16 @@ import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Select, Input, MessageBox } from '@/components/ui';
-import type { SelectOption } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
 import { updateReport } from '@/services/reports';
 import { AppError } from '@/lib/errors';
 import { FINDING_LEVELS, FINDINGS_FIELDS, type FindingsField } from '@/constants/findings-options';
+
+import { stepStyles as s } from './_stepStyles';
+
+import type { SelectOption } from '@/components/ui';
 import type { FindingLevel } from '@/types/report';
 
 const FIELD_LABEL_KEYS: Record<FindingsField, string> = {

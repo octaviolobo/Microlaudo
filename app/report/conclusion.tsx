@@ -3,7 +3,6 @@ import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Input, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
@@ -11,6 +10,8 @@ import { useDoctorStore } from '@/stores/doctorStore';
 import { updateReport } from '@/services/reports';
 import { AppError } from '@/lib/errors';
 import { REFERENCE_DEFAULT } from '@/constants/report-defaults';
+
+import { stepStyles as s } from './_stepStyles';
 
 export function ConclusionScreen() {
   const { t } = useTranslation('report');

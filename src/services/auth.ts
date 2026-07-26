@@ -1,7 +1,9 @@
-import type { Session } from '@supabase/supabase-js';
+import { AppError, ErrorCodes } from '@/lib/errors';
 
 import { supabase } from './supabase';
-import { AppError, ErrorCodes } from '@/lib/errors';
+
+import type { Session } from '@supabase/supabase-js';
+
 
 export type RegisterInput = {
   email: string;

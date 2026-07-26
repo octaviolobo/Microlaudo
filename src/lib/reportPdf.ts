@@ -4,10 +4,12 @@
 import { jsPDF } from 'jspdf/dist/jspdf.es.min.js';
 
 import { i18n } from '@/i18n';
+import { FINDINGS_FIELDS } from '@/constants/findings-options';
+
 import { classifyNugentScore } from './nugent';
 import { evaluateAmsel } from './amsel';
 import { formatDateBR } from './date';
-import { FINDINGS_FIELDS } from '@/constants/findings-options';
+
 import type { ReportRow, DoctorRow } from '@/types/database';
 
 export type ReportPdfAssets = {

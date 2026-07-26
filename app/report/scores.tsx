@@ -3,16 +3,18 @@ import { ScrollView, View, TouchableOpacity, Text, StyleSheet } from 'react-nati
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Select, Checkbox, Input, MessageBox } from '@/components/ui';
-import type { SelectOption } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
 import { updateReport } from '@/services/reports';
 import { calculateNugentScore } from '@/lib/nugent';
 import { evaluateAmsel } from '@/lib/amsel';
 import { AppError } from '@/lib/errors';
 import { Colors, Typography, Spacing } from '@/constants/theme';
+
+import { stepStyles as s } from './_stepStyles';
+
+import type { SelectOption } from '@/components/ui';
 import type { MorphotypeLevel } from '@/types/report';
 
 const MORPHOTYPE_OPTIONS: SelectOption[] = ['0', '1+', '2+', '3+', '4+'].map((level) => ({

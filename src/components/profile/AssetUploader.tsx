@@ -168,9 +168,8 @@ export function AssetUploader({
         // input DOM nativo — mais direto que expo-image-picker no web, e
         // consistente com o padrão de branch por Platform.OS === 'web' já
         // usado em app/report/preview.tsx
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         <input
-          ref={inputRef as unknown as any}
+          ref={inputRef}
           type="file"
           accept="image/png,image/jpeg,image/webp"
           onChange={handleFileChange}

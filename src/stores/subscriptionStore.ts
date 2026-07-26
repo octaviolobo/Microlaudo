@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 
-import type { SubscriptionStatus } from '@/types/subscription';
 import { TRIAL_REPORT_LIMIT } from '@/constants/plans';
+
+import type { SubscriptionStatus } from '@/types/subscription';
 
 type SubscriptionState = {
   status: SubscriptionStatus;

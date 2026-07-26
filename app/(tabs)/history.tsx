@@ -10,6 +10,7 @@ import { listReportsByDoctor } from '@/services/reports';
 import { AppError } from '@/lib/errors';
 import { formatDateBR } from '@/lib/date';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
+
 import type { ReportRow } from '@/types/database';
 
 const SEARCH_DEBOUNCE_MS = 300;

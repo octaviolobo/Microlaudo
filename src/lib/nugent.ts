@@ -1,4 +1,5 @@
 import { NUGENT_TABLE } from '@/constants/nugent-table';
+
 import type { MorphotypeLevel, Morphotypes, NugentClassification, NugentResult } from '@/types/report';
 
 const MORPHOTYPE_LEVELS: MorphotypeLevel[] = ['0', '1+', '2+', '3+', '4+'];

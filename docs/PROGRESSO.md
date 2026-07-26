@@ -271,3 +271,47 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 
 **Pendência reportada pelo usuário (não corrigida ainda):**
 - O PDF ainda tem bug de layout/alinhamento na seção **Score de Nugent / Critérios de Amsel**. Suspeita mais provável: a linha do "Valor do pH" (Amsel) usa a coluna fixa `MARGIN_X + 150` de `line()` em `src/lib/reportPdf.ts` — o mesmo padrão de bug já corrigido na seção de Achados Microscópicos (ali a coluna virou dinâmica via `doc.getTextWidth()`; aqui ainda não). Vale aplicar a mesma correção nas linhas restantes que usam a coluna fixa (dados do paciente e Amsel), em vez de só na de Achados. Não investigado a fundo — próxima sessão deve olhar o PDF renderizado dessa seção especificamente antes de mexer.
+
+---
+
+## Sessão 8 — 26 Jul 2026
+
+### README, date picker com calendário, campos obrigatórios + sprint de 5 subagents (web funcional)
+
+**O que foi feito diretamente:**
+- `README.md` criado do zero seguindo padrão profissional completo (badges, overview, stack, arquitetura, segurança, decisões técnicas, status do projeto) e publicado em `origin/expo-rewrite`.
+- `src/lib/date.ts` criado: fonte única de verdade para conversão ISO ↔ BR (`formatDateBR`, `parseISODate`, `toISODate`, `isoToday`, helpers de calendário).
+- `src/components/ui/DatePickerInput.tsx` criado: calendário dropdown nativo (sem lib nova, reaproveitando o padrão Modal/bottom-sheet do `Select.tsx`) — modos "dias" (grid mensal) e "anos" (grid de década), atalhos "Hoje"/"Limpar", exibe sempre em `DD-MM-AAAA`.
+- `app/report/patient.tsx`: campos "Data de nascimento" e "Data da coleta" trocados de texto livre (formato ISO errado) para `DatePickerInput`.
+- `Input.tsx` / `Select.tsx`: prop `required` adicionada como recurso do design system (asterisco vermelho no label), aplicada apenas onde já havia validação real bloqueando o submit (nome do paciente, data de coleta, nome completo e CRM no perfil). Telas de auth (login/register/forgot-password) ficaram de fora por não terem `label` visível ancorando o asterisco — decisão de redesenho ainda em aberto.
+
+**Sprint de 5 subagents (Opus, isolados em git worktrees) — objetivo: versão web totalmente funcional:**
+1. **Histórico** — `app/(tabs)/history.tsx` deixou de ser placeholder: lista real com busca, `app/report/preview.tsx` ganhou visualização/reimpressão e edição de laudo finalizado (revisão), `reportStore.ts` ganhou hidratação de laudo completo, `services/reports.ts` ganhou listagem/busca.
+2. **PDF** — corrigido o mesmo bug de coluna fixa (`MARGIN_X + 150`) que já tinha sido resolvido em Achados Microscópicos, agora também em Dados do Paciente e Amsel (coluna dinâmica via `getTextWidth()`); datas do PDF agora usam `formatDateBR`. Também corrigiu um bug latente: `handleFinalize` deixava de regenerar o PDF quando já existia `pdf_url`, mesmo com o laudo editado (`isDirty`) — agora regenera sempre que `isDirty === true`.
+3. **Testes** — `__tests__/lib/{amsel,date,nugent}.test.ts` criados (120 casos). De quebra, encontrou e removeu um bloco `"jest"` redundante em `package.json` que conflitava com `jest.config.js` e quebrava `npm run test` ("Multiple configurations found").
+4. **Perfil/LGPD** — upload de logo/assinatura do médico (`AssetUploader.tsx` + `services/assets.ts`, bucket `doctor-assets`) refletido no cabeçalho do PDF; exclusão de conta completa (RF22/LGPD) via edge function `delete-account` + `services/account.ts` + seção "Zona de Perigo" no perfil. Descobriu que `audit_log` tem `FORCE ROW LEVEL SECURITY`, o que bloqueava até inserts do `service_role` — corrigido com a migration `008_audit_log_service_role_insert.sql` (aplicada ao banco real via MCP).
+5. **Lint** (não concluído pelo agente, retomado e resolvido nesta sessão — ver abaixo).
+
+**Merge:** as 4 branches completas (Histórico, PDF, Testes, Perfil/LGPD) foram integradas em `expo-rewrite` sem conflitos reais (`git merge`, auto-merge limpo até em `reportPdf.ts`, tocado tanto pelo agente de PDF quanto pelo de Perfil). `npm run types` (0 erros) e `npm test` (120/120) confirmados após o merge. Worktrees das branches já mescladas foram removidos (`git worktree remove`).
+
+**Lint pré-existente finalmente corrigido (pendência desde a Sessão 6):**
+- Causa raiz: `eslint-config-expo` declara `import/resolver: { typescript: true }`, mas o pacote `eslint-import-resolver-typescript` só estava instalado aninhado dentro de `node_modules/eslint-config-expo/node_modules/` — inalcançável pela resolução de módulos do Node a partir dos arquivos lintados. O `eslint-module-utils` caía no fallback e tentava carregar o pacote `typescript` (o compilador) como se fosse o resolver, e falhava com "typescript with invalid interface loaded as resolver".
+- Corrigido instalando `eslint-import-resolver-typescript` como devDependency direta na raiz (`--legacy-peer-deps`, já que a versão mais nova exige `@typescript-eslint/utils@8` e o projeto está no `7.x` — não é o momento de subir essa major).
+- Criado `.eslintignore` excluindo `supabase/functions/` (código Deno com specifiers `jsr:`/`npm:` que o resolver Node não consegue resolver, e nem deveria tentar).
+- Rodado `eslint --fix`: resolveu todos os 52 erros de `import/order` que existiam represados no código (nunca detectados porque o lint nunca tinha rodado com sucesso).
+- Corrigido 1 erro real de `@typescript-eslint/no-explicit-any` em `AssetUploader.tsx` (cast desnecessário `as unknown as any` no `ref` do `<input>` web — `inputRef` já estava tipado como `HTMLInputElement | null`, bastava usar direto).
+- Resultado final: `npm run lint` → **0 erros**, 6 warnings pré-existentes/intencionais (2 `react-hooks/exhaustive-deps` antigos, 1 non-null assertion no `DatePickerInput`, 3 `console.log` de debug no `reportPdf.ts`). `npm run verify` (lint + types) passa limpo.
+
+**Verificação end-to-end desta sessão:**
+- `npm run types` — 0 erros.
+- `npm test` — 120/120 testes passando.
+- `npm run lint` — 0 erros.
+- `npm run build:web` (`expo export --platform web`) — bundle gerado com sucesso, 22 rotas estáticas, 4 chunks JS. Único aviso: favicon ausente.
+
+**Pendência nova, pré-existente e não relacionada a este sprint (não corrigida):**
+- `assets/images/` está vazio — `icon.png`, `splash.png`, `adaptive-icon.png` e `favicon.png` nunca existiram no projeto (referenciados em `app.json` mas ausentes desde o scaffold inicial). Não bloqueia o build web, só gera warning. Precisa de assets de design reais, não é algo para gerar programaticamente.
+
+**Pendências que continuam em aberto:**
+- Bug de alinhamento do PDF na seção Nugent/Amsel mencionado na Sessão 7 — não confirmado se o fix do agente de PDF (item 2 acima) resolveu completamente; validar visualmente no próximo laudo de teste.
+- Redesenho de login/register/forgot-password para ter labels visíveis (permitiria aplicar asterisco de campo obrigatório lá também) — aguardando decisão do usuário.
+- Ícones/splash/favicon do app (ver acima).

@@ -1,5 +1,6 @@
-import { supabase } from './supabase';
 import { AppError, ErrorCodes } from '@/lib/errors';
+
+import { supabase } from './supabase';
 
 // Chama a Edge Function delete-account, que valida o JWT, apaga os objetos de
 // Storage sob {user_id}/ nos 3 buckets, registra em audit_log e finalmente

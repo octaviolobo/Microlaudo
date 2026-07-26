@@ -1,5 +1,6 @@
-import { supabase } from './supabase';
 import { AppError, ErrorCodes } from '@/lib/errors';
+
+import { supabase } from './supabase';
 
 export type DoctorAssetKind = 'logo' | 'signature';
 

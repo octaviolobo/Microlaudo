@@ -1,5 +1,7 @@
-import { supabase } from './supabase';
 import { AppError, ErrorCodes } from '@/lib/errors';
+
+import { supabase } from './supabase';
+
 import type { ReportImageRow } from '@/types/database';
 
 const EXTENSION_BY_MIME: Record<string, string> = {

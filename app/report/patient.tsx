@@ -3,13 +3,14 @@ import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Input, DatePickerInput, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
 import { createReport, updateReport } from '@/services/reports';
 import { AppError } from '@/lib/errors';
 import { isoToday } from '@/lib/date';
+
+import { stepStyles as s } from './_stepStyles';
 
 function today() {
   return isoToday();
