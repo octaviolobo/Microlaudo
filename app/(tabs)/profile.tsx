@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import { getProfile, updateProfile } from '@/services/profile';
 import { signOut } from '@/services/auth';
+import { deleteAccount } from '@/services/account';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox, Select } from '@/components/ui';
+import { AssetUploader } from '@/components/profile/AssetUploader';
 import { useAuthStore } from '@/stores/authStore';
 import { useDoctorStore } from '@/stores/doctorStore';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
@@ -32,10 +34,17 @@ export function ProfileScreen() {
   const [clinicAddress, setClinicAddress] = useState('');
   const [clinicPhone, setClinicPhone] = useState('');
   const [defaultReference, setDefaultReference] = useState('');
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Danger zone
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Carrega perfil ao montar
   useEffect(() => {
@@ -53,6 +62,8 @@ export function ProfileScreen() {
         setClinicAddress(data.clinic_address ?? '');
         setClinicPhone(data.clinic_phone ?? '');
         setDefaultReference(data.default_reference ?? '');
+        setLogoUrl(data.logo_url ?? null);
+        setSignatureUrl(data.signature_url ?? null);
       } catch {
         // Perfil ainda não existe ou erro de rede — manter campos em branco
       } finally {
@@ -97,6 +108,65 @@ export function ProfileScreen() {
     } finally {
       clearAuth();
       router.replace('/(auth)/login');
+    }
+  }
+
+  async function handleLogoUploaded(path: string) {
+    const updated = await updateProfile({
+      full_name: fullName.trim() || (doctor?.full_name ?? ''),
+      crm: crm.trim() || (doctor?.crm ?? ''),
+      logo_url: path,
+    });
+    setDoctor(updated);
+    setLogoUrl(path);
+  }
+
+  async function handleLogoRemoved() {
+    const updated = await updateProfile({
+      full_name: fullName.trim() || (doctor?.full_name ?? ''),
+      crm: crm.trim() || (doctor?.crm ?? ''),
+      logo_url: null,
+    });
+    setDoctor(updated);
+    setLogoUrl(null);
+  }
+
+  async function handleSignatureUploaded(path: string) {
+    const updated = await updateProfile({
+      full_name: fullName.trim() || (doctor?.full_name ?? ''),
+      crm: crm.trim() || (doctor?.crm ?? ''),
+      signature_url: path,
+    });
+    setDoctor(updated);
+    setSignatureUrl(path);
+  }
+
+  async function handleSignatureRemoved() {
+    const updated = await updateProfile({
+      full_name: fullName.trim() || (doctor?.full_name ?? ''),
+      crm: crm.trim() || (doctor?.crm ?? ''),
+      signature_url: null,
+    });
+    setDoctor(updated);
+    setSignatureUrl(null);
+  }
+
+  async function handleConfirmDelete() {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount();
+      // Após deletar no backend, encerra sessão local e volta pro login
+      try {
+        await signOut();
+      } catch {
+        // sessão já pode estar inválida no servidor — segue o fluxo
+      }
+      clearAuth();
+      router.replace('/(auth)/login');
+    } catch (err) {
+      setDeleteError(err instanceof AppError ? err.message : t('profile.deleteAccountError'));
+      setIsDeleting(false);
     }
   }
 
@@ -193,6 +263,27 @@ export function ProfileScreen() {
 
       <View style={styles.divider} />
 
+      {/* ── Logo + Assinatura ──────────────────────────── */}
+      <Text style={styles.sectionTitle}>{t('profile.brandAssets')}</Text>
+      <MessageBox message={t('profile.brandAssetsInfo')} type="info" />
+
+      <AssetUploader
+        label={t('profile.logo')}
+        kind="logo"
+        currentPath={logoUrl}
+        onUploaded={handleLogoUploaded}
+        onRemoved={handleLogoRemoved}
+      />
+      <AssetUploader
+        label={t('profile.signature')}
+        kind="signature"
+        currentPath={signatureUrl}
+        onUploaded={handleSignatureUploaded}
+        onRemoved={handleSignatureRemoved}
+      />
+
+      <View style={styles.divider} />
+
       {/* ── Referência Bibliográfica ────────────────────── */}
       <Text style={styles.sectionTitle}>{t('profile.bibliographicRef')}</Text>
 
@@ -228,6 +319,55 @@ export function ProfileScreen() {
         fullWidth
         icon="log-out-outline"
       />
+
+      <View style={styles.divider} />
+
+      {/* ── Zona de Perigo (LGPD) ──────────────────────── */}
+      <View style={styles.dangerZone}>
+        <Text style={styles.dangerTitle}>{t('profile.dangerZone')}</Text>
+        <Text style={styles.dangerBody}>{t('profile.deleteAccountDescription')}</Text>
+
+        {!showDeleteConfirm ? (
+          <Button
+            label={t('profile.deleteAccount')}
+            onPress={() => {
+              setDeleteError(null);
+              setShowDeleteConfirm(true);
+            }}
+            variant="danger"
+            fullWidth
+            icon="trash-outline"
+          />
+        ) : (
+          <View style={styles.confirmBox}>
+            <Text style={styles.confirmTitle}>{t('profile.deleteAccountConfirmTitle')}</Text>
+            <Text style={styles.confirmBody}>{t('profile.deleteAccountConfirmBody')}</Text>
+
+            {deleteError && <MessageBox message={deleteError} type="error" />}
+
+            <Button
+              label={
+                isDeleting ? t('profile.deletingAccount') : t('profile.deleteAccountConfirmButton')
+              }
+              onPress={handleConfirmDelete}
+              variant="danger"
+              loading={isDeleting}
+              fullWidth
+              icon="alert-circle-outline"
+            />
+            <Button
+              label={t('profile.deleteAccountCancel')}
+              onPress={() => {
+                setShowDeleteConfirm(false);
+                setDeleteError(null);
+              }}
+              variant="secondary"
+              disabled={isDeleting}
+              fullWidth
+            />
+          </View>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -273,5 +413,46 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border,
     marginVertical: Spacing.lg,
     borderRadius: Radius.full,
+  },
+  dangerZone: {
+    borderWidth: 1,
+    borderColor: Colors.error,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    backgroundColor: Colors.errorBg,
+  },
+  dangerTitle: {
+    fontSize: 14,
+    fontFamily: Typography.bodyBold,
+    color: Colors.error,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: Spacing.xs,
+  },
+  dangerBody: {
+    fontSize: 13,
+    fontFamily: Typography.body,
+    color: Colors.text,
+    marginBottom: Spacing.md,
+    lineHeight: 18,
+  },
+  confirmBox: {
+    marginTop: Spacing.sm,
+    paddingTop: Spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: Colors.error,
+  },
+  confirmTitle: {
+    fontSize: 15,
+    fontFamily: Typography.bodyBold,
+    color: Colors.error,
+    marginBottom: Spacing.xs,
+  },
+  confirmBody: {
+    fontSize: 13,
+    fontFamily: Typography.body,
+    color: Colors.text,
+    marginBottom: Spacing.md,
+    lineHeight: 18,
   },
 });

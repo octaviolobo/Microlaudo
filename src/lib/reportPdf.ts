@@ -10,6 +10,11 @@ import { formatDateBR } from './date';
 import { FINDINGS_FIELDS } from '@/constants/findings-options';
 import type { ReportRow, DoctorRow } from '@/types/database';
 
+export type ReportPdfAssets = {
+  logoUrl?: string | null;
+  signatureUrl?: string | null;
+};
+
 const FIELD_LABEL_KEYS: Record<string, string> = {
   lactobacilli: 'lactobacilli',
   cocci: 'cocci',
@@ -52,6 +57,7 @@ export async function buildReportPdfBlob(
   report: ReportRow,
   doctor: DoctorRow,
   photoUrls: string[],
+  assets: ReportPdfAssets = {},
 ): Promise<Blob> {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -97,11 +103,28 @@ export async function buildReportPdfBlob(
     y += lines.length * 12 + 6;
   }
 
-  // Cabeçalho
+  // Cabeçalho — logo (se houver) à esquerda, texto ao lado
+  const LOGO_SIZE = 50;
+  let textX = MARGIN_X;
+  const headerTopY = y;
+  let logoEmbedded = false;
+
+  if (assets.logoUrl) {
+    try {
+      const logoDataUrl = await loadImageAsDataUrl(assets.logoUrl);
+      const format = logoDataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+      doc.addImage(logoDataUrl, format, MARGIN_X, headerTopY - 12, LOGO_SIZE, LOGO_SIZE);
+      textX = MARGIN_X + LOGO_SIZE + 12;
+      logoEmbedded = true;
+    } catch (err) {
+      console.warn('[reportPdf] falha ao embutir logo no PDF:', err);
+    }
+  }
+
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
   doc.setTextColor(8, 145, 178);
-  doc.text(doctor.clinic_name || 'MicroLaudo', MARGIN_X, y);
+  doc.text(doctor.clinic_name || 'MicroLaudo', textX, y);
   y += 18;
 
   doc.setFont('helvetica', 'normal');
@@ -109,7 +132,7 @@ export async function buildReportPdfBlob(
   doc.setTextColor(22, 78, 99);
   doc.text(
     `${doctor.full_name} — CRM ${doctor.crm}${doctor.rqe ? ` — RQE ${doctor.rqe}` : ''}`,
-    MARGIN_X,
+    textX,
     y,
   );
   y += 14;
@@ -117,8 +140,14 @@ export async function buildReportPdfBlob(
   if (doctor.clinic_address || doctor.clinic_phone) {
     doc.setFontSize(9);
     doc.setTextColor(100, 116, 139);
-    doc.text([doctor.clinic_address, doctor.clinic_phone].filter(Boolean).join(' — '), MARGIN_X, y);
+    doc.text([doctor.clinic_address, doctor.clinic_phone].filter(Boolean).join(' — '), textX, y);
     y += 14;
+  }
+
+  // Se a logo foi embutida, garante que o y fique abaixo dela antes da linha
+  if (logoEmbedded) {
+    const logoBottom = headerTopY - 12 + LOGO_SIZE;
+    if (y < logoBottom + 4) y = logoBottom + 4;
   }
 
   doc.setDrawColor(8, 145, 178);
@@ -234,6 +263,37 @@ export async function buildReportPdfBlob(
   if (report.conclusion) {
     heading(tr('steps.conclusion.title'));
     paragraph(report.conclusion);
+  }
+
+  // Assinatura do médico (imagem) — antes da referência bibliográfica
+  if (assets.signatureUrl) {
+    try {
+      const signatureDataUrl = await loadImageAsDataUrl(assets.signatureUrl);
+      const format = signatureDataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+      const sigWidth = 160;
+      const sigHeight = 60;
+      ensureSpace(sigHeight + 30);
+      y += 12;
+      const sigX = MARGIN_X + (contentWidth - sigWidth) / 2;
+      doc.addImage(signatureDataUrl, format, sigX, y, sigWidth, sigHeight);
+      y += sigHeight + 4;
+      doc.setDrawColor(148, 163, 184);
+      doc.setLineWidth(0.5);
+      doc.line(sigX, y, sigX + sigWidth, y);
+      y += 12;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text(
+        `${doctor.full_name} — CRM ${doctor.crm}${doctor.rqe ? ` — RQE ${doctor.rqe}` : ''}`,
+        pageWidth / 2,
+        y,
+        { align: 'center' },
+      );
+      y += 14;
+    } catch (err) {
+      console.warn('[reportPdf] falha ao embutir assinatura no PDF:', err);
+    }
   }
 
   if (report.bibliographic_reference) {

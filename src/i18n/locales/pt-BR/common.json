@@ -66,6 +66,24 @@
     "clinicPhone": "Telefone",
     "defaultReference": "Referência bibliográfica padrão",
     "saveSuccess": "Perfil atualizado com sucesso.",
-    "logout": "Sair"
+    "logout": "Sair",
+    "brandAssets": "Logo e Assinatura",
+    "brandAssetsInfo": "Logo aparece no cabeçalho e assinatura no rodapé do laudo PDF.",
+    "logo": "Logo da clínica",
+    "signature": "Assinatura do médico",
+    "chooseFile": "Escolher arquivo",
+    "replaceFile": "Substituir",
+    "removeFile": "Remover",
+    "uploading": "Enviando...",
+    "assetUploadError": "Falha ao enviar imagem. Tente novamente.",
+    "dangerZone": "Zona de Perigo",
+    "deleteAccount": "Excluir conta",
+    "deleteAccountDescription": "Exclui permanentemente seu perfil, todos os laudos, fotos e PDFs. Esta ação é irreversível.",
+    "deleteAccountConfirmTitle": "Tem certeza absoluta?",
+    "deleteAccountConfirmBody": "Todos os seus dados serão apagados permanentemente: perfil, laudos, fotos das lâminas, PDFs e logo/assinatura. Não é possível recuperar depois.",
+    "deleteAccountConfirmButton": "Sim, excluir minha conta",
+    "deleteAccountCancel": "Cancelar",
+    "deleteAccountError": "Falha ao excluir a conta. Tente novamente.",
+    "deletingAccount": "Excluindo conta..."
   }
 }
