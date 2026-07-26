@@ -12,6 +12,8 @@ export type ProfileUpdateInput = {
   clinic_address?: string | null;
   clinic_phone?: string | null;
   default_reference?: string;
+  logo_url?: string | null;
+  signature_url?: string | null;
 };
 
 // RLS filtra automaticamente pelo auth.uid() — não precisa passar doctor_id

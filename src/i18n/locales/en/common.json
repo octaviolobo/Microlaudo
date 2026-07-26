@@ -66,6 +66,24 @@
     "clinicPhone": "Phone",
     "defaultReference": "Default bibliographic reference",
     "saveSuccess": "Profile updated successfully.",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "brandAssets": "Logo and Signature",
+    "brandAssetsInfo": "The logo appears in the report PDF header and the signature in the footer.",
+    "logo": "Clinic logo",
+    "signature": "Doctor's signature",
+    "chooseFile": "Choose file",
+    "replaceFile": "Replace",
+    "removeFile": "Remove",
+    "uploading": "Uploading...",
+    "assetUploadError": "Failed to upload image. Please try again.",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete account",
+    "deleteAccountDescription": "Permanently deletes your profile, all reports, photos and PDFs. This action cannot be undone.",
+    "deleteAccountConfirmTitle": "Are you absolutely sure?",
+    "deleteAccountConfirmBody": "All of your data will be permanently deleted: profile, reports, slide photos, PDFs and logo/signature. There is no way to recover it afterwards.",
+    "deleteAccountConfirmButton": "Yes, delete my account",
+    "deleteAccountCancel": "Cancel",
+    "deleteAccountError": "Failed to delete account. Please try again.",
+    "deletingAccount": "Deleting account..."
   }
 }

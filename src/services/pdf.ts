@@ -1,7 +1,8 @@
 import { supabase } from './supabase';
 import { AppError, ErrorCodes } from '@/lib/errors';
-import { buildReportPdfBlob } from '@/lib/reportPdf';
+import { buildReportPdfBlob, type ReportPdfAssets } from '@/lib/reportPdf';
 import { getProfile } from './profile';
+import { getSignedDoctorAssetUrl } from './assets';
 import { updateReport } from './reports';
 import type { ReportRow } from '@/types/database';
 
@@ -18,7 +19,26 @@ export async function generateAndUploadReportPdf(
   let blob: Blob;
   try {
     const doctor = await getProfile();
-    blob = await buildReportPdfBlob(report, doctor, photoUrls);
+
+    // Resolve URLs assinadas para logo/assinatura (best-effort — se falhar,
+    // o PDF ainda é gerado sem essas imagens).
+    const assets: ReportPdfAssets = {};
+    if (doctor.logo_url) {
+      try {
+        assets.logoUrl = await getSignedDoctorAssetUrl(doctor.logo_url);
+      } catch {
+        // silencia — o PDF simplesmente fica sem logo
+      }
+    }
+    if (doctor.signature_url) {
+      try {
+        assets.signatureUrl = await getSignedDoctorAssetUrl(doctor.signature_url);
+      } catch {
+        // silencia — o PDF fica sem assinatura
+      }
+    }
+
+    blob = await buildReportPdfBlob(report, doctor, photoUrls, assets);
   } catch (err) {
     throw new AppError(ErrorCodes.PDF_GENERATION_FAILED, 'Falha ao gerar o PDF', err);
   }
