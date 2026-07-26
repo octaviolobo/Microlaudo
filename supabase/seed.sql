@@ -1,0 +1,3 @@
+-- Dados de seed para desenvolvimento local
+-- Executado com: npm run db:seed
+-- Populate com dados fake após rodar as migrations (F05)

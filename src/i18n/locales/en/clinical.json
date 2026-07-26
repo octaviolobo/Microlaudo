@@ -1,0 +1,49 @@
+{
+  "findings": {
+    "lactobacilli": "Lactobacilli",
+    "cocci": "Cocci",
+    "coccobacilliGramPos": "Gram-positive coccobacilli",
+    "coccobacilliGramNeg": "Gram-negative coccobacilli",
+    "leukocytes": "Leukocytes",
+    "redBloodCells": "Red blood cells",
+    "epithelialCells": "Epithelial cells",
+    "fungalElements": "Fungal elements (yeasts/hyphae)",
+    "trichomonas": "Trichomonas",
+    "clueCells": "Clue cells",
+    "mucus": "Mucus"
+  },
+  "findingLevels": {
+    "ausente": "Absent",
+    "raros": "Rare",
+    "alguns": "Some",
+    "numerosos": "Numerous"
+  },
+  "nugent": {
+    "title": "Nugent Score",
+    "subtitle": "Enter the observed quantity of each morphotype per oil immersion field (1000x)",
+    "morphotypes": {
+      "lactobacillus": "Lactobacillus (large gram+ rods)",
+      "gardnerella": "Gardnerella / Bacteroides (small gram-variable rods)",
+      "mobiluncus": "Mobiluncus (curved rods)"
+    },
+    "result": "Nugent Score: {{score}}/10",
+    "classifications": {
+      "normal": "Type I flora (normal) — Lactobacillus predominance",
+      "intermediate": "Type II flora (intermediate) — mixed flora",
+      "bacterial_vaginosis": "Type III flora — bacterial vaginosis"
+    }
+  },
+  "amsel": {
+    "title": "Amsel Criteria",
+    "subtitle": "Check the criteria that are present",
+    "result": "{{count}} of 4 criteria positive",
+    "diagnosis": "Suggestive of bacterial vaginosis (≥ 3 positive criteria)",
+    "criteria": {
+      "homogeneous_discharge": "Homogeneous, thin, gray vaginal discharge",
+      "whiff_test": "Positive whiff test (fishy odor with 10% KOH)",
+      "clue_cells_20": "Clue cells in more than 20% of epithelial cells",
+      "ph_above_45": "Vaginal pH above 4.5"
+    },
+    "phValue": "pH value (optional)"
+  }
+}

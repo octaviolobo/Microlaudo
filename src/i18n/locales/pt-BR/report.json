@@ -1,0 +1,57 @@
+{
+  "tabs": {
+    "home": "Início",
+    "history": "Histórico",
+    "profile": "Perfil"
+  },
+  "nav": {
+    "next": "Próximo",
+    "back": "Voltar",
+    "finalize": "Finalizar"
+  },
+  "steps": {
+    "patient": {
+      "title": "Dados do Paciente",
+      "patientName": "Nome do paciente",
+      "birthDate": "Data de nascimento",
+      "collectionDate": "Data da coleta",
+      "requestingDoctor": "Médico solicitante"
+    },
+    "photos": {
+      "title": "Fotos da Lâmina",
+      "addPhoto": "Adicionar foto",
+      "camera": "Câmera",
+      "gallery": "Galeria",
+      "maxPhotos": "Máximo de 3 fotos por laudo",
+      "minPhotos": "Pelo menos 1 foto obrigatória"
+    },
+    "findings": {
+      "title": "Achados Microscópicos",
+      "description": "Descrição livre dos achados"
+    },
+    "scores": {
+      "title": "Nugent & Amsel",
+      "nugentScore": "Score de Nugent",
+      "amselScore": "Critérios de Amsel"
+    },
+    "conclusion": {
+      "title": "Conclusão",
+      "conclusion": "Conclusão",
+      "bibliographicReference": "Referência bibliográfica",
+      "microscopicDescription": "Descrição microscópica"
+    },
+    "preview": {
+      "title": "Preview do Laudo",
+      "download": "Baixar PDF",
+      "finalize": "Finalizar Laudo"
+    }
+  },
+  "status": {
+    "draft": "Rascunho",
+    "completed": "Finalizado"
+  },
+  "revision": "Revisão {{number}}",
+  "material": "Material",
+  "method": "Método",
+  "evaluationDate": "Data da avaliação"
+}

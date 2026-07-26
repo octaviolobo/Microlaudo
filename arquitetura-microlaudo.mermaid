@@ -1,0 +1,216 @@
+graph TB
+    %% ══════════════════════════════════════════════
+    %% BOUNDARY: DISPOSITIVO DO MÉDICO
+    %% ══════════════════════════════════════════════
+
+    subgraph DEVICE["🔒 DISPOSITIVO DO EXAMINADOR"]
+        direction TB
+
+        subgraph CAPTURE["Captura de Imagem"]
+            CAM["📷 Câmera<br/>(expo-camera)"]
+            GAL["🖼️ Galeria<br/>(expo-image-picker)"]
+            CROP["✂️ Crop<br/>(image-manipulator /<br/>react-easy-crop)"]
+        end
+
+        subgraph APP["Aplicação React Native + Expo"]
+            direction TB
+
+            subgraph NAV["Navegação (Expo Router)"]
+                AUTH_SCREENS["Telas de Auth<br/>Login · Cadastro"]
+                HOME["Dashboard<br/>Home · Histórico"]
+                REPORT_FLOW["Fluxo do Laudo<br/>6 steps"]
+                PROFILE["Perfil & Config<br/>Clínica · Assinatura"]
+                PLANS["Planos &<br/>Assinatura"]
+            end
+
+            subgraph STATE["Estado (Zustand)"]
+                AUTH_STORE["authStore<br/>sessão do examinador"]
+                REPORT_STORE["reportStore<br/>laudo em progresso"]
+                SUB_STORE["subscriptionStore<br/>plano ativo · trial"]
+            end
+
+            subgraph LOGIC["Lógica de Negócio"]
+                NUGENT["Cálculo Nugent<br/>morfotipos → score 0-10<br/>→ classificação I/II/III"]
+                AMSEL["Contagem Amsel<br/>4 critérios → X/4"]
+                TRIAL_CHECK["Verificação Trial<br/>laudos usados < 2?"]
+                DESC_GEN["Gerador de Descrição<br/>seletores qualitativos<br/>→ texto estruturado"]
+            end
+
+            subgraph PDF_ENGINE["Geração de PDF"]
+                PDF_TPL["Template do Laudo<br/>(@react-pdf/renderer)"]
+                PDF_RENDER["Renderizador<br/>componentes React → PDF"]
+                PDF_FILE["Arquivo PDF<br/>pronto para download"]
+            end
+
+            subgraph I18N["Internacionalização"]
+                LOCALE["react-i18next<br/>PT-BR · EN · ES"]
+            end
+        end
+    end
+
+    %% ══════════════════════════════════════════════
+    %% BOUNDARY: REDE (HTTPS/TLS)
+    %% ══════════════════════════════════════════════
+
+    subgraph NETWORK["🔐 HTTPS / TLS"]
+        TLS["Tráfego criptografado<br/>em trânsito"]
+    end
+
+    %% ══════════════════════════════════════════════
+    %% BOUNDARY: BACKEND (SUPABASE)
+    %% ══════════════════════════════════════════════
+
+    subgraph SUPABASE["🔒 SUPABASE (Backend Gerenciado)"]
+        direction TB
+
+        subgraph AUTH_SVC["Autenticação"]
+            SB_AUTH["Supabase Auth<br/>e-mail/senha<br/>Google OAuth<br/>Apple Sign-In"]
+            JWT["JWT Token<br/>identifica o examinador<br/>em toda request"]
+        end
+
+        subgraph DB["PostgreSQL + RLS"]
+            direction TB
+            RLS["🛡️ Row Level Security<br/>Examinador A NUNCA<br/>vê dados do B"]
+            TB_DOCTORS["doctors<br/>perfil · CRM · clínica"]
+            TB_REPORTS["reports<br/>laudos · achados ·<br/>scores · conclusão"]
+            TB_IMAGES["report_images<br/>referências às fotos<br/>(1-3 por laudo)"]
+        end
+
+        subgraph STORAGE["Storage (Buckets Privados)"]
+            BK_PHOTOS["📁 microscopy-photos<br/>fotos das lâminas"]
+            BK_LOGOS["📁 clinic-logos<br/>logotipos"]
+            BK_SIGS["📁 signatures<br/>assinaturas manuscritas"]
+            BK_PDFS["📁 generated-pdfs<br/>laudos finalizados"]
+            SIGNED_URL["URLs Assinadas<br/>expiram em minutos<br/>acesso temporário"]
+        end
+
+        subgraph EDGE["Edge Functions"]
+            FN_TRIAL["fn: check-trial<br/>verifica trial_reports_used<br/>+ subscription_status<br/>ANTES de permitir<br/>finalização"]
+            FN_WEBHOOK["fn: payment-webhook<br/>recebe eventos de<br/>RevenueCat / Stripe<br/>atualiza subscription_status"]
+        end
+    end
+
+    %% ══════════════════════════════════════════════
+    %% SERVIÇOS EXTERNOS
+    %% ══════════════════════════════════════════════
+
+    subgraph EXTERNAL["Serviços Externos"]
+        direction TB
+
+        subgraph PAYMENTS["Pagamentos"]
+            RC["RevenueCat<br/>iOS + Android<br/>subscriptions"]
+            STRIPE["Stripe<br/>Web subscriptions"]
+            APPLE_IAP["Apple<br/>In-App Purchase"]
+            GOOGLE_BP["Google Play<br/>Billing"]
+        end
+
+        subgraph OAUTH["OAuth Providers"]
+            GOOGLE_AUTH["Google<br/>Sign-In"]
+            APPLE_AUTH["Apple<br/>Sign-In"]
+        end
+
+        subgraph STORES["Distribuição"]
+            APP_STORE["App Store"]
+            PLAY_STORE["Play Store"]
+            WEB_DEPLOY["Web<br/>(Vercel/Netlify)"]
+        end
+    end
+
+    %% ══════════════════════════════════════════════
+    %% FLUXOS DE DADOS
+    %% ══════════════════════════════════════════════
+
+    %% Captura → App
+    CAM -->|"foto capturada"| CROP
+    GAL -->|"foto selecionada"| CROP
+    CROP -->|"foto recortada"| REPORT_STORE
+
+    %% Navegação ↔ State
+    AUTH_SCREENS -->|"credenciais"| AUTH_STORE
+    REPORT_FLOW -->|"dados do laudo<br/>(6 steps)"| REPORT_STORE
+    PLANS -->|"status do plano"| SUB_STORE
+
+    %% State → Lógica
+    REPORT_STORE -->|"morfotipos"| NUGENT
+    REPORT_STORE -->|"4 critérios"| AMSEL
+    SUB_STORE -->|"plano ativo?"| TRIAL_CHECK
+    REPORT_STORE -->|"achados qualitativos"| DESC_GEN
+
+    %% Lógica → State (resultados)
+    NUGENT -->|"score + classificação"| REPORT_STORE
+    AMSEL -->|"contagem X/4"| REPORT_STORE
+    DESC_GEN -->|"texto descritivo"| REPORT_STORE
+
+    %% State → PDF
+    REPORT_STORE -->|"todos os dados<br/>do laudo"| PDF_TPL
+    PDF_TPL --> PDF_RENDER
+    PDF_RENDER --> PDF_FILE
+
+    %% i18n → Telas
+    LOCALE -.->|"strings traduzidas"| NAV
+    LOCALE -.->|"labels traduzidos"| PDF_TPL
+
+    %% ══════════════════════════════════════════════
+    %% FLUXOS DEVICE ↔ SUPABASE (via TLS)
+    %% ══════════════════════════════════════════════
+
+    AUTH_STORE ==>|"login/registro"| TLS
+    TLS ==>|"JWT"| SB_AUTH
+    SB_AUTH --> JWT
+
+    REPORT_STORE ==>|"salvar/buscar<br/>laudos"| TLS
+    TLS ==>|"query + JWT"| RLS
+    RLS --> TB_REPORTS
+    RLS --> TB_IMAGES
+    RLS --> TB_DOCTORS
+
+    CROP ==>|"upload foto"| TLS
+    TLS ==>|"foto criptografada"| BK_PHOTOS
+    PDF_FILE ==>|"upload PDF"| TLS
+    TLS ==> BK_PDFS
+    BK_PHOTOS -->|"URL assinada"| SIGNED_URL
+    BK_PDFS -->|"URL assinada"| SIGNED_URL
+
+    PROFILE ==>|"upload logo /<br/>assinatura"| TLS
+    TLS ==> BK_LOGOS
+    TLS ==> BK_SIGS
+
+    %% Trial check
+    TRIAL_CHECK ==>|"verificar cota"| TLS
+    TLS ==> FN_TRIAL
+    FN_TRIAL -->|"consulta"| TB_DOCTORS
+
+    %% ══════════════════════════════════════════════
+    %% FLUXOS SUPABASE ↔ EXTERNOS
+    %% ══════════════════════════════════════════════
+
+    %% Pagamentos
+    RC -->|"webhook:<br/>subscription.created<br/>subscription.renewed<br/>subscription.expired"| FN_WEBHOOK
+    STRIPE -->|"webhook:<br/>checkout.completed<br/>invoice.paid<br/>subscription.deleted"| FN_WEBHOOK
+    FN_WEBHOOK -->|"atualiza<br/>subscription_status"| TB_DOCTORS
+
+    RC --- APPLE_IAP
+    RC --- GOOGLE_BP
+
+    %% OAuth
+    SB_AUTH ---|"OAuth flow"| GOOGLE_AUTH
+    SB_AUTH ---|"OAuth flow"| APPLE_AUTH
+
+    %% ══════════════════════════════════════════════
+    %% ESTILOS
+    %% ══════════════════════════════════════════════
+
+    classDef boundary fill:#1a1a2e,stroke:#e94560,stroke-width:3px,color:#eee
+    classDef device fill:#16213e,stroke:#0f3460,stroke-width:2px,color:#eee
+    classDef app fill:#1a1a40,stroke:#533483,stroke-width:1px,color:#ddd
+    classDef supabase fill:#1b2a1b,stroke:#3ecf8e,stroke-width:2px,color:#eee
+    classDef external fill:#2a1b1b,stroke:#e07c24,stroke-width:2px,color:#eee
+    classDef security fill:#3d0000,stroke:#ff4444,stroke-width:3px,color:#fff
+    classDef network fill:#0d0d0d,stroke:#ffd700,stroke-width:3px,color:#ffd700
+
+    class DEVICE device
+    class APP app
+    class SUPABASE supabase
+    class EXTERNAL external
+    class NETWORK network
+    class RLS,SIGNED_URL,JWT security

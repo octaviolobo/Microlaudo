@@ -1,0 +1,57 @@
+{
+  "tabs": {
+    "home": "Home",
+    "history": "History",
+    "profile": "Profile"
+  },
+  "nav": {
+    "next": "Next",
+    "back": "Back",
+    "finalize": "Finalize"
+  },
+  "steps": {
+    "patient": {
+      "title": "Patient Data",
+      "patientName": "Patient name",
+      "birthDate": "Date of birth",
+      "collectionDate": "Collection date",
+      "requestingDoctor": "Requesting physician"
+    },
+    "photos": {
+      "title": "Slide Photos",
+      "addPhoto": "Add photo",
+      "camera": "Camera",
+      "gallery": "Gallery",
+      "maxPhotos": "Maximum 3 photos per report",
+      "minPhotos": "At least 1 photo required"
+    },
+    "findings": {
+      "title": "Microscopic Findings",
+      "description": "Free-text description of findings"
+    },
+    "scores": {
+      "title": "Nugent & Amsel",
+      "nugentScore": "Nugent Score",
+      "amselScore": "Amsel Criteria"
+    },
+    "conclusion": {
+      "title": "Conclusion",
+      "conclusion": "Conclusion",
+      "bibliographicReference": "Bibliographic reference",
+      "microscopicDescription": "Microscopic description"
+    },
+    "preview": {
+      "title": "Report Preview",
+      "download": "Download PDF",
+      "finalize": "Finalize Report"
+    }
+  },
+  "status": {
+    "draft": "Draft",
+    "completed": "Finalized"
+  },
+  "revision": "Revision {{number}}",
+  "material": "Material",
+  "method": "Method",
+  "evaluationDate": "Evaluation date"
+}
