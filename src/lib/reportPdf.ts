@@ -6,6 +6,7 @@ import { jsPDF } from 'jspdf/dist/jspdf.es.min.js';
 import { i18n } from '@/i18n';
 import { classifyNugentScore } from './nugent';
 import { evaluateAmsel } from './amsel';
+import { formatDateBR } from './date';
 import { FINDINGS_FIELDS } from '@/constants/findings-options';
 import type { ReportRow, DoctorRow } from '@/types/database';
 
@@ -133,12 +134,28 @@ export async function buildReportPdfBlob(
 
   // Dados do paciente
   heading(tr('steps.patient.title'));
-  line(tr('steps.patient.patientName'), report.patient_name);
-  if (report.patient_birth_date) line(tr('steps.patient.birthDate'), report.patient_birth_date);
-  line(tr('steps.patient.collectionDate'), report.collection_date);
-  if (report.requesting_doctor) line(tr('steps.patient.requestingDoctor'), report.requesting_doctor);
-  line(tr('material'), report.material);
-  line(tr('method'), report.method);
+  const patientLabels: string[] = [
+    tr('steps.patient.patientName'),
+    ...(report.patient_birth_date ? [tr('steps.patient.birthDate')] : []),
+    tr('steps.patient.collectionDate'),
+    ...(report.requesting_doctor ? [tr('steps.patient.requestingDoctor')] : []),
+    tr('material'),
+    tr('method'),
+  ];
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const patientMaxLabelWidth = Math.max(0, ...patientLabels.map((l) => doc.getTextWidth(`${l}:`)));
+  const patientColumnX = MARGIN_X + patientMaxLabelWidth + 14;
+  line(tr('steps.patient.patientName'), report.patient_name, patientColumnX);
+  if (report.patient_birth_date) {
+    line(tr('steps.patient.birthDate'), formatDateBR(report.patient_birth_date), patientColumnX);
+  }
+  line(tr('steps.patient.collectionDate'), formatDateBR(report.collection_date), patientColumnX);
+  if (report.requesting_doctor) {
+    line(tr('steps.patient.requestingDoctor'), report.requesting_doctor, patientColumnX);
+  }
+  line(tr('material'), report.material, patientColumnX);
+  line(tr('method'), report.method, patientColumnX);
   y += 6;
 
   // Fotos
@@ -205,7 +222,11 @@ export async function buildReportPdfBlob(
     `${t('amsel.result', { count: amsel.positiveCount })}${amsel.diagnosis ? ` — ${t('amsel.diagnosis')}` : ''}`,
   );
   if (report.amsel_ph_value != null) {
-    line(t('amsel.phValue'), String(report.amsel_ph_value));
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const amselPhLabel = t('amsel.phValue');
+    const amselColumnX = MARGIN_X + doc.getTextWidth(`${amselPhLabel}:`) + 14;
+    line(amselPhLabel, String(report.amsel_ph_value), amselColumnX);
   }
   y += 6;
 
