@@ -208,7 +208,7 @@ O desenvolvimento é sessão a sessão, com progresso registrado de forma transp
 - ✅ Geração de PDF real com upload para Storage e download assinado
 - ✅ Perfil do médico (dados pessoais, clínica, idioma)
 
-**Em aberto (transparência total, sem esconder debe técnica):**
+**Em aberto (transparência total, sem esconder dívida técnica):**
 - ⏳ Testes automatizados para `lib/nugent.ts` e `lib/amsel.ts` (lógica pronta e pura, cobertura ainda não escrita)
 - ⏳ Tela de histórico de laudos (`app/(tabs)/history.tsx`) ainda é placeholder
 - ⏳ Upload de logo e assinatura digital no perfil do médico
