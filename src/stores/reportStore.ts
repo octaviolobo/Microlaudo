@@ -1,6 +1,21 @@
 import { create } from 'zustand';
 
-import type { Report, PatientData, Findings, AmselCriteria, Morphotypes } from '@/types/report';
+import { pointsToMorphotypes } from '@/lib/nugent';
+import { FINDING_LEVELS } from '@/constants/findings-options';
+import type { ReportRow } from '@/types/database';
+import type {
+  Report,
+  PatientData,
+  Findings,
+  AmselCriteria,
+  Morphotypes,
+  FindingLevel,
+} from '@/types/report';
+
+function toFindingLevel(value: string | null): FindingLevel | undefined {
+  if (!value) return undefined;
+  return (FINDING_LEVELS as string[]).includes(value) ? (value as FindingLevel) : undefined;
+}
 
 type FindingsPatch = Partial<Omit<Findings, 'description'>> & { microscopic_description?: string };
 
@@ -20,6 +35,12 @@ type ReportState = {
   setConclusion: (conclusion: string, reference?: string) => void;
   setPdfUrl: (url: string) => void;
   setStep: (step: number) => void;
+  // Popula o estado completo a partir de um laudo persistido (edição / retomar rascunho).
+  // Diferente dos setters incrementais (que servem para IR preenchendo um laudo NOVO),
+  // hydrate substitui `currentReport` inteiro e reconstrói os morfotipos qualitativos a
+  // partir dos pontos salvos usando pointsToMorphotypes (ver caveat da conversão inversa
+  // do mobiluncus em src/lib/nugent.ts).
+  hydrate: (report: ReportRow) => void;
   reset: () => void;
 };
 
@@ -74,6 +95,54 @@ export const useReportStore = create<ReportState>((set) => ({
     })),
 
   setStep: (currentStep) => set({ currentStep }),
+
+  hydrate: (report) => {
+    // Reconstrói morfotipos qualitativos a partir dos pontos salvos (best-effort).
+    // A conversão do mobiluncus é ambígua (2+, 3+, 4+ → 2 pts), então pointsToMorphotypes
+    // escolhe o menor nível equivalente. O médico pode ajustar antes de re-finalizar.
+    const morphotypes = pointsToMorphotypes({
+      lactobacillus: report.nugent_lactobacillus,
+      gardnerella: report.nugent_gardnerella,
+      mobiluncus: report.nugent_mobiluncus,
+    });
+
+    set({
+      reportId: report.id,
+      currentReport: {
+        patient_name: report.patient_name,
+        patient_birth_date: report.patient_birth_date ?? undefined,
+        collection_date: report.collection_date,
+        requesting_doctor: report.requesting_doctor ?? undefined,
+        lactobacilli: toFindingLevel(report.lactobacilli),
+        cocci: toFindingLevel(report.cocci),
+        coccobacilli_gram_pos: toFindingLevel(report.coccobacilli_gram_pos),
+        coccobacilli_gram_neg: toFindingLevel(report.coccobacilli_gram_neg),
+        leukocytes: toFindingLevel(report.leukocytes),
+        red_blood_cells: toFindingLevel(report.red_blood_cells),
+        epithelial_cells: toFindingLevel(report.epithelial_cells),
+        fungal_elements: toFindingLevel(report.fungal_elements),
+        trichomonas: toFindingLevel(report.trichomonas),
+        clue_cells: toFindingLevel(report.clue_cells),
+        mucus: toFindingLevel(report.mucus),
+        microscopic_description: report.microscopic_description ?? undefined,
+        nugent_lactobacillus: report.nugent_lactobacillus ?? undefined,
+        nugent_gardnerella: report.nugent_gardnerella ?? undefined,
+        nugent_mobiluncus: report.nugent_mobiluncus ?? undefined,
+        nugent_score: report.nugent_score ?? undefined,
+        amsel_homogeneous_discharge: report.amsel_homogeneous_discharge,
+        amsel_whiff_test: report.amsel_whiff_test,
+        amsel_clue_cells_20: report.amsel_clue_cells_20,
+        amsel_ph_above_45: report.amsel_ph_above_45,
+        amsel_ph_value: report.amsel_ph_value ?? undefined,
+        conclusion: report.conclusion ?? undefined,
+        bibliographic_reference: report.bibliographic_reference ?? undefined,
+        pdf_url: report.pdf_url ?? undefined,
+      },
+      morphotypes,
+      isDirty: false,
+      currentStep: 1,
+    });
+  },
 
   reset: () => set({ reportId: null, currentReport: null, morphotypes: null, isDirty: false, currentStep: 1 }),
 }));

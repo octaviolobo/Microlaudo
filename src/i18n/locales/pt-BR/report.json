@@ -53,5 +53,15 @@
   "revision": "Revisão {{number}}",
   "material": "Material",
   "method": "Método",
-  "evaluationDate": "Data da avaliação"
+  "evaluationDate": "Data da avaliação",
+  "history": {
+    "title": "Histórico de Laudos",
+    "searchPlaceholder": "Buscar por nome do paciente",
+    "empty": "Você ainda não tem laudos.",
+    "collectedOn": "Coletado em {{date}}",
+    "view": "Visualizar",
+    "continueDraft": "Continuar rascunho",
+    "edit": "Editar",
+    "editConfirm": "Editar este laudo criará uma nova revisão. Continuar?"
+  }
 }
