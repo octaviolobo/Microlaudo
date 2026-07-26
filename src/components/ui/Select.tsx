@@ -19,6 +19,7 @@ type SelectProps = {
   onValueChange: (value: string) => void;
   options: SelectOption[];
   label?: string;
+  required?: boolean;
   placeholder?: string;
   error?: string;
   disabled?: boolean;
@@ -30,6 +31,7 @@ export function Select({
   onValueChange,
   options,
   label,
+  required = false,
   placeholder = 'Selecionar...',
   error,
   disabled = false,
@@ -47,7 +49,12 @@ export function Select({
 
   return (
     <View style={styles.wrapper}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && (
+        <Text style={styles.label}>
+          {label}
+          {required && <Text style={styles.required}> *</Text>}
+        </Text>
+      )}
 
       <Pressable
         onPress={() => !disabled && setOpen(true)}
@@ -122,6 +129,9 @@ const styles = StyleSheet.create({
     fontFamily: Typography.bodyMedium,
     color: Colors.foreground,
     marginBottom: Spacing.xs,
+  },
+  required: {
+    color: Colors.error,
   },
   trigger: {
     flexDirection: 'row',

@@ -16,6 +16,16 @@
   "delete": "Delete",
   "search": "Search",
   "noResults": "No results found.",
+  "calendar": {
+    "weekdaysShort": ["S", "M", "T", "W", "T", "F", "S"],
+    "months": [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ],
+    "today": "Today",
+    "clear": "Clear",
+    "selectYear": "Select year"
+  },
   "auth": {
     "email": "Email",
     "password": "Password",

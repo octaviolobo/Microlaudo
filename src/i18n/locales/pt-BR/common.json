@@ -16,6 +16,16 @@
   "delete": "Excluir",
   "search": "Buscar",
   "noResults": "Nenhum resultado encontrado.",
+  "calendar": {
+    "weekdaysShort": ["D", "S", "T", "Q", "Q", "S", "S"],
+    "months": [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ],
+    "today": "Hoje",
+    "clear": "Limpar",
+    "selectYear": "Selecionar ano"
+  },
   "auth": {
     "email": "E-mail",
     "password": "Senha",

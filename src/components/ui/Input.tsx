@@ -16,6 +16,7 @@ type InputProps = {
   onChangeText: (text: string) => void;
   placeholder?: string;
   label?: string;
+  required?: boolean;
   error?: string;
   helper?: string;
   type?: InputType;
@@ -41,6 +42,7 @@ export function Input({
   onChangeText,
   placeholder,
   label,
+  required = false,
   error,
   helper,
   type = 'text',
@@ -65,7 +67,12 @@ export function Input({
 
   return (
     <View style={styles.wrapper}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && (
+        <Text style={styles.label}>
+          {label}
+          {required && <Text style={styles.required}> *</Text>}
+        </Text>
+      )}
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -107,6 +114,9 @@ const styles = StyleSheet.create({
     fontFamily: Typography.bodyMedium,
     color: Colors.foreground,
     marginBottom: Spacing.xs,
+  },
+  required: {
+    color: Colors.error,
   },
   input: {
     width: '100%',

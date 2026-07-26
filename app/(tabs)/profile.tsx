@@ -121,6 +121,7 @@ export function ProfileScreen() {
 
       <Input
         label={t('profile.fullName')}
+        required
         value={fullName}
         onChangeText={setFullName}
         autoCapitalize="words"
@@ -129,6 +130,7 @@ export function ProfileScreen() {
       />
       <Input
         label={t('profile.crm')}
+        required
         value={crm}
         onChangeText={setCrm}
         autoCapitalize="characters"

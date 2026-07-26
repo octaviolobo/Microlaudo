@@ -5,13 +5,14 @@ import { useTranslation } from 'react-i18next';
 
 import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
-import { Input, MessageBox } from '@/components/ui';
+import { Input, DatePickerInput, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
 import { createReport, updateReport } from '@/services/reports';
 import { AppError } from '@/lib/errors';
+import { isoToday } from '@/lib/date';
 
 function today() {
-  return new Date().toISOString().slice(0, 10);
+  return isoToday();
 }
 
 export function PatientScreen() {
@@ -71,23 +72,25 @@ export function PatientScreen() {
 
         <Input
           label={t('steps.patient.patientName')}
+          required
           value={patientName}
           onChangeText={setPatientName}
           autoCapitalize="words"
           disabled={isSaving}
         />
-        <Input
+        <DatePickerInput
           label={t('steps.patient.birthDate')}
           value={birthDate}
-          onChangeText={setBirthDate}
-          placeholder="AAAA-MM-DD"
+          onChange={setBirthDate}
+          maximumDate={today()}
           disabled={isSaving}
         />
-        <Input
+        <DatePickerInput
           label={t('steps.patient.collectionDate')}
+          required
           value={collectionDate}
-          onChangeText={setCollectionDate}
-          placeholder="AAAA-MM-DD"
+          onChange={setCollectionDate}
+          maximumDate={today()}
           disabled={isSaving}
         />
         <Input
