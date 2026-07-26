@@ -53,5 +53,15 @@
   "revision": "Revision {{number}}",
   "material": "Material",
   "method": "Method",
-  "evaluationDate": "Evaluation date"
+  "evaluationDate": "Evaluation date",
+  "history": {
+    "title": "Report History",
+    "searchPlaceholder": "Search by patient name",
+    "empty": "You don't have any reports yet.",
+    "collectedOn": "Collected on {{date}}",
+    "view": "View",
+    "continueDraft": "Continue draft",
+    "edit": "Edit",
+    "editConfirm": "Editing this report will create a new revision. Continue?"
+  }
 }

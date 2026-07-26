@@ -7,7 +7,7 @@ import { stepStyles as s } from './_stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Button, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
-import { finalizeReport, getReport } from '@/services/reports';
+import { finalizeReport, getReport, updateReport } from '@/services/reports';
 import { listReportImages, getSignedImageUrl } from '@/services/images';
 import { generateAndUploadReportPdf, getSignedPdfUrl } from '@/services/pdf';
 import { classifyNugentScore } from '@/lib/nugent';
@@ -37,14 +37,22 @@ export function PreviewScreen() {
   const { t: tClinical } = useTranslation('clinical');
 
   const reportId = useReportStore((state) => state.reportId);
+  const isDirty = useReportStore((state) => state.isDirty);
   const reset = useReportStore((state) => state.reset);
+  const hydrate = useReportStore((state) => state.hydrate);
 
   const [report, setReport] = useState<ReportRow | null>(null);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Modo "somente visualização": chegamos aqui pelo histórico (laudo já finalizado)
+  // e o médico não editou nada nesta sessão. Nesse caso escondemos "Finalizar" e
+  // oferecemos "Editar" (que volta para rascunho) + "Baixar PDF".
+  const isViewOnly = report?.status === 'completed' && !isDirty;
 
   useEffect(() => {
     if (!reportId) return;
@@ -67,7 +75,12 @@ export function PreviewScreen() {
     try {
       setIsFinalizing(true);
       setError(null);
-      if (!report.pdf_url) await generateAndUploadReportPdf(report, photoUrls);
+      // Sempre (re)gerar o PDF quando estamos finalizando após edições nesta sessão,
+      // ou se ainda não havia PDF. finalizeReport() cuida do bump de revision_number
+      // quando o laudo já foi finalizado antes.
+      if (!report.pdf_url || isDirty) {
+        await generateAndUploadReportPdf(report, photoUrls);
+      }
       await finalizeReport(reportId);
       reset();
       router.replace('/(tabs)/home');
@@ -75,6 +88,22 @@ export function PreviewScreen() {
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {
       setIsFinalizing(false);
+    }
+  }
+
+  async function handleEdit() {
+    if (!reportId || !report) return;
+    try {
+      setIsEditing(true);
+      setError(null);
+      // Reabre para edição: volta para rascunho (revision_number será incrementado ao re-finalizar)
+      const updated = await updateReport(reportId, { status: 'draft' });
+      hydrate(updated);
+      router.replace('/report/patient');
+    } catch (err) {
+      setError(err instanceof AppError ? err.message : tc('genericError'));
+    } finally {
+      setIsEditing(false);
     }
   }
 
@@ -112,8 +141,13 @@ export function PreviewScreen() {
   return (
     <View style={s.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        <StepIndicator currentStep={6} />
+        {!isViewOnly && <StepIndicator currentStep={6} />}
         <Text style={s.title}>{t('steps.preview.title')}</Text>
+        {report.revision_number > 1 && (
+          <Text style={previewStyles.revisionBadge}>
+            {t('revision', { number: report.revision_number })}
+          </Text>
+        )}
 
         <Text style={previewStyles.sectionTitle}>{t('steps.patient.title')}</Text>
         <Text style={previewStyles.line}>{report.patient_name}</Text>
@@ -195,9 +229,15 @@ export function PreviewScreen() {
         <TouchableOpacity style={s.backButton} onPress={() => router.back()}>
           <Text style={s.backText}>{t('nav.back')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={s.finalizeButton} onPress={handleFinalize} disabled={isFinalizing}>
-          <Text style={s.finalizeText}>{isFinalizing ? tc('loading') : t('nav.finalize')}</Text>
-        </TouchableOpacity>
+        {isViewOnly ? (
+          <TouchableOpacity style={s.nextButton} onPress={handleEdit} disabled={isEditing}>
+            <Text style={s.nextText}>{isEditing ? tc('loading') : t('history.edit')}</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={s.finalizeButton} onPress={handleFinalize} disabled={isFinalizing}>
+            <Text style={s.finalizeText}>{isFinalizing ? tc('loading') : t('nav.finalize')}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -206,6 +246,15 @@ export function PreviewScreen() {
 export default PreviewScreen;
 
 const previewStyles = StyleSheet.create({
+  revisionBadge: {
+    fontSize: 12,
+    fontFamily: Typography.bodyMedium,
+    color: Colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginTop: -Spacing.md,
+    marginBottom: Spacing.md,
+  },
   sectionTitle: {
     fontSize: 14,
     fontFamily: Typography.bodyMedium,

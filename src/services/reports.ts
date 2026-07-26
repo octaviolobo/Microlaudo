@@ -33,8 +33,17 @@ export async function updateReport(id: string, patch: ReportUpdate): Promise<Rep
   return data;
 }
 
+// Marca o laudo como finalizado. Se o laudo já havia sido finalizado antes (detectado pelo
+// status atual === 'completed' OU pela existência de pdf_url), incrementa revision_number
+// para preservar o histórico de revisões (RF21 / F25).
 export async function finalizeReport(id: string): Promise<ReportRow> {
-  return updateReport(id, { status: 'completed' });
+  const current = await getReport(id);
+  const isRefinalizing = current.status === 'completed' || Boolean(current.pdf_url);
+  const patch: ReportUpdate = { status: 'completed' };
+  if (isRefinalizing) {
+    patch.revision_number = (current.revision_number ?? 1) + 1;
+  }
+  return updateReport(id, patch);
 }
 
 export async function getReport(id: string): Promise<ReportRow> {
@@ -46,4 +55,22 @@ export async function getReport(id: string): Promise<ReportRow> {
 
   if (error) throw new AppError(ErrorCodes.REPORT_NOT_FOUND, error.message, error);
   return data;
+}
+
+// Lista os laudos do médico autenticado. RLS (supabase/migrations/005_enable_rls.sql)
+// já garante isolamento por auth.uid() → doctors.user_id → reports.doctor_id, então não
+// filtramos por doctor_id manualmente aqui.
+export async function listReportsByDoctor(params?: { search?: string }): Promise<ReportRow[]> {
+  let query = supabase.from('reports').select('*').order('created_at', { ascending: false });
+
+  const search = params?.search?.trim();
+  if (search) {
+    // Escapa % e _ para evitar wildcards vindos do usuário
+    const escaped = search.replace(/[%_]/g, (m) => `\\${m}`);
+    query = query.ilike('patient_name', `%${escaped}%`);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new AppError(ErrorCodes.REPORT_NOT_FOUND, error.message, error);
+  return data ?? [];
 }
