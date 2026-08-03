@@ -15,7 +15,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>
-        {t('nav.step', { defaultValue: 'Passo {{current}} de {{total}}', current: currentStep, total: TOTAL_STEPS })}
+        {t('nav.step', { current: currentStep, total: TOTAL_STEPS })}
       </Text>
       <View style={styles.dots}>
         {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((step) => (

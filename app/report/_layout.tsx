@@ -1,8 +1,11 @@
 import { Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, Typography } from '@/constants/theme';
 
 export function ReportLayout() {
+  const { t } = useTranslation('report');
+
   return (
     <Stack
       screenOptions={{
@@ -11,12 +14,12 @@ export function ReportLayout() {
         headerTitleStyle: { fontFamily: Typography.headingSemiBold },
       }}
     >
-      <Stack.Screen name="patient"    options={{ title: 'Dados do Paciente' }} />
-      <Stack.Screen name="photos"     options={{ title: 'Fotos da Lâmina' }} />
-      <Stack.Screen name="findings"   options={{ title: 'Achados Microscópicos' }} />
-      <Stack.Screen name="scores"     options={{ title: 'Nugent & Amsel' }} />
-      <Stack.Screen name="conclusion" options={{ title: 'Conclusão' }} />
-      <Stack.Screen name="preview"    options={{ title: 'Preview do Laudo' }} />
+      <Stack.Screen name="patient"    options={{ title: t('steps.patient.title') }} />
+      <Stack.Screen name="photos"     options={{ title: t('steps.photos.title') }} />
+      <Stack.Screen name="findings"   options={{ title: t('steps.findings.title') }} />
+      <Stack.Screen name="scores"     options={{ title: t('steps.scores.title') }} />
+      <Stack.Screen name="conclusion" options={{ title: t('steps.conclusion.title') }} />
+      <Stack.Screen name="preview"    options={{ title: t('steps.preview.title') }} />
     </Stack>
   );
 }

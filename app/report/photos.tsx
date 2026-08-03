@@ -109,6 +109,8 @@ export function PhotosScreen() {
               onPress={() => (image ? handleRemove(image) : handlePick(slot))}
               disabled={isBusy}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={image ? t('steps.photos.removePhoto') : t('steps.photos.addPhoto')}
             >
               {image && previewUrls[image.id] ? (
                 <>

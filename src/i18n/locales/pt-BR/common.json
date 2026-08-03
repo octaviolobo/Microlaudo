@@ -16,6 +16,8 @@
   "delete": "Excluir",
   "search": "Buscar",
   "noResults": "Nenhum resultado encontrado.",
+  "selectPlaceholder": "Selecionar...",
+  "datePlaceholder": "DD-MM-AAAA",
   "calendar": {
     "weekdaysShort": ["D", "S", "T", "Q", "Q", "S", "S"],
     "months": [

@@ -27,7 +27,7 @@ export function ForgotPasswordScreen() {
       await sendPasswordReset(email.trim());
       setSent(true);
     } catch (err) {
-      setError(err instanceof AppError ? t('genericError') : t('genericError'));
+      setError(err instanceof AppError ? err.message : t('genericError'));
     } finally {
       setIsLoading(false);
     }

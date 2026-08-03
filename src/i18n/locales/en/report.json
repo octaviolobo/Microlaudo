@@ -7,7 +7,8 @@
   "nav": {
     "next": "Next",
     "back": "Back",
-    "finalize": "Finalize"
+    "finalize": "Finalize",
+    "step": "Step {{current}} of {{total}}"
   },
   "steps": {
     "patient": {
@@ -20,6 +21,7 @@
     "photos": {
       "title": "Slide Photos",
       "addPhoto": "Add photo",
+      "removePhoto": "Remove photo",
       "camera": "Camera",
       "gallery": "Gallery",
       "maxPhotos": "Maximum 3 photos per report",
