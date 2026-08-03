@@ -77,13 +77,12 @@ export function PreviewScreen() {
     try {
       setIsFinalizing(true);
       setError(null);
-      // Sempre (re)gerar o PDF quando estamos finalizando após edições nesta sessão,
-      // ou se ainda não havia PDF. finalizeReport() cuida do bump de revision_number
-      // quando o laudo já foi finalizado antes.
-      if (!report.pdf_url || isDirty) {
-        await generateAndUploadReportPdf(report, photoUrls);
+      // finalizeReport() primeiro para obter o revision_number já incrementado (se for
+      // re-finalização) — o PDF regenerado precisa refletir a revisão nova, não a antiga.
+      const finalized = await finalizeReport(reportId);
+      if (!finalized.pdf_url || isDirty) {
+        await generateAndUploadReportPdf(finalized, photoUrls);
       }
-      await finalizeReport(reportId);
       reset();
       router.replace('/(tabs)/home');
     } catch (err) {
