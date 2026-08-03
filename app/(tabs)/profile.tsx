@@ -23,7 +23,10 @@ const LANGUAGE_OPTIONS: SelectOption[] = [
 export function ProfileScreen() {
   const { t } = useTranslation('common');
   const clearAuth = useAuthStore((s) => s.clearAuth);
-  const { doctor, setDoctor, isLoading, setLoading } = useDoctorStore();
+  const doctor = useDoctorStore((s) => s.doctor);
+  const setDoctor = useDoctorStore((s) => s.setDoctor);
+  const isLoading = useDoctorStore((s) => s.isLoading);
+  const setLoading = useDoctorStore((s) => s.setLoading);
 
   // Campos do formulário
   const [fullName, setFullName] = useState('');
@@ -97,7 +100,7 @@ export function ProfileScreen() {
       setDoctor(updated);
       setSaveSuccess(true);
     } catch (err) {
-      setSaveError(err instanceof AppError ? t('genericError') : t('genericError'));
+      setSaveError(err instanceof AppError ? err.message : t('genericError'));
     } finally {
       setIsSaving(false);
     }
@@ -113,43 +116,59 @@ export function ProfileScreen() {
   }
 
   async function handleLogoUploaded(path: string) {
-    const updated = await updateProfile({
-      full_name: fullName.trim() || (doctor?.full_name ?? ''),
-      crm: crm.trim() || (doctor?.crm ?? ''),
-      logo_url: path,
-    });
-    setDoctor(updated);
-    setLogoUrl(path);
+    try {
+      const updated = await updateProfile({
+        full_name: fullName.trim() || (doctor?.full_name ?? ''),
+        crm: crm.trim() || (doctor?.crm ?? ''),
+        logo_url: path,
+      });
+      setDoctor(updated);
+      setLogoUrl(path);
+    } catch (err) {
+      setSaveError(err instanceof AppError ? err.message : t('genericError'));
+    }
   }
 
   async function handleLogoRemoved() {
-    const updated = await updateProfile({
-      full_name: fullName.trim() || (doctor?.full_name ?? ''),
-      crm: crm.trim() || (doctor?.crm ?? ''),
-      logo_url: null,
-    });
-    setDoctor(updated);
-    setLogoUrl(null);
+    try {
+      const updated = await updateProfile({
+        full_name: fullName.trim() || (doctor?.full_name ?? ''),
+        crm: crm.trim() || (doctor?.crm ?? ''),
+        logo_url: null,
+      });
+      setDoctor(updated);
+      setLogoUrl(null);
+    } catch (err) {
+      setSaveError(err instanceof AppError ? err.message : t('genericError'));
+    }
   }
 
   async function handleSignatureUploaded(path: string) {
-    const updated = await updateProfile({
-      full_name: fullName.trim() || (doctor?.full_name ?? ''),
-      crm: crm.trim() || (doctor?.crm ?? ''),
-      signature_url: path,
-    });
-    setDoctor(updated);
-    setSignatureUrl(path);
+    try {
+      const updated = await updateProfile({
+        full_name: fullName.trim() || (doctor?.full_name ?? ''),
+        crm: crm.trim() || (doctor?.crm ?? ''),
+        signature_url: path,
+      });
+      setDoctor(updated);
+      setSignatureUrl(path);
+    } catch (err) {
+      setSaveError(err instanceof AppError ? err.message : t('genericError'));
+    }
   }
 
   async function handleSignatureRemoved() {
-    const updated = await updateProfile({
-      full_name: fullName.trim() || (doctor?.full_name ?? ''),
-      crm: crm.trim() || (doctor?.crm ?? ''),
-      signature_url: null,
-    });
-    setDoctor(updated);
-    setSignatureUrl(null);
+    try {
+      const updated = await updateProfile({
+        full_name: fullName.trim() || (doctor?.full_name ?? ''),
+        crm: crm.trim() || (doctor?.crm ?? ''),
+        signature_url: null,
+      });
+      setDoctor(updated);
+      setSignatureUrl(null);
+    } catch (err) {
+      setSaveError(err instanceof AppError ? err.message : t('genericError'));
+    }
   }
 
   async function handleConfirmDelete() {

@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, Typography, Spacing, Radius, TouchTarget } from '@/constants/theme';
 
@@ -32,12 +33,14 @@ export function Select({
   options,
   label,
   required = false,
-  placeholder = 'Selecionar...',
+  placeholder,
   error,
   disabled = false,
   accessibilityLabel,
 }: SelectProps) {
+  const { t } = useTranslation('common');
   const [open, setOpen] = useState(false);
+  const resolvedPlaceholder = placeholder ?? t('selectPlaceholder');
 
   const selected = options.find((o) => o.value === value);
   const borderColor = error ? Colors.error : Colors.inputBorder;
@@ -59,7 +62,7 @@ export function Select({
       <Pressable
         onPress={() => !disabled && setOpen(true)}
         accessibilityRole="combobox"
-        accessibilityLabel={accessibilityLabel ?? label ?? placeholder}
+        accessibilityLabel={accessibilityLabel ?? label ?? resolvedPlaceholder}
         accessibilityState={{ disabled, expanded: open }}
         style={[styles.trigger, { borderColor }, disabled && styles.disabled]}
       >
@@ -67,7 +70,7 @@ export function Select({
           style={[styles.triggerText, !selected && styles.placeholder]}
           numberOfLines={1}
         >
-          {selected ? selected.label : placeholder}
+          {selected ? selected.label : resolvedPlaceholder}
         </Text>
         <Ionicons
           name={open ? 'chevron-up' : 'chevron-down'}

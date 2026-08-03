@@ -1,11 +1,13 @@
 import { Redirect, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/hooks/useAuth';
 import { Colors } from '@/constants/theme';
 
 export function TabsLayout() {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation('report');
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
 
@@ -25,7 +27,7 @@ export function TabsLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Início',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -34,7 +36,7 @@ export function TabsLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: 'Histórico',
+          title: t('tabs.history'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="document-text-outline" size={size} color={color} />
           ),
@@ -43,7 +45,7 @@ export function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Perfil',
+          title: t('tabs.profile'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),

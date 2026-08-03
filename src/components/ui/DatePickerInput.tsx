@@ -137,7 +137,7 @@ export function DatePickerInput({
         style={[styles.trigger, { borderColor }, disabled && styles.disabled]}
       >
         <Text style={[styles.triggerText, !value && styles.placeholder]} numberOfLines={1}>
-          {value ? formatDateBR(value) : 'DD-MM-AAAA'}
+          {value ? formatDateBR(value) : t('datePlaceholder')}
         </Text>
         <Ionicons name="calendar-outline" size={20} color={Colors.textMuted} />
       </Pressable>

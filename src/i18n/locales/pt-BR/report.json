@@ -7,7 +7,8 @@
   "nav": {
     "next": "Próximo",
     "back": "Voltar",
-    "finalize": "Finalizar"
+    "finalize": "Finalizar",
+    "step": "Passo {{current}} de {{total}}"
   },
   "steps": {
     "patient": {
@@ -20,6 +21,7 @@
     "photos": {
       "title": "Fotos da Lâmina",
       "addPhoto": "Adicionar foto",
+      "removePhoto": "Remover foto",
       "camera": "Câmera",
       "gallery": "Galeria",
       "maxPhotos": "Máximo de 3 fotos por laudo",
