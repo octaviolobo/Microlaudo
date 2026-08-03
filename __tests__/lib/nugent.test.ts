@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { NUGENT_MAX_SCORE, NUGENT_TABLE } from '@/constants/nugent-table';
-import { calculateNugentScore, classifyNugentScore } from '@/lib/nugent';
+import { calculateNugentScore, classifyNugentScore, pointsToMorphotypes } from '@/lib/nugent';
 
 import type { Morphotypes, MorphotypeLevel } from '@/types/report';
 
@@ -214,5 +214,69 @@ describe('calculateNugentScore', () => {
     });
     expect(result.score).toBe(7);
     expect(result.classification).toBe('bacterial_vaginosis');
+  });
+});
+
+describe('pointsToMorphotypes', () => {
+  it('retorna null quando os três eixos são null (laudo sem Nugent salvo)', () => {
+    expect(
+      pointsToMorphotypes({ lactobacillus: null, gardnerella: null, mobiluncus: null }),
+    ).toBeNull();
+  });
+
+  it('reidrata os três eixos quando a tabela é injetiva (lactobacillus e gardnerella)', () => {
+    const result = pointsToMorphotypes({ lactobacillus: 0, gardnerella: 4, mobiluncus: null });
+    expect(result).toEqual({ lactobacillus: '4+', gardnerella: '4+' });
+  });
+
+  it('mapeia cada valor de pontos de lactobacillus para o nível correspondente (bijetivo)', () => {
+    expect(pointsToMorphotypes({ lactobacillus: 4, gardnerella: null, mobiluncus: null })).toEqual({
+      lactobacillus: '0',
+    });
+    expect(pointsToMorphotypes({ lactobacillus: 3, gardnerella: null, mobiluncus: null })).toEqual({
+      lactobacillus: '1+',
+    });
+    expect(pointsToMorphotypes({ lactobacillus: 2, gardnerella: null, mobiluncus: null })).toEqual({
+      lactobacillus: '2+',
+    });
+    expect(pointsToMorphotypes({ lactobacillus: 1, gardnerella: null, mobiluncus: null })).toEqual({
+      lactobacillus: '3+',
+    });
+  });
+
+  it('escolhe o MENOR nível quando o mapeamento de mobiluncus não é injetivo (2 pts → "2+", não "3+"/"4+")', () => {
+    const result = pointsToMorphotypes({ lactobacillus: null, gardnerella: null, mobiluncus: 2 });
+    expect(result).toEqual({ mobiluncus: '2+' });
+  });
+
+  it('reidrata todos os eixos simultaneamente a partir de pontos persistidos', () => {
+    const result = pointsToMorphotypes({ lactobacillus: 1, gardnerella: 2, mobiluncus: 2 });
+    expect(result).toEqual({ lactobacillus: '3+', gardnerella: '2+', mobiluncus: '2+' });
+  });
+
+  it('ignora (omite) um eixo cujos pontos não correspondem a nenhum nível da tabela', () => {
+    const result = pointsToMorphotypes({ lactobacillus: 99, gardnerella: 1, mobiluncus: null });
+    expect(result).toEqual({ gardnerella: '1+' });
+  });
+
+  it('retorna null quando nenhum eixo casa com a tabela (todos inválidos ou null)', () => {
+    const result = pointsToMorphotypes({ lactobacillus: 99, gardnerella: null, mobiluncus: -1 });
+    expect(result).toBeNull();
+  });
+
+  it('round-trip: calculateNugentScore → pointsToMorphotypes reconstrói o mesmo nível para tabelas bijetivas', () => {
+    for (const level of LEVELS) {
+      const { breakdown } = calculateNugentScore({
+        lactobacillus: level,
+        gardnerella: level,
+        mobiluncus: '0',
+      });
+      const result = pointsToMorphotypes({
+        lactobacillus: breakdown.lactobacillusPoints,
+        gardnerella: breakdown.gardnerellaPoints,
+        mobiluncus: null,
+      });
+      expect(result).toEqual({ lactobacillus: level, gardnerella: level });
+    }
   });
 });
