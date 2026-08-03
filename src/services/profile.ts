@@ -1,4 +1,5 @@
 import { AppError, ErrorCodes } from '@/lib/errors';
+import { validateCrm } from '@/lib/validation';
 
 import { supabase } from './supabase';
 
@@ -30,6 +31,8 @@ export async function getProfile(): Promise<DoctorRow> {
 }
 
 export async function updateProfile(input: ProfileUpdateInput): Promise<DoctorRow> {
+  validateCrm(input.crm);
+
   const { data, error } = await supabase
     .from('doctors')
     .update(input)

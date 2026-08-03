@@ -37,10 +37,14 @@ export async function deleteDoctorAsset(path: string): Promise<void> {
   if (error) throw new AppError(ErrorCodes.IMAGE_UPLOAD_FAILED, error.message, error);
 }
 
+// Expiração curta (10 min) por política de segurança — ver docs/analise-seguranca.md
+// e docs/arquitetura.md §7 ("URLs assinadas com expiração ≤ 10 min").
+const SIGNED_URL_EXPIRY_SECONDS = 600;
+
 export async function getSignedDoctorAssetUrl(path: string): Promise<string> {
   const { data, error } = await supabase.storage
     .from('doctor-assets')
-    .createSignedUrl(path, 3600);
+    .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
 
   if (error) throw new AppError(ErrorCodes.IMAGE_DOWNLOAD_FAILED, error.message, error);
   return data.signedUrl;

@@ -1,4 +1,5 @@
 import { AppError, ErrorCodes } from '@/lib/errors';
+import { validateCrm } from '@/lib/validation';
 
 import { supabase } from './supabase';
 
@@ -25,6 +26,8 @@ export async function signIn(email: string, password: string): Promise<void> {
 // O perfil do médico é criado pelo trigger handle_new_user (migration 001).
 // Passamos os dados via user_metadata para o trigger ler.
 export async function signUp(input: RegisterInput): Promise<SignUpResult> {
+  validateCrm(input.crm);
+
   const { data, error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
