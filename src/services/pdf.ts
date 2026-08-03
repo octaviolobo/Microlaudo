@@ -58,8 +58,14 @@ export async function generateAndUploadReportPdf(
   return path;
 }
 
+// Expiração curta (10 min) por política de segurança — ver docs/analise-seguranca.md
+// e docs/arquitetura.md §7 ("URLs assinadas com expiração ≤ 10 min").
+const SIGNED_URL_EXPIRY_SECONDS = 600;
+
 export async function getSignedPdfUrl(path: string): Promise<string> {
-  const { data, error } = await supabase.storage.from('report-pdfs').createSignedUrl(path, 3600);
-  if (error) throw new AppError(ErrorCodes.PDF_UPLOAD_FAILED, error.message, error);
+  const { data, error } = await supabase.storage
+    .from('report-pdfs')
+    .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
+  if (error) throw new AppError(ErrorCodes.PDF_DOWNLOAD_FAILED, error.message, error);
   return data.signedUrl;
 }
