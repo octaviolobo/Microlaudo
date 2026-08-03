@@ -38,7 +38,8 @@
       "title": "Conclusion",
       "conclusion": "Conclusion",
       "bibliographicReference": "Bibliographic reference",
-      "microscopicDescription": "Microscopic description"
+      "microscopicDescription": "Microscopic description",
+      "useSuggested": "Use suggested conclusion"
     },
     "preview": {
       "title": "Report Preview",

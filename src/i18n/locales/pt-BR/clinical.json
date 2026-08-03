@@ -45,5 +45,11 @@
       "ph_above_45": "pH vaginal acima de 4,5"
     },
     "phValue": "Valor do pH (opcional)"
+  },
+  "conclusionTemplates": {
+    "normal": "Achados compatíveis com microbiota vaginal normal (Flora tipo I). Escore de Nugent de {{score}}/10, dentro da faixa normal. Critérios clínicos de Amsel negativos ({{count}} de 4). Ausência de sinais sugestivos de vaginose bacteriana.",
+    "intermediate": "Microbiota vaginal intermediária (Flora tipo II), com escore de Nugent de {{score}}/10, sem critérios definitivos para o diagnóstico de vaginose bacteriana ({{count}} de 4 critérios de Amsel positivos). Recomenda-se correlação clínica e, se necessário, reavaliação.",
+    "bacterial_vaginosis": "Achados compatíveis com vaginose bacteriana (Flora tipo III), confirmados tanto pelo critério laboratorial — escore de Nugent de {{score}}/10 — quanto pelo critério clínico de Amsel ({{count}} de 4 critérios positivos).",
+    "discordant": "Achados discordantes entre o critério laboratorial e o clínico: escore de Nugent de {{score}}/10 ({{classification}}) e {{count}} de 4 critérios de Amsel positivos. Recomenda-se correlação clínica cuidadosa e, se necessário, repetição do exame."
   }
 }
