@@ -112,6 +112,6 @@ export async function listReportsByDoctor(params?: { search?: string }): Promise
   }
 
   const { data, error } = await query;
-  if (error) throw new AppError(ErrorCodes.REPORT_NOT_FOUND, error.message, error);
+  if (error) throw new AppError(ErrorCodes.REPORT_LIST_FAILED, error.message, error);
   return data ?? [];
 }
