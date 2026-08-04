@@ -33,9 +33,15 @@ export async function getProfile(): Promise<DoctorRow> {
 export async function updateProfile(input: ProfileUpdateInput): Promise<DoctorRow> {
   validateCrm(input.crm);
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new AppError(ErrorCodes.PROFILE_UPDATE_FAILED, 'Usuário não autenticado');
+
   const { data, error } = await supabase
     .from('doctors')
     .update(input)
+    .eq('user_id', user.id)
     .select()
     .single();
 

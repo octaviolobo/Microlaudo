@@ -354,3 +354,15 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - `npm run build:web` — sucesso, 22 rotas estáticas, 4 chunks JS.
 
 **Pendência menor não corrigida:** `CONVENTIONS.md` ainda cita `REPORT_VALIDATION_FAILED` como exemplo (código renomeado para `VALIDATION_FAILED` pelo agente de backend) — só um exemplo em doc, não afeta o app.
+
+---
+
+## Sessão 10 — 03 Ago 2026
+
+### Investigação de erro no web + bug real em "Salvar perfil"
+
+**"Uncaught Error: 6000ms timeout exceeded" no LogBox do web (investigado, não é bug):** ao abrir `/home` no web logo após o merge da Sessão 9, apareceu esse erro no LogBox. Rastreado até `node_modules/expo-font/src/ExpoFontLoader.web.ts:174` — no web, o `expo-font` usa a lib `fontfaceobserver` com timeout hardcoded de 6000ms por fonte, pra detectar quando a fonte customizada (Figtree/Noto Sans, `app/_layout.tsx`) terminou de carregar no navegador. Se o Metro ainda está compilando o bundle "frio" (comum logo após instalar/remover dependências), a checagem começa tarde e estoura o timeout. Não quebra o app: `useFonts` já captura o reject via `.catch` (`node_modules/expo-font/src/FontHooks.ts:31-35`) e vira só `fontError`, com fallback documentado pro font do sistema (`app/_layout.tsx:66-68`). O LogBox mostra a rejeição mesmo assim porque é um erro real, só que tratado. Resolve sozinho com um refresh (F5) depois que o bundle esquenta o cache do Metro; não foi necessária nenhuma mudança de código.
+
+**Bug real corrigido — "UPDATE requires a WHERE clause" ao salvar o perfil:** `src/services/profile.ts#updateProfile` fazia `.update(input)` na tabela `doctors` sem nenhum filtro (`.eq(...)`). O Postgres/PostgREST do Supabase bloqueia `UPDATE`/`DELETE` sem `WHERE` por segurança, contra atualização acidental da tabela inteira. `getProfile()` funcionava porque é um `SELECT` e a RLS filtra leitura automaticamente por `auth.uid()`, mas updates exigem filtro explícito na própria query. Corrigido buscando o usuário autenticado (`supabase.auth.getUser()`) e filtrando com `.eq('user_id', user.id)`, no mesmo padrão que `reports.ts` já usava com `.eq('id', id)`. Grep confirmou que era o único `.update()` do código sem filtro. Testado manualmente pelo usuário no navegador após o fix — funcionou.
+
+**Verificação:** `npm run types` — 0 erros.
