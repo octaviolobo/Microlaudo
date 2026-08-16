@@ -16,7 +16,10 @@
       "patientName": "Nome do paciente",
       "birthDate": "Data de nascimento",
       "collectionDate": "Data da coleta",
-      "requestingDoctor": "Médico solicitante"
+      "requestingDoctor": "Médico solicitante",
+      "prodoctorSearching": "Buscando no ProDoctor...",
+      "prodoctorNoBirthDate": "Data de nascimento não informada",
+      "prodoctorLoadingDoctor": "Buscando médica do último atendimento..."
     },
     "photos": {
       "title": "Fotos da Lâmina",
@@ -29,7 +32,8 @@
     },
     "findings": {
       "title": "Achados Microscópicos",
-      "description": "Descrição livre dos achados"
+      "description": "Descrição dos achados",
+      "useSuggested": "Usar descrição sugerida"
     },
     "scores": {
       "title": "Nugent & Amsel",

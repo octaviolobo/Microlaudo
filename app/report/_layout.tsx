@@ -16,8 +16,8 @@ export function ReportLayout() {
     >
       <Stack.Screen name="patient"    options={{ title: t('steps.patient.title') }} />
       <Stack.Screen name="photos"     options={{ title: t('steps.photos.title') }} />
-      <Stack.Screen name="findings"   options={{ title: t('steps.findings.title') }} />
       <Stack.Screen name="scores"     options={{ title: t('steps.scores.title') }} />
+      <Stack.Screen name="findings"   options={{ title: t('steps.findings.title') }} />
       <Stack.Screen name="conclusion" options={{ title: t('steps.conclusion.title') }} />
       <Stack.Screen name="preview"    options={{ title: t('steps.preview.title') }} />
     </Stack>

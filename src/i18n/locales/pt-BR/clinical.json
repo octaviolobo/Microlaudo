@@ -51,5 +51,12 @@
     "intermediate": "Microbiota vaginal intermediária (Flora tipo II), com escore de Nugent de {{score}}/10, sem critérios definitivos para o diagnóstico de vaginose bacteriana ({{count}} de 4 critérios de Amsel positivos). Recomenda-se correlação clínica e, se necessário, reavaliação.",
     "bacterial_vaginosis": "Achados compatíveis com vaginose bacteriana (Flora tipo III), confirmados tanto pelo critério laboratorial — escore de Nugent de {{score}}/10 — quanto pelo critério clínico de Amsel ({{count}} de 4 critérios positivos).",
     "discordant": "Achados discordantes entre o critério laboratorial e o clínico: escore de Nugent de {{score}}/10 ({{classification}}) e {{count}} de 4 critérios de Amsel positivos. Recomenda-se correlação clínica cuidadosa e, se necessário, repetição do exame."
+  },
+  "_comment_findingsTemplates": "Textos-padrão de descrição microscópica por diagnóstico. Revisar clinicamente antes de publicar em produção.",
+  "findingsTemplates": {
+    "normal": "Esfregaço com predominância de lactobacilos (bacilos de Döderlein), morfologia epitelial preservada, sem aumento significativo de leucócitos. Ausência de clue cells, cocobacilos gram-variáveis em quantidade relevante, elementos fúngicos ou Trichomonas vaginalis. Flora compatível com microbiota vaginal normal (Flora tipo I).",
+    "intermediate": "Esfregaço com flora bacteriana mista, apresentando redução do número de lactobacilos e presença de cocobacilos gram-variáveis em quantidade intermediária. Ausência de critérios definitivos para vaginose bacteriana. Achados compatíveis com flora intermediária (Flora tipo II), recomendando-se correlação clínica.",
+    "bacterial_vaginosis": "Flora vaginal predominantemente composta por cocobacilos Gram-variáveis, com escassez ou ausência de lactobacilos e presença de clue cells, compatível com vaginose bacteriana (Flora tipo III).",
+    "discordant": "Esfregaço com achados microscópicos que não se correlacionam de forma concordante entre o critério laboratorial (Nugent) e o critério clínico (Amsel). Recomenda-se correlação clínica cuidadosa e, se necessário, repetição do exame."
   }
 }

@@ -86,7 +86,7 @@ export function PhotosScreen() {
 
   function handleNext() {
     setStep(3);
-    router.push('/report/findings');
+    router.push('/report/scores');
   }
 
   const canAdvance = images.length > 0;

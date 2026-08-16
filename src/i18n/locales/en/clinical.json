@@ -51,5 +51,12 @@
     "intermediate": "Intermediate vaginal microbiota (Type II flora), Nugent score of {{score}}/10, without definitive criteria for a diagnosis of bacterial vaginosis ({{count}} of 4 Amsel criteria positive). Clinical correlation and re-evaluation, if needed, are recommended.",
     "bacterial_vaginosis": "Findings compatible with bacterial vaginosis (Type III flora), confirmed by both the laboratory criterion — Nugent score of {{score}}/10 — and the clinical Amsel criterion ({{count}} of 4 criteria positive).",
     "discordant": "Discordant findings between the laboratory and clinical criteria: Nugent score of {{score}}/10 ({{classification}}) and {{count}} of 4 Amsel criteria positive. Careful clinical correlation and, if needed, repeat testing are recommended."
+  },
+  "_comment_findingsTemplates": "Standard microscopic description texts per diagnosis. Review clinically before shipping to production.",
+  "findingsTemplates": {
+    "normal": "Smear showing predominance of lactobacilli (Döderlein bacilli), preserved epithelial morphology, and no significant increase in leukocytes. No clue cells, no relevant amount of gram-variable coccobacilli, no fungal elements or Trichomonas vaginalis. Flora compatible with normal vaginal microbiota (Type I flora).",
+    "intermediate": "Smear showing mixed bacterial flora, with reduced numbers of lactobacilli and gram-variable coccobacilli present in intermediate quantity. No definitive criteria for bacterial vaginosis. Findings compatible with intermediate flora (Type II flora); clinical correlation is recommended.",
+    "bacterial_vaginosis": "Vaginal flora predominantly composed of gram-variable coccobacilli, with scarce or absent lactobacilli and presence of clue cells, compatible with bacterial vaginosis (Type III flora).",
+    "discordant": "Smear with microscopic findings that do not correlate consistently between the laboratory criterion (Nugent) and the clinical criterion (Amsel). Careful clinical correlation and, if needed, repeat testing are recommended."
   }
 }

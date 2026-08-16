@@ -4,10 +4,13 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { StepIndicator } from '@/components/report/StepIndicator';
-import { Select, Input, MessageBox } from '@/components/ui';
+import { Select, Input, Button, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
 import { updateReport } from '@/services/reports';
 import { AppError } from '@/lib/errors';
+import { calculateNugentScore } from '@/lib/nugent';
+import { evaluateAmsel } from '@/lib/amsel';
+import { classifyConclusionCase } from '@/lib/conclusionTemplates';
 import { FINDING_LEVELS, FINDINGS_FIELDS, type FindingsField } from '@/constants/findings-options';
 
 import { stepStyles as s } from './_stepStyles';
@@ -36,15 +39,49 @@ export function FindingsScreen() {
 
   const reportId = useReportStore((state) => state.reportId);
   const currentReport = useReportStore((state) => state.currentReport);
+  const morphotypes = useReportStore((state) => state.morphotypes);
   const setFindings = useReportStore((state) => state.setFindings);
   const setStep = useReportStore((state) => state.setStep);
+
+  // Nugent + Amsel já foram preenchidos na etapa anterior (Scores). Reaproduzimos o mesmo
+  // cálculo usado em conclusion.tsx para sugerir uma descrição microscópica padrão coerente
+  // com o diagnóstico. Se os dados de Scores estiverem incompletos, conclusionCase é `null`
+  // e o campo se comporta como texto livre (comportamento anterior).
+  const nugentResult =
+    morphotypes?.lactobacillus && morphotypes?.gardnerella && morphotypes?.mobiluncus
+      ? calculateNugentScore({
+          lactobacillus: morphotypes.lactobacillus,
+          gardnerella: morphotypes.gardnerella,
+          mobiluncus: morphotypes.mobiluncus,
+        })
+      : null;
+
+  const amselResult =
+    currentReport?.amsel_homogeneous_discharge !== undefined &&
+    currentReport?.amsel_whiff_test !== undefined &&
+    currentReport?.amsel_clue_cells_20 !== undefined &&
+    currentReport?.amsel_ph_above_45 !== undefined
+      ? evaluateAmsel({
+          homogeneous_discharge: currentReport.amsel_homogeneous_discharge,
+          whiff_test: currentReport.amsel_whiff_test,
+          clue_cells_20: currentReport.amsel_clue_cells_20,
+          ph_above_45: currentReport.amsel_ph_above_45,
+        })
+      : null;
+
+  const conclusionCase = classifyConclusionCase(nugentResult, amselResult);
 
   const [values, setValues] = useState<Partial<Record<FindingsField, FindingLevel>>>(
     Object.fromEntries(FINDINGS_FIELDS.map((field) => [field, currentReport?.[field]])) as Partial<
       Record<FindingsField, FindingLevel>
     >,
   );
-  const [description, setDescription] = useState(currentReport?.microscopic_description ?? '');
+  // Pré-preenche com a descrição padrão sugerida pelo diagnóstico calculado (Nugent + Amsel)
+  // ao entrar na tela, exceto se já houver uma descrição salva (edição de laudo existente).
+  const [description, setDescription] = useState(
+    currentReport?.microscopic_description ??
+      (conclusionCase ? tClinical(`findingsTemplates.${conclusionCase}`) : ''),
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,6 +89,11 @@ export function FindingsScreen() {
     label: tClinical(`findingLevels.${level}`),
     value: level,
   }));
+
+  function handleUseSuggestedDescription() {
+    if (!conclusionCase) return;
+    setDescription(tClinical(`findingsTemplates.${conclusionCase}`));
+  }
 
   async function handleNext() {
     if (!reportId) return;
@@ -63,8 +105,8 @@ export function FindingsScreen() {
       setError(null);
       await updateReport(reportId, { ...values, microscopic_description: trimmedDescription || null });
       setFindings({ ...values, microscopic_description: trimmedDescription || undefined });
-      setStep(4);
-      router.push('/report/scores');
+      setStep(5);
+      router.push('/report/conclusion');
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {
@@ -75,7 +117,7 @@ export function FindingsScreen() {
   return (
     <View style={s.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
-        <StepIndicator currentStep={3} />
+        <StepIndicator currentStep={4} />
         <Text style={s.title}>{t('steps.findings.title')}</Text>
 
         {FINDINGS_FIELDS.map((field) => (
@@ -97,6 +139,15 @@ export function FindingsScreen() {
           numberOfLines={4}
           disabled={isSaving}
         />
+        {conclusionCase && (
+          <Button
+            label={t('steps.findings.useSuggested')}
+            onPress={handleUseSuggestedDescription}
+            variant="secondary"
+            size="sm"
+            disabled={isSaving}
+          />
+        )}
 
         {error && <MessageBox message={error} type="error" />}
       </ScrollView>

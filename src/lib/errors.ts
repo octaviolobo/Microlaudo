@@ -34,6 +34,9 @@ export const ErrorCodes = {
   PDF_DOWNLOAD_FAILED: 'PDF_DOWNLOAD_FAILED',
   // Validação de input (client-side, antes de chamar o servidor)
   VALIDATION_FAILED: 'VALIDATION_FAILED',
+  // ProDoctor (autofill de paciente) — nunca deve bloquear o preenchimento
+  // manual, então em geral é apenas logado (ver src/services/prodoctor.ts)
+  PRODOCTOR_SEARCH_FAILED: 'PRODOCTOR_SEARCH_FAILED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

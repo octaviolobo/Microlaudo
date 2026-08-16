@@ -16,7 +16,10 @@
       "patientName": "Patient name",
       "birthDate": "Date of birth",
       "collectionDate": "Collection date",
-      "requestingDoctor": "Requesting physician"
+      "requestingDoctor": "Requesting physician",
+      "prodoctorSearching": "Searching ProDoctor...",
+      "prodoctorNoBirthDate": "Date of birth not provided",
+      "prodoctorLoadingDoctor": "Looking up last attending physician..."
     },
     "photos": {
       "title": "Slide Photos",
@@ -29,7 +32,8 @@
     },
     "findings": {
       "title": "Microscopic Findings",
-      "description": "Free-text description of findings"
+      "description": "Description of findings",
+      "useSuggested": "Use suggested description"
     },
     "scores": {
       "title": "Nugent & Amsel",

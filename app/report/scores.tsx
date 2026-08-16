@@ -100,8 +100,8 @@ export function ScoresScreen() {
       await updateReport(reportId, patch);
       if (morphotypes) setMorphotypes(morphotypes);
       setAmsel(amsel);
-      setStep(5);
-      router.push('/report/conclusion');
+      setStep(4);
+      router.push('/report/findings');
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {
@@ -112,7 +112,7 @@ export function ScoresScreen() {
   return (
     <View style={s.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
-        <StepIndicator currentStep={4} />
+        <StepIndicator currentStep={3} />
         <Text style={s.title}>{t('steps.scores.title')}</Text>
 
         <Text style={scoreStyles.sectionTitle}>{tClinical('nugent.title')}</Text>

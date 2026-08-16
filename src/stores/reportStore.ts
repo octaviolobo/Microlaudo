@@ -74,11 +74,25 @@ export const useReportStore = create<ReportState>((set) => ({
       isDirty: true,
     })),
 
+  // `amsel` chega no formato de AmselCriteria (chaves sem prefixo, usado para o cálculo em
+  // lib/amsel.ts), mas currentReport segue o formato do Report/DB (chaves `amsel_*`). Precisa
+  // mapear explicitamente — um merge direto (`...amsel`) grava nas chaves erradas e deixa
+  // `currentReport.amsel_*` sempre undefined (bug: fazia o diagnóstico em findings.tsx/
+  // conclusion.tsx nunca fechar, mesmo com o Nugent calculado corretamente).
   setAmsel: (amsel) =>
-    set((state) => ({
-      currentReport: { ...state.currentReport, ...amsel },
-      isDirty: true,
-    })),
+    set((state) => {
+      const patch: Partial<Report> = {};
+      if (amsel.homogeneous_discharge !== undefined) patch.amsel_homogeneous_discharge = amsel.homogeneous_discharge;
+      if (amsel.whiff_test !== undefined) patch.amsel_whiff_test = amsel.whiff_test;
+      if (amsel.clue_cells_20 !== undefined) patch.amsel_clue_cells_20 = amsel.clue_cells_20;
+      if (amsel.ph_above_45 !== undefined) patch.amsel_ph_above_45 = amsel.ph_above_45;
+      if (amsel.ph_value !== undefined) patch.amsel_ph_value = amsel.ph_value;
+
+      return {
+        currentReport: { ...state.currentReport, ...patch },
+        isDirty: true,
+      };
+    }),
 
   setConclusion: (conclusion, reference) =>
     set((state) => ({

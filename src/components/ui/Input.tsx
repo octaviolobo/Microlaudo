@@ -27,6 +27,8 @@ type InputProps = {
   multiline?: boolean;
   numberOfLines?: number;
   accessibilityLabel?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 };
 
 const typeConfig: Record<InputType, Partial<React.ComponentProps<typeof TextInput>>> = {
@@ -53,6 +55,8 @@ export function Input({
   multiline = false,
   numberOfLines,
   accessibilityLabel,
+  onFocus,
+  onBlur,
 }: InputProps) {
   const [focused, setFocused] = useState(false);
 
@@ -85,8 +89,14 @@ export function Input({
         numberOfLines={numberOfLines}
         accessibilityLabel={accessibilityLabel ?? label ?? placeholder}
         accessibilityState={{ disabled }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onFocus={() => {
+          setFocused(true);
+          onFocus?.();
+        }}
+        onBlur={() => {
+          setFocused(false);
+          onBlur?.();
+        }}
         style={[
           styles.input,
           { borderColor },
