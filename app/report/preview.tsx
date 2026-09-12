@@ -108,6 +108,28 @@ export function PreviewScreen() {
     }
   }
 
+  // Tenta compartilhar o PDF como arquivo (folha nativa do SO, com o PDF anexado)
+  // em vez de só um link. Retorna false se o navegador não suportar ou o usuário
+  // cancelar, para o chamador cair no fallback de abrir a URL assinada.
+  async function tryShareReportPdf(url: string): Promise<boolean> {
+    const nav = navigator as Navigator & {
+      canShare?: (data: ShareData) => boolean;
+    };
+    if (!nav.share || !nav.canShare) return false;
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const file = new File([blob], `laudo-${report?.patient_name ?? 'microlaudo'}.pdf`, {
+        type: 'application/pdf',
+      });
+      if (!nav.canShare({ files: [file] })) return false;
+      await nav.share({ files: [file] });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async function handleDownloadPdf() {
     if (!report) return;
     try {
@@ -116,7 +138,13 @@ export function PreviewScreen() {
       const path = report.pdf_url ?? (await generateAndUploadReportPdf(report, photoUrls));
       setReport((prev) => (prev ? { ...prev, pdf_url: path } : prev));
       const url = await getSignedPdfUrl(path);
-      if (Platform.OS === 'web') window.open(url, '_blank');
+      if (Platform.OS === 'web') {
+        // Só recorre à navegação na própria aba se o compartilhamento nativo
+        // (com o arquivo já anexado) não estiver disponível — abrir uma aba
+        // nova aqui é bloqueado por vários navegadores mobile.
+        const shared = await tryShareReportPdf(url);
+        if (!shared) window.location.href = url;
+      }
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {
