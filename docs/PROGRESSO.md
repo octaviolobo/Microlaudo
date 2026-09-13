@@ -366,3 +366,29 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 **Bug real corrigido — "UPDATE requires a WHERE clause" ao salvar o perfil:** `src/services/profile.ts#updateProfile` fazia `.update(input)` na tabela `doctors` sem nenhum filtro (`.eq(...)`). O Postgres/PostgREST do Supabase bloqueia `UPDATE`/`DELETE` sem `WHERE` por segurança, contra atualização acidental da tabela inteira. `getProfile()` funcionava porque é um `SELECT` e a RLS filtra leitura automaticamente por `auth.uid()`, mas updates exigem filtro explícito na própria query. Corrigido buscando o usuário autenticado (`supabase.auth.getUser()`) e filtrando com `.eq('user_id', user.id)`, no mesmo padrão que `reports.ts` já usava com `.eq('id', id)`. Grep confirmou que era o único `.update()` do código sem filtro. Testado manualmente pelo usuário no navegador após o fix — funcionou.
 
 **Verificação:** `npm run types` — 0 erros.
+
+---
+
+## Sessão 11 — 12 Set 2026
+
+### Fix pontual + auditoria de prontidão para lançamento nas lojas
+
+**Fix commitado e enviado (`a70f5f6`):** `app/report/preview.tsx#handleDownloadPdf` — no web, `window.open(url, '_blank')` é bloqueado por vários navegadores mobile. Agora tenta `navigator.share`/`canShare` com o PDF anexado (folha nativa do SO) e só cai para `window.location.href = url` se o compartilhamento nativo não existir, falhar ou for cancelado. Validado com `npm run types` (0 erros), `npm run lint` (0 erros, mesmos 14 warnings pré-existentes), `npm test` (100/100) e `npm run build:web` (sucesso). Não foi possível testar a folha de compartilhamento nativa de fato (exige gesto de usuário real em navegador/dispositivo — sem ferramenta de automação de browser disponível na sessão); recomendado teste manual no celular.
+
+**Auditoria: o app pode ser submetido às lojas hoje?** Não. Levantamento do que falta, abaixo como checklist. Nada disso é bug — é trabalho ainda não iniciado (fases 6, 7 e 10 do `docs/backlog.md`).
+
+### TODO — Checklist de lançamento nas lojas
+
+**Bloqueadores (impedem build/submissão):**
+- [ ] **Ícones e splash** — `assets/images/` está vazio (só `.gitkeep`). `app.json` referencia `icon.png`, `splash.png`, `adaptive-icon.png`, `favicon.png` que nunca existiram desde o scaffold. Precisa de assets de design reais (F40).
+- [ ] **Configurar EAS** — `app.json` não tem `extra.eas.projectId`/`owner`; `eas build:configure` nunca rodou. Nenhum build nativo (iOS/Android) foi gerado até hoje, só o build web (F44/F45).
+- [ ] **Política de Privacidade + Termos de Uso** — inexistentes no repo. Obrigatório nas duas lojas, e crítico aqui por lidar com dados de saúde de pacientes (F41).
+- [ ] **Decisão sobre monetização antes do lançamento** — `RevenueCat`/`Stripe` são só placeholders vazios em `src/constants/plans.ts` (IDs `''`), sem SDK instalado, sem edge functions `check-trial`/`payment-webhook` (F30–F34, nenhuma feita). Definir: lançar grátis primeiro, ou terminar a integração de pagamento antes.
+- [ ] **Contas de desenvolvedor** — sem indício de Apple Developer ($99/ano) nem Google Play Console ($25) configuradas (só o usuário pode criar) (F43).
+- [ ] **Build nativo + teste em dispositivo real** — tudo validado até agora foi só web; falta pelo menos um ciclo de TestFlight/APK interno (F44–F46).
+
+**Não-bloqueador / polimento (pode esperar o lançamento):**
+- [ ] Login social Google/Apple (F28/F29) — opcional se não for requisito de lançamento.
+- [ ] Redesenho de login/register/forgot-password com labels visíveis (para asterisco de campo obrigatório) — aguardando decisão do usuário (pendência desde a Sessão 8).
+- [ ] Validar visualmente se o alinhamento do PDF nas seções Nugent/Amsel está mesmo corrigido (pendência desde a Sessão 7/8).
+- [ ] `CONVENTIONS.md` cita `REPORT_VALIDATION_FAILED` como exemplo desatualizado (renomeado para `VALIDATION_FAILED`) — só doc, não afeta o app (pendência da Sessão 9).
