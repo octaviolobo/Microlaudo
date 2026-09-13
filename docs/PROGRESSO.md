@@ -392,3 +392,17 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - [ ] Redesenho de login/register/forgot-password com labels visíveis (para asterisco de campo obrigatório) — aguardando decisão do usuário (pendência desde a Sessão 8).
 - [ ] Validar visualmente se o alinhamento do PDF nas seções Nugent/Amsel está mesmo corrigido (pendência desde a Sessão 7/8).
 - [ ] `CONVENTIONS.md` cita `REPORT_VALIDATION_FAILED` como exemplo desatualizado (renomeado para `VALIDATION_FAILED`) — só doc, não afeta o app (pendência da Sessão 9).
+
+### Deploy para o servidor Tailscale (`desktop-u2icebd`) — em andamento, retomar na próxima sessão
+
+**Contexto:** existe um servidor rodando em `desktop-u2icebd` (nó da tailnet do usuário, junto com `octavio` — esta máquina — e 2 iPhones) que entrega a aplicação para os dispositivos da rede Tailscale. Não documentado em nenhum lugar do repo até agora.
+
+**Confirmado: `git push` não atualiza esse servidor sozinho.** Não há GitHub Actions, git hooks, nem qualquer webhook de deploy no repositório — o push só atualiza o `origin` no GitHub. Se `desktop-u2icebd` serve a aplicação, alguém (ou algum processo externo ao repo) precisa dar `git pull` + rebuild/restart manualmente lá.
+
+**Tentativa de acesso SSH (autorizada pelo usuário) — bloqueada por falta de credencial:**
+- `desktop-u2icebd` resolve normalmente via MagicDNS do Tailscale.
+- `tailscale ssh desktop-u2icebd` falhou (host não roda o servidor SSH do próprio Tailscale, caiu no SSH tradicional).
+- `ssh desktop-u2icebd` direto: host key aceita com sucesso (`StrictHostKeyChecking=accept-new`), mas autenticação falhou — `Permission denied (publickey,password)` para o usuário `blind`.
+- Gerado um par de chaves local (`~/.ssh/id_ed25519`, comentário `claude-code@microlaudo-deploy`) especificamente para esse fim. Chave pública entregue ao usuário para adicionar ao `authorized_keys` de `desktop-u2icebd` (ou ele informa outra credencial de acesso).
+
+**Próximo passo (retomar amanhã):** usuário precisa autorizar a chave pública `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGuKWRS57Uwk1owgKR0avwYYVE/jFXi8pTgbLh2rXU4L claude-code@microlaudo-deploy` no `desktop-u2icebd` (ou fornecer outra forma de acesso), para então eu conseguir de fato entrar na máquina e atualizar/reiniciar o servidor que serve a app via Tailscale.
