@@ -406,3 +406,34 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - Gerado um par de chaves local (`~/.ssh/id_ed25519`, comentário `claude-code@microlaudo-deploy`) especificamente para esse fim. Chave pública entregue ao usuário para adicionar ao `authorized_keys` de `desktop-u2icebd` (ou ele informa outra credencial de acesso).
 
 **Próximo passo (retomar amanhã):** usuário precisa autorizar a chave pública `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGuKWRS57Uwk1owgKR0avwYYVE/jFXi8pTgbLh2rXU4L claude-code@microlaudo-deploy` no `desktop-u2icebd` (ou fornecer outra forma de acesso), para então eu conseguir de fato entrar na máquina e atualizar/reiniciar o servidor que serve a app via Tailscale.
+
+---
+
+## Sessão 12 — 15 Set 2026
+
+### EAS configurado + permissão de microfone indevida removida + ícones placeholder (F40/F44 parcial)
+
+**Objetivo:** avançar no checklist de lançamento nas lojas (Sessão 11) — configurar o EAS Build e resolver o bloqueador de assets ausentes.
+
+**O que foi feito:**
+- Login no EAS via `npx eas-cli login` (conta `octaviolobo21@gmail.com`).
+- Projeto criado e vinculado: `npx eas-cli init --account ocatviolobo21 --non-interactive` → `@ocatviolobo21/microlaudo` (https://expo.dev/accounts/ocatviolobo21/projects/microlaudo). `app.json` ganhou `extra.eas.projectId` e `owner`.
+- `npx eas-cli build:configure -p all` confirmou o projeto pronto para build (`eas build`/`eas submit`).
+
+**Bug de privacidade encontrado durante a configuração do EAS (não pedido, apareceu sozinho):** o próprio `eas init` resolveu a config e revelou que o app pedia `android.permission.RECORD_AUDIO` sem nunca usar áudio. Rastreado: **não** era o `expo-camera` (que só ativa microfone se não for explicitamente desativado), mas sim o plugin do **`expo-image-picker`**, que adiciona `RECORD_AUDIO` por padrão pensando em captura de vídeo (`node_modules/expo-image-picker/plugin/build/withImagePicker.js`), independente do `expo-camera`. Corrigido adicionando `"microphonePermission": false` na config de ambos os plugins em `app.json` (`expo-camera` também ganhou `"recordAudioAndroid": false`, redundante com o do image-picker mas documenta a intenção). Confirmado via `npx expo config --type public` (com `.expo/` limpo pra evitar cache) que o Android só pede `CAMERA` agora. Relevante para um app de saúde: pedir permissão sem uso real é motivo de rejeição/desconfiança na revisão da loja.
+
+**Ícones/splash placeholder gerados (bloqueador da Sessão 11):** `assets/images/` estava vazio desde o scaffold inicial. Gerado via PowerShell (`System.Drawing`, sem dependência nova) usando a cor primária do design system (`#0891B2`, cyan médico de `src/constants/theme.ts`): `icon.png` (1024×1024, fundo cyan + "ML" branco), `adaptive-icon.png` (1024×1024, camada transparente com círculo cyan + "ML" branco, respeita `backgroundColor: #ffffff` do Android), `favicon.png` (196×196), `splash.png` (1242×2436, fundo branco + círculo cyan com "ML" centralizado). São placeholders explícitos — usuário deve substituir por arte de design real antes do lançamento definitivo, mas já desbloqueiam build/preview sem warning.
+
+**Decisão registrada:** lançamento vai **aguardar a integração de pagamento** (RevenueCat/Stripe, F30-F34, ainda não iniciada) antes de escrever a Política de Privacidade e Termos de Uso definitivos — não faz sentido redigir termos comerciais antes de saber o modelo final. Política/Termos (F41) ficam pendentes até essa decisão avançar.
+- CNPJ não é obrigatório para o lançamento: Apple Developer e Google Play aceitam conta de pessoa física (CPF), e a Política de Privacidade só precisa identificar o responsável pelo tratamento de dados — não necessariamente uma pessoa jurídica.
+
+**Verificação end-to-end:**
+- `npm run types` — 0 erros.
+- `npm run build:web` — sucesso, 22 rotas estáticas, sem warning de favicon ausente (existia desde a Sessão 8).
+
+**Pendências que continuam em aberto (ver checklist completo na Sessão 11):**
+- Ícones/splash são placeholder — trocar por arte de design real antes da submissão às lojas.
+- Política de Privacidade + Termos de Uso — aguardando decisão de monetização (ver acima).
+- Conta Apple Developer / Google Play Console — ainda não criadas.
+- Nenhum build nativo (iOS/Android) gerado ainda — só a configuração do EAS foi feita, falta rodar `eas build` de fato (depende de conta Apple Developer para iOS).
+- Deploy Tailscale (`desktop-u2icebd`) — ainda bloqueado esperando o usuário autorizar a chave SSH (ver Sessão 11).
