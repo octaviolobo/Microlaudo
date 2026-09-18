@@ -437,3 +437,25 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - Conta Apple Developer / Google Play Console — ainda não criadas.
 - Nenhum build nativo (iOS/Android) gerado ainda — só a configuração do EAS foi feita, falta rodar `eas build` de fato (depende de conta Apple Developer para iOS).
 - Deploy Tailscale (`desktop-u2icebd`) — ainda bloqueado esperando o usuário autorizar a chave SSH (ver Sessão 11).
+
+---
+
+## Sessão 13 — 17 Set 2026
+
+### Draft da Política de Privacidade (F41 parcial) + decisão sobre repositório público
+
+**Objetivo:** apesar da decisão da Sessão 12 de aguardar a integração de pagamento antes de redigir a Política de Privacidade, o usuário pediu para adiantar o rascunho mesmo assim (a seção de pagamentos ficou como placeholder textual, atualizável depois).
+
+**O que foi feito:**
+- Levantamento real do inventário de dados no código (`src/types/doctor.ts`, `src/types/report.ts`, `src/services/account.ts`) antes de escrever qualquer texto — a política reflete exatamente o que o app coleta hoje, não um texto genérico.
+- Criado `docs/legal/politica-privacidade.md`: documento LGPD completo em PT-BR, com uma distinção importante para o modelo de negócio — **o médico é o controlador dos dados do paciente** (decide coletar, mantém a relação médico-paciente), e o **MicroLaudo atua como operador** (processa só sob instrução do médico). Isso limita a responsabilidade direta do MicroLaudo sobre a relação médico-paciente. Cobre: inventário de dados, finalidade/base legal por tipo de dado, segurança (RLS FORCE, buckets privados, URLs assinadas, HTTPS, transferência internacional Art. 33), retenção/exclusão de conta (cascade delete real), direitos do titular (Art. 18), seção de pagamentos como placeholder textual (não bloqueia o documento, só é atualizada quando a integração existir), e ausência de DPO formal declarada explicitamente (porte individual).
+- Usuário preencheu o CPF do responsável diretamente no documento.
+
+**Decisão de segurança tomada durante a sessão:** o repositório `octaviolobo/Microlaudo` no GitHub é **público** (confirmado via `mcp__github-mcp__search_repositories`, campo `visibility: "public"`). Publicar o CPF nesse repositório o exporia permanentemente no histórico do git, mesmo que removido depois. Levantei o ponto antes de commitar; usuário optou por **não versionar** os documentos legais por enquanto. `docs/legal/` foi adicionado ao `.gitignore` (commit `aee1f7f`) — o arquivo continua no disco local, mas fora do controle de versão até ser publicado em local apropriado (site próprio, hospedagem privada) no momento do lançamento.
+
+**Verificação:** `git status` confirmou que o arquivo nunca tinha sido commitado antes do `.gitignore` ser adicionado (sem exposição prévia no histórico).
+
+**Pendências:**
+- Política de Privacidade ainda precisa: nome fantasia/endereço se aplicável, revisão de advogado (recomendado dado que trata dado de saúde), e decidir onde hospedar a versão pública final (a loja exige URL acessível sem login).
+- Termos de Uso — ainda não iniciado.
+- Seção 9 (pagamentos) da política precisa ser reescrita quando a integração Stripe/RevenueCat existir.
