@@ -52,6 +52,11 @@ coverage/
 supabase/.branches/
 supabase/.temp/
 
+# Documentos legais com dados pessoais sensiveis (CPF etc.) - nao versionar
+# em repositorio publico. Publicar a versao final em outro lugar (site,
+# hospedagem privada) quando pronta para producao.
+docs/legal/
+
 # Build artifacts
 build/
 
