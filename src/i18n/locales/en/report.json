@@ -17,6 +17,7 @@
       "birthDate": "Date of birth",
       "collectionDate": "Collection date",
       "requestingDoctor": "Requesting physician",
+      "requestingDoctorDefault": "Dr. {{name}}",
       "prodoctorSearching": "Searching ProDoctor...",
       "prodoctorNoBirthDate": "Date of birth not provided",
       "prodoctorLoadingDoctor": "Looking up last attending physician..."

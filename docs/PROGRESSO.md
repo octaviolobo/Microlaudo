@@ -459,3 +459,30 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - Política de Privacidade ainda precisa: nome fantasia/endereço se aplicável, revisão de advogado (recomendado dado que trata dado de saúde), e decidir onde hospedar a versão pública final (a loja exige URL acessível sem login).
 - Termos de Uso — ainda não iniciado.
 - Seção 9 (pagamentos) da política precisa ser reescrita quando a integração Stripe/RevenueCat existir.
+
+---
+
+## Sessão 14 — 23 Set 2026
+
+### Upgrade Expo SDK 52→57 + testes reais no iPhone via Expo Go + PDF mobile + autofill médico solicitante
+
+**Objetivo:** usuário queria testar a versão mobile pela primeira vez (via Expo Go, sem conta de desenvolvedor Apple ainda) antes de decidir sobre monetização. Bloqueio inicial: o app Expo Go da App Store só suporta a versão mais recente do SDK em dispositivos físicos, e o projeto estava no SDK 52 — sem alternativa que não fosse atualizar. Usuário autorizou um loop de correção com **limite explícito de 5 tentativas** para controlar gasto de tokens.
+
+**Upgrade em si (tentativa 1/5 — sucesso de primeira):**
+- `expo` 52→57, `react`/`react-dom`→19.2.3, `react-native`→0.86.3, `expo-router`→~57.0.22, todos os módulos `expo-*` alinhados, `typescript`→~6.0.3, `jest-expo`→~57.0.5.
+- Correções de compatibilidade: `tsconfig.json` (`ignoreDeprecations` 5.0→6.0), `StyleSheet.absoluteFillObject` removido da RN (trocado por `absoluteFill` em `DatePickerInput.tsx`/`Select.tsx`), `app.json` (config de splash migrada pro plugin `expo-splash-screen`, formato antigo tinha sido removido), `@react-native/jest-preset` adicionado como devDependency direta.
+- Branch isolada: `chore/expo-sdk-57-upgrade` (ainda não commitada — só commitar quando o usuário pedir).
+
+**Bugs reais só expostos agora que o mobile finalmente rodava (tentativas 2-5/5):**
+1. **Crash de boot no iOS** ("Unknown encoding: latin1"): jsPDF (só funciona na web, depende de encoding que o Hermes não implementa) estava importado estaticamente em `src/lib/reportPdf.ts`, e o Expo Router carrega todo o grafo de rotas no boot — corrigido com `import()` dinâmico.
+2. **Upload de foto rejeitado** ("mime type text/plain not supported"), 3 tentativas até achar a causa raiz de verdade: não era o `mimeType` do `expo-image-picker` (que pode vir `null`), nem o `blob.type` do `fetch(uri).blob()` (não confiável no RN) — era que o `@supabase/storage-js`, ao receber um `Blob`, embrulha tudo num `FormData` e **ignora silenciosamente a opção `contentType`** (só respeita pra `ArrayBuffer`/string). Fix definitivo: ler o arquivo como `ArrayBuffer` via `expo-file-system` (`new File(uri).arrayBuffer()`) em vez de `Blob`, no nativo. Essa é a causa raiz mais não-óbvia da sessão — vale lembrar pra qualquer upload novo no mobile.
+
+**Duas features novas pedidas após o upgrade estabilizar (dois subagentes em paralelo):**
+3. **PDF funcionando no mobile** (antes só web): caminho nativo usa `expo-print` (`Print.printToFileAsync`) com HTML equivalente ao layout jsPDF (`buildReportPdfHtml` em `src/lib/reportPdf.ts`), upload via `ArrayBuffer` (mesmo padrão do fix de fotos), e `expo-sharing` pra abrir a folha de compartilhamento nativa no download.
+4. **"Médico Solicitante" pré-preenchido**: `app/report/patient.tsx` agora prefila com "Dr(a) {nome completo}" do perfil do médico logado (`useDoctorStore`, com fallback pra `getProfile()` já que o store só é populado ao visitar "Meu Perfil"). Nunca sobrescreve valor existente, lookup do ProDoctor pra médico do último atendimento da paciente, ou edição manual do usuário.
+
+**Verificação:** `types`/`lint`/`test`/`build:web` verdes em todas as etapas. Testado end-to-end no iPhone real do usuário via Expo Go (não simulador): upload de foto, download de PDF, autofill do médico solicitante — todos confirmados funcionando.
+
+**Pendências:**
+- Nada commitado ainda — branch `chore/expo-sdk-57-upgrade` com todo o trabalho da sessão, aguardando o usuário pedir o commit.
+- Conta de desenvolvedor Apple/Google ainda não existe — monetização e publicação nas lojas seguem bloqueadas por isso (não pelo código).
