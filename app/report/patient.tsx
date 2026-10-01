@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Input, DatePickerInput, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';
+import { useDoctorStore } from '@/stores/doctorStore';
 import { createReport, updateReport } from '@/services/reports';
+import { getProfile } from '@/services/profile';
 import { searchPatients, parseProDoctorBirthDate, getLastAttendingDoctor } from '@/services/prodoctor';
 import { AppError } from '@/lib/errors';
 import { isoToday, formatDateBR } from '@/lib/date';
@@ -40,6 +42,9 @@ export function PatientScreen() {
   const setReportId = useReportStore((state) => state.setReportId);
   const setPatientData = useReportStore((state) => state.setPatientData);
   const setStep = useReportStore((state) => state.setStep);
+
+  const doctor = useDoctorStore((state) => state.doctor);
+  const setDoctor = useDoctorStore((state) => state.setDoctor);
 
   const [patientName, setPatientName] = useState(currentReport?.patient_name ?? '');
   const [birthDate, setBirthDate] = useState(currentReport?.patient_birth_date ?? '');
@@ -70,6 +75,42 @@ export function PatientScreen() {
     },
     [],
   );
+
+  // Preenche "Médico solicitante" com "Dr(a) {nome}" do médico logado por
+  // padrão, assumindo que quem preenche o laudo é também quem o solicitou.
+  // Como esta é a primeira tela do fluxo, o doctorStore normalmente ainda
+  // não foi populado (isso só acontece ao visitar a aba "Meu Perfil"), então
+  // buscamos o perfil aqui quando necessário. Nunca sobrescreve um valor já
+  // existente (laudo em edição, autopreenchimento do ProDoctor ou edição
+  // manual do usuário) e nunca bloqueia a tela em caso de falha — mesmo
+  // padrão de "falha silenciosa" usado nas buscas do ProDoctor acima.
+  useEffect(() => {
+    function applyDefault(fullName: string | null | undefined) {
+      if (!fullName) return;
+      const defaultValue = t('steps.patient.requestingDoctorDefault', { name: fullName });
+      setRequestingDoctor((prev) => (prev.trim() ? prev : defaultValue));
+    }
+
+    if (doctor) {
+      applyDefault(doctor.full_name);
+      return;
+    }
+
+    let cancelled = false;
+    getProfile()
+      .then((data) => {
+        if (cancelled) return;
+        setDoctor(data);
+        applyDefault(data.full_name);
+      })
+      .catch(() => {
+        // Perfil ainda não carregado/disponível: mantém o campo como está.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [doctor, setDoctor, t]);
 
   function handlePatientNameChange(text: string) {
     setPatientName(text);

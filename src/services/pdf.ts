@@ -1,5 +1,9 @@
+import { Platform } from 'react-native';
+import { File } from 'expo-file-system';
+import * as Print from 'expo-print';
+
 import { AppError, ErrorCodes } from '@/lib/errors';
-import { buildReportPdfBlob, type ReportPdfAssets } from '@/lib/reportPdf';
+import { buildReportPdfBlob, buildReportPdfHtml, type ReportPdfAssets } from '@/lib/reportPdf';
 
 import { supabase } from './supabase';
 import { getProfile } from './profile';
@@ -18,7 +22,13 @@ export async function generateAndUploadReportPdf(
 
   if (!user) throw new AppError(ErrorCodes.PDF_GENERATION_FAILED, 'Usuário não autenticado');
 
-  let blob: Blob;
+  // Na web usamos jsPDF (Blob, ver buildReportPdfBlob); no nativo, jsPDF quebra
+  // no Hermes ("Unknown encoding: latin1"), então usamos expo-print para
+  // renderizar o mesmo HTML (buildReportPdfHtml) em um PDF local, cujos bytes
+  // lemos como ArrayBuffer — ver comentário em readFileBody() em
+  // src/services/images.ts sobre por que ArrayBuffer (e não Blob) é
+  // necessário pro storage-js aplicar o contentType corretamente no RN.
+  let body: Blob | ArrayBuffer;
   try {
     const doctor = await getProfile();
 
@@ -40,7 +50,13 @@ export async function generateAndUploadReportPdf(
       }
     }
 
-    blob = await buildReportPdfBlob(report, doctor, photoUrls, assets);
+    if (Platform.OS === 'web') {
+      body = await buildReportPdfBlob(report, doctor, photoUrls, assets);
+    } else {
+      const html = await buildReportPdfHtml(report, doctor, photoUrls, assets);
+      const { uri } = await Print.printToFileAsync({ html });
+      body = await new File(uri).arrayBuffer();
+    }
   } catch (err) {
     throw new AppError(ErrorCodes.PDF_GENERATION_FAILED, 'Falha ao gerar o PDF', err);
   }
@@ -49,7 +65,7 @@ export async function generateAndUploadReportPdf(
 
   const { error: uploadError } = await supabase.storage
     .from('report-pdfs')
-    .upload(path, blob, { contentType: 'application/pdf', upsert: true });
+    .upload(path, body, { contentType: 'application/pdf', upsert: true });
 
   if (uploadError) throw new AppError(ErrorCodes.PDF_UPLOAD_FAILED, uploadError.message, uploadError);
 

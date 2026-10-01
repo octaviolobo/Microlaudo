@@ -61,8 +61,7 @@ export function PhotosScreen() {
       if (result.canceled || !result.assets[0]) return;
 
       setBusySlot(sortOrder);
-      const blob = await fetch(result.assets[0].uri).then((r) => r.blob());
-      await uploadReportImage(reportId, blob, sortOrder);
+      await uploadReportImage(reportId, result.assets[0].uri, sortOrder, result.assets[0].mimeType);
       await loadImages();
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));

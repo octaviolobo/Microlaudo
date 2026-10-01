@@ -50,7 +50,16 @@
     "invalidCredentials": "E-mail ou senha incorretos.",
     "emailInUse": "Este e-mail já está em uso.",
     "weakPassword": "Senha deve ter pelo menos 6 caracteres.",
-    "fillRequired": "Preencha todos os campos obrigatórios."
+    "fillRequired": "Preencha todos os campos obrigatórios.",
+    "continueWithGoogle": "Continuar com Google",
+    "continueWithFacebook": "Continuar com Facebook",
+    "orDivider": "ou"
+  },
+  "completeProfile": {
+    "title": "Complete seu cadastro",
+    "subtitle": "Falta pouco! Precisamos do seu CRM para liberar o app.",
+    "prefilledHint": "Alguns dados foram preenchidos automaticamente a partir da sua conta.",
+    "submit": "Continuar"
   },
   "profile": {
     "title": "Meu Perfil",

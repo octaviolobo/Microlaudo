@@ -28,6 +28,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: SecureStoreAdapter,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false,
+    // No web, o supabase-js processa o retorno do OAuth (?code=) sozinho a partir da URL.
+    detectSessionInUrl: Platform.OS === 'web',
+    flowType: 'pkce',
   },
 });

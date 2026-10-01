@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+// Aliased: o módulo já importa o `File` global do DOM (Web File API) em
+// tryShareReportPdf() — precisamos dos dois nomes distintos no mesmo arquivo.
+import { File as ExpoFile, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Button, MessageBox } from '@/components/ui';
@@ -81,7 +85,16 @@ export function PreviewScreen() {
       // re-finalização) — o PDF regenerado precisa refletir a revisão nova, não a antiga.
       const finalized = await finalizeReport(reportId);
       if (!finalized.pdf_url || isDirty) {
-        await generateAndUploadReportPdf(finalized, photoUrls);
+        try {
+          await generateAndUploadReportPdf(finalized, photoUrls);
+        } catch (pdfErr) {
+          // O laudo já foi finalizado no banco — não faz sentido travar o
+          // usuário numa tela de erro por uma falha na geração do PDF em si
+          // (ex: rede instável no nativo). Na web mantemos o comportamento
+          // bloqueante de sempre; no nativo, "Baixar PDF" na tela de preview
+          // permite gerar/tentar novamente depois.
+          if (Platform.OS === 'web') throw pdfErr;
+        }
       }
       reset();
       router.replace('/(tabs)/home');
@@ -130,6 +143,17 @@ export function PreviewScreen() {
     }
   }
 
+  // Equivalente nativo de tryShareReportPdf: baixa o PDF assinado para um
+  // arquivo local (a folha de compartilhamento nativa do iOS/Android exige
+  // uma URI de arquivo, não aceita URLs remotas) e abre a folha do sistema.
+  async function shareReportPdfNative(url: string): Promise<void> {
+    const destination = new ExpoFile(Paths.cache, `laudo-${report?.id ?? 'microlaudo'}.pdf`);
+    const file = await ExpoFile.downloadFileAsync(url, destination, { idempotent: true });
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(file.uri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf' });
+    }
+  }
+
   async function handleDownloadPdf() {
     if (!report) return;
     try {
@@ -144,6 +168,8 @@ export function PreviewScreen() {
         // nova aqui é bloqueado por vários navegadores mobile.
         const shared = await tryShareReportPdf(url);
         if (!shared) window.location.href = url;
+      } else {
+        await shareReportPdfNative(url);
       }
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));
