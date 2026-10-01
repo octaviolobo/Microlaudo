@@ -523,4 +523,41 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - **Supabase Dashboard:** Authentication → Providers → habilitar Google e Facebook com as credenciais acima. Authentication → URL Configuration → Redirect URLs → adicionar o `exp://...` gerado no momento do teste via Expo Go (e futuramente `microlaudo://auth-callback` quando existir build nativo).
 - Teste manual completo (login de fato) só é possível depois que essas credenciais existirem — combinar sessão de teste conjunta (web primeiro, mobile via Expo Go depois).
 - ProDoctor: flag por médico ainda não implementada (ver "Bloqueadores" no checklist de lançamento, acima).
-- Nada desta sessão foi commitado ainda — branch `chore/expo-sdk-57-upgrade`, aguardando o usuário pedir o commit.
+- **Commitado e enviado (`b48d16b`):** login social + tela de completar perfil + correção do `supabase/config.toml` (Redirect URL local estava com `https` em vez de `http` e sem o path `/auth-callback`).
+
+### Checklist consolidado — tudo que falta pro lançamento de verdade (visão completa)
+
+Pedido do usuário: juntar num só lugar literalmente tudo que falta, além do que já está nos checklists das Sessões 11/12 (que seguem valendo, isto é um resumo consolidado, não substitui os detalhes acima).
+
+**A. Infraestrutura / deploy — nada disso existe hoje:**
+- [ ] **Domínio próprio** — não há nenhum domínio registrado. O app só é acessível via `localhost` (dev), Expo Go (rede local) e o servidor Tailscale `desktop-u2icebd` (rede privada do usuário, não pública).
+- [ ] **Hospedagem pública da versão web** — Tailscale não serve a internet pública. Se o produto final incluir uma versão web de verdade (não só preview interno), falta decidir onde hospedar o export (`npm run build:web`) com domínio e HTTPS próprios (Vercel/Netlify/VPS).
+- [ ] **Publicar Política de Privacidade e Termos de Uso numa URL pública** — Apple e Google exigem um link ativo nas duas lojas. Os documentos (ainda em draft, Sessão 13) estão em `docs/legal/`, fora do git por decisão de segurança (CPF do usuário), e hoje não estão publicados em lugar nenhum.
+- [ ] **E-mail/URL de suporte** — obrigatório nas duas lojas; hoje não existe domínio nem endereço dedicado, só o Gmail pessoal do usuário.
+- [ ] **Decidir separação dev/produção no Supabase** — hoje tudo (inclusive os testes) usa o mesmo projeto remoto (`flxxotkhgjpxlpphazcd`). Avaliar se vale criar um projeto separado antes de ter pacientes/dados reais de produção.
+
+**B. Contas e credenciais de loja — nenhuma criada/configurada:**
+- [ ] Apple Developer Program ($99/ano).
+- [ ] Google Play Console ($25 único).
+- [ ] Credenciais de submissão automática: `eas.json` tem `submit.production: {}` vazio — falta App Store Connect API Key (Apple) e Service Account JSON (Google).
+- [ ] Assets de loja: screenshots por tamanho de device, descrição curta/longa, categoria, classificação de idade/conteúdo.
+- [ ] Formulários de privacidade das lojas: "App Privacy" (Apple) e "Data Safety" (Google) — precisam declarar que o app trata dado de saúde de paciente (nome, resultado de exame), ponto sensível pra aprovação.
+
+**C. Decisões de produto/negócio pendentes:**
+- [ ] Monetização (RevenueCat/Stripe, F30–F34) — ainda são placeholders vazios. Decidir: lançar grátis primeiro ou terminar a integração antes.
+- [ ] Política de Privacidade/Termos **definitivos** — intencionalmente aguardando a decisão de monetização acima (Sessão 12), pra não redigir cláusula comercial antes da hora.
+- [x] CNPJ — **resolvido na Sessão 12**: não é obrigatório, Apple/Google aceitam pessoa física (CPF).
+
+**D. Bloqueador de segurança (já detalhado acima, repetido aqui pra não passar batido):**
+- [ ] ProDoctor: flag `prodoctor_enabled` por médico — sem isso não dá pra abrir o cadastro ao público (vazaria pacientes da clínica da mãe do usuário pra qualquer médico cadastrado).
+
+**E. Build e testes nativos:**
+- [ ] Nenhum build nativo foi gerado ainda — `eas build` nunca rodou de fato, só `eas build:configure` (Sessão 12).
+- [ ] Pelo menos um ciclo de TestFlight (iOS) e teste interno/fechado (Android) com usuário real antes de ir a produção.
+- [ ] Ícones/splash são placeholder gerado por script (Sessão 12) — trocar por arte de design real antes da submissão.
+- [ ] OAuth Google/Facebook — código pronto (esta sessão), faltam credenciais reais no Google Cloud Console/Meta for Developers (checklist acima) e teste de ponta a ponta.
+
+**F. Operacional pós-lançamento — recomendado, não bloqueia a submissão em si:**
+- [ ] Monitoramento de erro/crash em produção (ex. Sentry) — inexistente hoje; num app de saúde, ajuda a pegar bug antes do usuário reportar.
+- [ ] Estratégia de atualização OTA (`expo-updates`/EAS Update) — não configurada; hoje toda mudança de JS exige novo build+review nas lojas.
+- [ ] Confirmar se o `audit_log` (Sessão 9) e as práticas atuais já atendem retenção/backup de dado de saúde exigido pela LGPD, ou se falta política formal por escrito.
