@@ -27,7 +27,7 @@ enabled = true
 [auth]
 enabled = true
 site_url = "exp://localhost:8081"
-additional_redirect_urls = ["https://localhost:8081", "microlaudo://"]
+additional_redirect_urls = ["http://localhost:8081", "microlaudo://auth-callback"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10

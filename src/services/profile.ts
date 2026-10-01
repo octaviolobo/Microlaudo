@@ -24,9 +24,10 @@ export async function getProfile(): Promise<DoctorRow> {
   const { data, error } = await supabase
     .from('doctors')
     .select('*')
-    .single();
+    .maybeSingle();
 
   if (error) throw new AppError(ErrorCodes.PROFILE_NOT_FOUND, error.message, error);
+  if (!data) throw new AppError(ErrorCodes.PROFILE_NOT_FOUND, 'Perfil não encontrado');
   return data;
 }
 

@@ -386,9 +386,11 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - [ ] **Decisão sobre monetização antes do lançamento** — `RevenueCat`/`Stripe` são só placeholders vazios em `src/constants/plans.ts` (IDs `''`), sem SDK instalado, sem edge functions `check-trial`/`payment-webhook` (F30–F34, nenhuma feita). Definir: lançar grátis primeiro, ou terminar a integração de pagamento antes.
 - [ ] **Contas de desenvolvedor** — sem indício de Apple Developer ($99/ano) nem Google Play Console ($25) configuradas (só o usuário pode criar) (F43).
 - [ ] **Build nativo + teste em dispositivo real** — tudo validado até agora foi só web; falta pelo menos um ciclo de TestFlight/APK interno (F44–F46).
+- [ ] **ProDoctor: flag por médico pra não vazar dados da clínica** — **correção em 28/09/2026: isto É um bloqueador**, decisão anterior (24/09) de tratar como polimento estava errada — o app vai ao público, então a credencial global do ProDoctor (`PRODOCTOR_API_KEY`/`PASSWORD`, hoje aponta pro consultório da mãe do usuário) não pode ficar visível a qualquer médico que se cadastre. Sem a flag, qualquer médico logado veria os pacientes da clínica dela no autocomplete — vazamento de dados de saúde de terceiros, inaceitável num lançamento público. Precisa de um flag (ex.: `prodoctor_enabled` em `doctors`, default `false`) e só mostrar a busca/autofill quando `true`, habilitado manualmente só na conta dela.
 
 **Não-bloqueador / polimento (pode esperar o lançamento):**
-- [ ] Login social Google/Apple (F28/F29) — opcional se não for requisito de lançamento.
+- [ ] **ProDoctor: configurar credenciais na conta da mãe do usuário** — a integração (`prodoctor-patients`) hoje usa uma credencial global (`PRODOCTOR_API_KEY`/`PASSWORD`) do consultório dela. Ao criar a conta dela, configurar esses secrets no Supabase apontando pro consultório dela.
+- [ ] Login social Google/Apple (F28/F29) — **código implementado na Sessão 15** (Google + Facebook; Apple adiado, depende de conta Apple Developer paga). Falta só configurar credenciais reais no Google Cloud Console/Meta for Developers/Supabase Dashboard (checklist na Sessão 15) e testar de fato.
 - [ ] Redesenho de login/register/forgot-password com labels visíveis (para asterisco de campo obrigatório) — aguardando decisão do usuário (pendência desde a Sessão 8).
 - [ ] Validar visualmente se o alinhamento do PDF nas seções Nugent/Amsel está mesmo corrigido (pendência desde a Sessão 7/8).
 - [ ] `CONVENTIONS.md` cita `REPORT_VALIDATION_FAILED` como exemplo desatualizado (renomeado para `VALIDATION_FAILED`) — só doc, não afeta o app (pendência da Sessão 9).
@@ -486,3 +488,39 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 **Pendências:**
 - Nada commitado ainda — branch `chore/expo-sdk-57-upgrade` com todo o trabalho da sessão, aguardando o usuário pedir o commit.
 - Conta de desenvolvedor Apple/Google ainda não existe — monetização e publicação nas lojas seguem bloqueadas por isso (não pelo código).
+
+---
+
+## Sessão 15 — 28 Set 2026
+
+### Correção do escopo do ProDoctor (bloqueador) + Login social Google/Facebook (F28/F29)
+
+**Correção de uma decisão anterior errada:** a Sessão 11 tinha registrado a falta de isolamento por médico na integração ProDoctor (credencial global do Supabase aponta pro consultório da mãe do usuário) como item "não-bloqueador/polimento", partindo do pressuposto de que o app seria de uso restrito. O usuário corrigiu: **o app vai ser lançado ao público**, então qualquer médico que se cadastre veria os pacientes da clínica dela no autocomplete — vazamento de dado de saúde de terceiros, inaceitável. Item movido para "Bloqueadores" no checklist acima (ainda não implementado; precisa de um flag `prodoctor_enabled` por médico em `doctors`, default `false`).
+
+**Login social — Google + Facebook implementado (Apple adiado):**
+- Restrição de ambiente: o app é testado hoje via **Expo Go puro** (sem custom dev client/EAS build nativo). SDKs nativos de login (`@react-native-google-signin/google-signin`, `react-native-fbsdk-next`) quebrariam esse fluxo. Solução: OAuth genérico do Supabase (`signInWithOAuth`) + `expo-auth-session`/`expo-web-browser` (100% JS, funciona no Expo Go).
+- `src/services/supabase.ts`: `flowType: 'pkce'` adicionado e `detectSessionInUrl` agora é `true` só no web (o app nativo processa o `?code=` manualmente via `exchangeCodeForSession`).
+- `src/services/auth.ts`: nova `signInWithOAuth(provider: 'google' | 'facebook')` — no native abre `WebBrowser.openAuthSessionAsync`, extrai `code` do retorno e troca por sessão; no web navega a página inteira e deixa o supabase-js processar sozinho. Cancelamento do usuário não vira erro visível.
+- `app/_layout.tsx`: o `useEffect` de sessão agora também busca `getProfile()` e popula `useDoctorStore` quando há sessão (boot e mudanças de auth state), esperando isso antes de esconder a splash screen — evita flash de tela errada.
+- `app/(tabs)/_layout.tsx`: redireciona para `/complete-profile` se o médico logado tem `crm` vazio (caso de primeiro login via OAuth).
+- `app/complete-profile.tsx` (novo): tela obrigatória pós-OAuth pra completar nome/CRM/RQE antes de liberar o app, reaproveitando `updateProfile()`.
+- `app/(auth)/login.tsx`: botões "Continuar com Google"/"Continuar com Facebook" (ícones `logo-google`/`logo-facebook` do Ionicons, já suportados pelo `Button` existente), com loading por provedor.
+- `supabase/migrations/009_oauth_full_name_fallback.sql` (aplicada via MCP): `handle_new_user()` agora tenta `raw_user_meta_data->>'name'` como fallback quando `full_name` não vem preenchido (alguns provedores OAuth só populam `name`).
+- `src/services/profile.ts#getProfile`: `.single()` trocado por `.maybeSingle()` como defesa extra contra timing entre o trigger de criação de perfil e a leitura.
+- Novas chaves i18n em `pt-BR`/`en`: `auth.continueWithGoogle`, `auth.continueWithFacebook`, `auth.orDivider`, seção `completeProfile.*`.
+
+**Limitação conhecida, documentada e não é bug:** rodando via Expo Go, `AuthSession.makeRedirectUri()` gera um `exp://192.168.x.x:8081/--/auth-callback` (não o scheme customizado `microlaudo://`), que muda a cada rede/reinício do Metro e precisa estar na allow-list de Redirect URLs do Supabase a cada sessão de teste. Resolve sozinho quando o app for para um build standalone/dev client (EAS).
+
+**Verificação end-to-end:**
+- `npm run types` — 0 erros (precisou rodar `npm run build:web` antes, pra regenerar `.expo/types/router.d.ts` com a nova rota `/complete-profile` — o typegen do Expo Router só roda durante `expo start`/`expo export`, não durante `tsc` isolado).
+- `npm run lint` — 0 erros, mesmos warnings pré-existentes + 1 novo `react-hooks/exhaustive-deps` em `app/_layout.tsx` (mesmo padrão intencional já existente em `profile.tsx`, effect de boot que deve rodar só uma vez).
+- `npm test` — 100/100.
+- `npm run build:web` — sucesso, nova rota `/complete-profile` presente nas 23 rotas estáticas exportadas.
+
+**Pendência — checklist de configuração manual (não pode ser feito por ferramenta, entregar ao usuário):**
+- **Google Cloud Console:** OAuth consent screen (External, modo teste, adicionar `octaviolobo21@gmail.com` como test user) → criar credencial OAuth Client ID tipo **Web application** → em "Authorized redirect URIs" colar `https://flxxotkhgjpxlpphazcd.supabase.co/auth/v1/callback` → copiar Client ID + Secret.
+- **Meta for Developers:** criar App → produto "Facebook Login" → em Settings, "Valid OAuth Redirect URIs" = mesma URL acima → em Roles, adicionar o usuário como Tester/Admin (app em modo Development não deixa outros logarem sem isso) → copiar App ID + Secret.
+- **Supabase Dashboard:** Authentication → Providers → habilitar Google e Facebook com as credenciais acima. Authentication → URL Configuration → Redirect URLs → adicionar o `exp://...` gerado no momento do teste via Expo Go (e futuramente `microlaudo://auth-callback` quando existir build nativo).
+- Teste manual completo (login de fato) só é possível depois que essas credenciais existirem — combinar sessão de teste conjunta (web primeiro, mobile via Expo Go depois).
+- ProDoctor: flag por médico ainda não implementada (ver "Bloqueadores" no checklist de lançamento, acima).
+- Nada desta sessão foi commitado ainda — branch `chore/expo-sdk-57-upgrade`, aguardando o usuário pedir o commit.

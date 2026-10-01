@@ -50,7 +50,16 @@
     "invalidCredentials": "Incorrect email or password.",
     "emailInUse": "This email is already in use.",
     "weakPassword": "Password must be at least 6 characters.",
-    "fillRequired": "Please fill in all required fields."
+    "fillRequired": "Please fill in all required fields.",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithFacebook": "Continue with Facebook",
+    "orDivider": "or"
+  },
+  "completeProfile": {
+    "title": "Complete your profile",
+    "subtitle": "Almost there! We need your CRM to unlock the app.",
+    "prefilledHint": "Some fields were pre-filled from your account.",
+    "submit": "Continue"
   },
   "profile": {
     "title": "My Profile",

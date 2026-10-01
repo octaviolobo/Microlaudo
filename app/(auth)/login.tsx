@@ -3,10 +3,12 @@ import { View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { signIn } from '@/services/auth';
+import { signIn, signInWithOAuth } from '@/services/auth';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';
+
+import type { OAuthProvider } from '@/services/auth';
 
 export function LoginScreen() {
   const { t } = useTranslation('common');
@@ -14,6 +16,7 @@ export function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleLogin() {
@@ -29,6 +32,18 @@ export function LoginScreen() {
       setError(err instanceof AppError ? t('auth.invalidCredentials') : t('genericError'));
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleOAuthLogin(provider: OAuthProvider) {
+    try {
+      setOauthLoading(provider);
+      setError(null);
+      await signInWithOAuth(provider);
+    } catch (err) {
+      setError(err instanceof AppError ? err.message : t('genericError'));
+    } finally {
+      setOauthLoading(null);
     }
   }
 
@@ -63,15 +78,40 @@ export function LoginScreen() {
         label={t('auth.login')}
         onPress={handleLogin}
         loading={isLoading}
+        disabled={!!oauthLoading}
         fullWidth
         accessibilityLabel={t('auth.login')}
+      />
+
+      <Text style={styles.orDivider}>{t('auth.orDivider')}</Text>
+
+      <Button
+        label={t('auth.continueWithGoogle')}
+        onPress={() => handleOAuthLogin('google')}
+        variant="secondary"
+        icon="logo-google"
+        loading={oauthLoading === 'google'}
+        disabled={isLoading || (!!oauthLoading && oauthLoading !== 'google')}
+        fullWidth
+        accessibilityLabel={t('auth.continueWithGoogle')}
+      />
+
+      <Button
+        label={t('auth.continueWithFacebook')}
+        onPress={() => handleOAuthLogin('facebook')}
+        variant="secondary"
+        icon="logo-facebook"
+        loading={oauthLoading === 'facebook'}
+        disabled={isLoading || (!!oauthLoading && oauthLoading !== 'facebook')}
+        fullWidth
+        accessibilityLabel={t('auth.continueWithFacebook')}
       />
 
       <Button
         label={t('auth.register')}
         onPress={() => router.push('/(auth)/register')}
         variant="secondary"
-        disabled={isLoading}
+        disabled={isLoading || !!oauthLoading}
         fullWidth
       />
 
@@ -79,7 +119,7 @@ export function LoginScreen() {
         label={t('auth.forgotPassword')}
         onPress={() => router.push('/(auth)/forgot-password')}
         variant="secondary"
-        disabled={isLoading}
+        disabled={isLoading || !!oauthLoading}
         fullWidth
       />
     </View>
@@ -111,6 +151,13 @@ const styles = StyleSheet.create({
     fontFamily: Typography.body,
     color: Colors.textMuted,
     marginBottom: Spacing.xl,
+    textAlign: 'center',
+  },
+  orDivider: {
+    fontSize: 13,
+    fontFamily: Typography.body,
+    color: Colors.textMuted,
+    marginVertical: Spacing.sm,
     textAlign: 'center',
   },
 });

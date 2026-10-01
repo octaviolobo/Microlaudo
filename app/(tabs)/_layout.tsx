@@ -3,13 +3,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useDoctorStore } from '@/stores/doctorStore';
 import { Colors } from '@/constants/theme';
 
 export function TabsLayout() {
   const { isAuthenticated } = useAuth();
+  const doctor = useDoctorStore((s) => s.doctor);
   const { t } = useTranslation('report');
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+  if (doctor && !doctor.crm) return <Redirect href="/complete-profile" />;
 
   return (
     <Tabs
