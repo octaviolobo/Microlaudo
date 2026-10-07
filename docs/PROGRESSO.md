@@ -581,9 +581,10 @@ Branch `feat/prodoctor-flag` (a partir de `chore/expo-sdk-57-upgrade`).
 
 **Verificação:** `npm run lint` 0 erros (warnings pré-existentes), `npm run types` 0 erros, `npm test` 103/103.
 
-**Pendente — deploy (manual):**
-- [ ] Aplicar a migration 010 no projeto remoto (`npm run db:migrate` ou SQL editor).
-- [ ] `supabase functions deploy prodoctor-patients` — **a ordem importa**: a function nova consulta a coluna, então aplicar a migration antes (senão a busca dá 500 pra todo mundo, falhando fechado).
+**Deploy (06/10/2026):**
+- [x] Migration 010 aplicada no remoto via `npx supabase db query --linked -f supabase/migrations/010_doctors_prodoctor_flag.sql` — conferido: coluna `boolean NOT NULL DEFAULT false`, trigger presente, 0 de 2 médicos habilitados. Testado numa transação com ROLLBACK como `authenticated`: o UPDATE da flag falha com `42501`.
+- [x] `npx supabase functions deploy prodoctor-patients` — smoke test: OPTIONS 200, POST sem token 401.
+- ⚠️ **Não usar `supabase db push` neste projeto:** o histórico remoto de migrations está com timestamps (aplicadas via MCP), não com `001`–`010`, então o CLI acha que TODAS as locais estão pendentes e tentaria recriar as tabelas. Aplicar migrations novas uma a uma com `db query --linked -f`, ou alinhar o histórico com `supabase migration repair` antes.
 - [ ] Habilitar só a conta da mãe do usuário (SQL editor, roda como postgres):
   ```sql
   UPDATE doctors SET prodoctor_enabled = true
