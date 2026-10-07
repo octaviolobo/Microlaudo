@@ -58,6 +58,7 @@ export type Database = {
           id: string
           logo_url: string | null
           preferred_language: string | null
+          prodoctor_enabled: boolean
           rqe: string | null
           signature_url: string | null
           subscription_status: string
@@ -77,6 +78,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           preferred_language?: string | null
+          prodoctor_enabled?: boolean
           rqe?: string | null
           signature_url?: string | null
           subscription_status?: string
@@ -96,6 +98,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           preferred_language?: string | null
+          prodoctor_enabled?: boolean
           rqe?: string | null
           signature_url?: string | null
           subscription_status?: string

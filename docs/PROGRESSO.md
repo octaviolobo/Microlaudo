@@ -386,7 +386,7 @@ Registro de todas as sessões de desenvolvimento. Atualizado ao final de cada se
 - [ ] **Decisão sobre monetização antes do lançamento** — `RevenueCat`/`Stripe` são só placeholders vazios em `src/constants/plans.ts` (IDs `''`), sem SDK instalado, sem edge functions `check-trial`/`payment-webhook` (F30–F34, nenhuma feita). Definir: lançar grátis primeiro, ou terminar a integração de pagamento antes.
 - [ ] **Contas de desenvolvedor** — sem indício de Apple Developer ($99/ano) nem Google Play Console ($25) configuradas (só o usuário pode criar) (F43).
 - [ ] **Build nativo + teste em dispositivo real** — tudo validado até agora foi só web; falta pelo menos um ciclo de TestFlight/APK interno (F44–F46).
-- [ ] **ProDoctor: flag por médico pra não vazar dados da clínica** — **correção em 28/09/2026: isto É um bloqueador**, decisão anterior (24/09) de tratar como polimento estava errada — o app vai ao público, então a credencial global do ProDoctor (`PRODOCTOR_API_KEY`/`PASSWORD`, hoje aponta pro consultório da mãe do usuário) não pode ficar visível a qualquer médico que se cadastre. Sem a flag, qualquer médico logado veria os pacientes da clínica dela no autocomplete — vazamento de dados de saúde de terceiros, inaceitável num lançamento público. Precisa de um flag (ex.: `prodoctor_enabled` em `doctors`, default `false`) e só mostrar a busca/autofill quando `true`, habilitado manualmente só na conta dela.
+- [x] **ProDoctor: flag por médico pra não vazar dados da clínica** — **código feito na Sessão 16** (falta aplicar migration 010 + deploy da function, ver Sessão 16). **correção em 28/09/2026: isto É um bloqueador**, decisão anterior (24/09) de tratar como polimento estava errada — o app vai ao público, então a credencial global do ProDoctor (`PRODOCTOR_API_KEY`/`PASSWORD`, hoje aponta pro consultório da mãe do usuário) não pode ficar visível a qualquer médico que se cadastre. Sem a flag, qualquer médico logado veria os pacientes da clínica dela no autocomplete — vazamento de dados de saúde de terceiros, inaceitável num lançamento público. Precisa de um flag (ex.: `prodoctor_enabled` em `doctors`, default `false`) e só mostrar a busca/autofill quando `true`, habilitado manualmente só na conta dela.
 
 **Não-bloqueador / polimento (pode esperar o lançamento):**
 - [ ] **ProDoctor: configurar credenciais na conta da mãe do usuário** — a integração (`prodoctor-patients`) hoje usa uma credencial global (`PRODOCTOR_API_KEY`/`PASSWORD`) do consultório dela. Ao criar a conta dela, configurar esses secrets no Supabase apontando pro consultório dela.
@@ -549,7 +549,7 @@ Pedido do usuário: juntar num só lugar literalmente tudo que falta, além do q
 - [x] CNPJ — **resolvido na Sessão 12**: não é obrigatório, Apple/Google aceitam pessoa física (CPF).
 
 **D. Bloqueador de segurança (já detalhado acima, repetido aqui pra não passar batido):**
-- [ ] ProDoctor: flag `prodoctor_enabled` por médico — sem isso não dá pra abrir o cadastro ao público (vazaria pacientes da clínica da mãe do usuário pra qualquer médico cadastrado).
+- [x] ProDoctor: flag `prodoctor_enabled` por médico (código na Sessão 16; deploy pendente) — sem isso não dá pra abrir o cadastro ao público (vazaria pacientes da clínica da mãe do usuário pra qualquer médico cadastrado).
 
 **E. Build e testes nativos:**
 - [ ] Nenhum build nativo foi gerado ainda — `eas build` nunca rodou de fato, só `eas build:configure` (Sessão 12).
@@ -561,3 +561,32 @@ Pedido do usuário: juntar num só lugar literalmente tudo que falta, além do q
 - [ ] Monitoramento de erro/crash em produção (ex. Sentry) — inexistente hoje; num app de saúde, ajuda a pegar bug antes do usuário reportar.
 - [ ] Estratégia de atualização OTA (`expo-updates`/EAS Update) — não configurada; hoje toda mudança de JS exige novo build+review nas lojas.
 - [ ] Confirmar se o `audit_log` (Sessão 9) e as práticas atuais já atendem retenção/backup de dado de saúde exigido pela LGPD, ou se falta política formal por escrito.
+
+---
+
+## Sessão 16 — 06 Out 2026
+
+### ProDoctor: flag `prodoctor_enabled` por médico (bloqueador de segurança)
+
+Branch `feat/prodoctor-flag` (a partir de `chore/expo-sdk-57-upgrade`).
+
+**Achado durante a implementação:** a policy `"Doctors: own row only"` (migration 005) é `FOR ALL` — o médico pode dar UPDATE/INSERT na própria linha. Uma coluna sozinha não bastaria: qualquer médico se auto-habilitaria com `update({ prodoctor_enabled: true })`. (Mesmo problema vale hoje para `subscription_status`/`trial_reports_used` — registrar quando a monetização for implementada.)
+
+- `supabase/migrations/010_doctors_prodoctor_flag.sql`: coluna `prodoctor_enabled BOOLEAN NOT NULL DEFAULT false` + trigger `doctors_protect_prodoctor_enabled` (BEFORE INSERT OR UPDATE) que rejeita (`42501`) qualquer mudança na flag vinda das roles `authenticated`/`anon`. service_role, postgres (SQL editor) e funções SECURITY DEFINER continuam podendo alterar.
+- `supabase/functions/prodoctor-patients/index.ts`: depois de validar o JWT, lê `prodoctor_enabled` do próprio médico (client do usuário, sob RLS) e devolve **403** se não for `true`. É o controle de acesso real — vale para `search` e `lastDoctor`.
+- `src/services/prodoctor.ts`: novo `isProDoctorEnabled(doctor)` (perfil não carregado = desabilitado). O tratamento de erro existente já converte o 403 em lista vazia/`null`.
+- `app/report/patient.tsx`: sem a flag, digitar o nome não dispara busca e o dropdown nunca aparece; o campo vira texto livre.
+- Tipos: `prodoctor_enabled` em `src/types/database.ts` (editado à mão, mesmo shape que `db:types` geraria) e `src/types/doctor.ts`.
+- Teste: `__tests__/services/prodoctor.test.ts` (3 casos).
+
+**Verificação:** `npm run lint` 0 erros (warnings pré-existentes), `npm run types` 0 erros, `npm test` 103/103.
+
+**Pendente — deploy (manual):**
+- [ ] Aplicar a migration 010 no projeto remoto (`npm run db:migrate` ou SQL editor).
+- [ ] `supabase functions deploy prodoctor-patients` — **a ordem importa**: a function nova consulta a coluna, então aplicar a migration antes (senão a busca dá 500 pra todo mundo, falhando fechado).
+- [ ] Habilitar só a conta da mãe do usuário (SQL editor, roda como postgres):
+  ```sql
+  UPDATE doctors SET prodoctor_enabled = true
+  WHERE user_id = (SELECT id FROM auth.users WHERE email = '<email-dela>');
+  ```
+- [ ] Teste manual: conta habilitada vê o autocomplete; outra conta não vê, e um `POST` direto na function devolve 403.

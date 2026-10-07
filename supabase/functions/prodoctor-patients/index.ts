@@ -19,7 +19,10 @@
 // supabase/functions/delete-account/index.ts:
 //   1. Valida o JWT do médico autenticado via header Authorization (client
 //      com anon key + auth.getUser()) — só médicos logados podem consultar.
-//   2. Só então chama a API do ProDoctor usando segredos lidos de Deno.env.
+//   2. Confere `doctors.prodoctor_enabled` do médico (403 se false) — a
+//      credencial é de um consultório específico, não pode servir a qualquer
+//      médico cadastrado (ver migration 010).
+//   3. Só então chama a API do ProDoctor usando segredos lidos de Deno.env.
 //
 // action "search": só "buscar por nome" (POST Pacientes). O endpoint de
 // detalhe (GET Pacientes/Detalhar/{codigo}) não é chamado porque a própria
@@ -148,6 +151,25 @@ Deno.serve(async (req: Request) => {
 
   if (userError || !user) {
     return jsonResponse(401, { error: 'Invalid or expired token' });
+  }
+
+  // A credencial do ProDoctor é de UM consultório específico — só médicos
+  // com `prodoctor_enabled = true` (habilitado manualmente, ver migration
+  // 010) podem consultá-la. Esconder a busca no client não basta: este é o
+  // controle de acesso de verdade. Lido com o client do usuário (RLS "own
+  // row only"), então não há como consultar o flag de outro médico.
+  const { data: doctor, error: doctorError } = await userClient
+    .from('doctors')
+    .select('prodoctor_enabled')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (doctorError) {
+    console.error('[prodoctor-patients] falha ao ler prodoctor_enabled:', doctorError.message);
+    return jsonResponse(500, { error: 'Could not verify ProDoctor access' });
+  }
+  if (doctor?.prodoctor_enabled !== true) {
+    return jsonResponse(403, { error: 'ProDoctor integration not enabled for this doctor' });
   }
 
   let body: unknown;
