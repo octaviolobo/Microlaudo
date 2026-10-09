@@ -16,7 +16,12 @@ import { useReportStore } from '@/stores/reportStore';
 import { useDoctorStore } from '@/stores/doctorStore';
 import { createReport, updateReport } from '@/services/reports';
 import { getProfile } from '@/services/profile';
-import { searchPatients, parseProDoctorBirthDate, getLastAttendingDoctor } from '@/services/prodoctor';
+import {
+  searchPatients,
+  parseProDoctorBirthDate,
+  getLastAttendingDoctor,
+  isProDoctorEnabled,
+} from '@/services/prodoctor';
 import { AppError } from '@/lib/errors';
 import { isoToday, formatDateBR } from '@/lib/date';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
@@ -45,6 +50,7 @@ export function PatientScreen() {
 
   const doctor = useDoctorStore((state) => state.doctor);
   const setDoctor = useDoctorStore((state) => state.setDoctor);
+  const prodoctorEnabled = isProDoctorEnabled(doctor);
 
   const [patientName, setPatientName] = useState(currentReport?.patient_name ?? '');
   const [birthDate, setBirthDate] = useState(currentReport?.patient_birth_date ?? '');
@@ -114,6 +120,8 @@ export function PatientScreen() {
 
   function handlePatientNameChange(text: string) {
     setPatientName(text);
+
+    if (!prodoctorEnabled) return;
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -224,7 +232,7 @@ export function PatientScreen() {
             disabled={isSaving}
           />
 
-          {showSuggestions && (isSearching || suggestions.length > 0) && (
+          {prodoctorEnabled && showSuggestions && (isSearching || suggestions.length > 0) && (
             <View style={autocompleteStyles.dropdown}>
               {isSearching && suggestions.length === 0 && (
                 <View style={autocompleteStyles.statusRow}>

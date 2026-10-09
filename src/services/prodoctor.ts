@@ -14,6 +14,8 @@ import { toISODate } from '@/lib/date';
 
 import { supabase } from './supabase';
 
+import type { DoctorRow } from '@/types/database';
+
 export type ProDoctorPatientSummary = {
   codigo: string;
   nome: string;
@@ -23,6 +25,15 @@ export type ProDoctorPatientSummary = {
 };
 
 const MIN_SEARCH_LENGTH = 2;
+
+// A credencial do ProDoctor é de um consultório específico, então a busca só
+// é oferecida a médicos habilitados manualmente (`doctors.prodoctor_enabled`,
+// ver supabase/migrations/010_doctors_prodoctor_flag.sql). Perfil ainda não
+// carregado conta como desabilitado. A Edge Function aplica a mesma regra
+// (403) — este helper só evita chamadas inúteis e esconde a UI.
+export function isProDoctorEnabled(doctor: Pick<DoctorRow, 'prodoctor_enabled'> | null | undefined): boolean {
+  return doctor?.prodoctor_enabled === true;
+}
 
 // Busca pacientes por nome. Termos com menos de 2 caracteres nem chegam a
 // disparar uma chamada de rede (evita spam de requisições enquanto o usuário

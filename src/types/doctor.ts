@@ -16,6 +16,9 @@ export type Doctor = {
   logo_url?: string;
   // Referência bibliográfica padrão
   default_reference: string;
+  // Integração ProDoctor (autofill de paciente) — só habilitado manualmente
+  // por um administrador, ver supabase/migrations/010_doctors_prodoctor_flag.sql
+  prodoctor_enabled: boolean;
   // Trial e assinatura
   trial_reports_used: number;
   subscription_status: SubscriptionStatus;
