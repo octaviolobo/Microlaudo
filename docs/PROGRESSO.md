@@ -570,7 +570,7 @@ Pedido do usuário: juntar num só lugar literalmente tudo que falta, além do q
 
 Branch `feat/prodoctor-flag` (a partir de `chore/expo-sdk-57-upgrade`).
 
-**Achado durante a implementação:** a policy `"Doctors: own row only"` (migration 005) é `FOR ALL` — o médico pode dar UPDATE/INSERT na própria linha. Uma coluna sozinha não bastaria: qualquer médico se auto-habilitaria com `update({ prodoctor_enabled: true })`. (Mesmo problema vale hoje para `subscription_status`/`trial_reports_used` — registrar quando a monetização for implementada.)
+**Achado durante a implementação:** a policy `"Doctors: own row only"` (migration 005) é `FOR ALL` — o médico pode dar UPDATE/INSERT na própria linha. Uma coluna sozinha não bastaria: qualquer médico se auto-habilitaria com `update({ prodoctor_enabled: true })`. (Mesmo problema valia para `subscription_status`/`trial_reports_used` — corrigido na Sessão 17, migration 011.)
 
 - `supabase/migrations/010_doctors_prodoctor_flag.sql`: coluna `prodoctor_enabled BOOLEAN NOT NULL DEFAULT false` + trigger `doctors_protect_prodoctor_enabled` (BEFORE INSERT OR UPDATE) que rejeita (`42501`) qualquer mudança na flag vinda das roles `authenticated`/`anon`. service_role, postgres (SQL editor) e funções SECURITY DEFINER continuam podendo alterar.
 - `supabase/functions/prodoctor-patients/index.ts`: depois de validar o JWT, lê `prodoctor_enabled` do próprio médico (client do usuário, sob RLS) e devolve **403** se não for `true`. É o controle de acesso real — vale para `search` e `lastDoctor`.
@@ -591,3 +591,19 @@ Branch `feat/prodoctor-flag` (a partir de `chore/expo-sdk-57-upgrade`).
   WHERE user_id = (SELECT id FROM auth.users WHERE email = '<email-dela>');
   ```
 - [ ] Teste manual: conta habilitada vê o autocomplete; outra conta não vê, e um `POST` direto na function devolve 403.
+
+---
+
+## Sessão 17 — 09 Out 2026
+
+### Trava das colunas administrativas de `doctors` (migration 011) + PR da flag ProDoctor
+
+- **PR #2** aberto: `feat/prodoctor-flag` → `chore/expo-sdk-57-upgrade` (https://github.com/octaviolobo/Microlaudo/pull/2). MCPs do GitHub e do Supabase configurados no escopo user do Claude Code.
+- **Problema:** a policy `"Doctors: own row only"` era `FOR ALL`. O médico podia (a) dar `update({ subscription_status: 'active' })` e virar assinante, e (b) DELETE + INSERT da própria linha para zerar `trial_reports_used`.
+- **`supabase/migrations/011_doctors_protect_admin_columns.sql`** (branch `fix/doctors-protected-columns`):
+  - troca a policy `FOR ALL` por `"Doctors: read own row"` (SELECT) + `"Doctors: update own row"` (UPDATE). Sem INSERT/DELETE para `authenticated` — a linha é criada por `handle_new_user()` (SECURITY DEFINER, owner `postgres`, que tem BYPASSRLS — conferido em `pg_roles`) e apagada pelo `ON DELETE CASCADE` de `auth.users` no `delete-account` (cascata de FK não passa por RLS). Nenhum código do app insere/apaga `doctors` diretamente.
+  - substitui o trigger da 010 por `doctors_protect_admin_columns` (BEFORE UPDATE), que barra `authenticated`/`anon` de mudar `prodoctor_enabled`, `subscription_status` e `trial_reports_used`.
+- **Teste antes de aplicar** (transações com ROLLBACK no remoto, rodando a migration real): médico enxerga só a própria linha (1), update de perfil funciona, e cada uma das 3 colunas dá `42501`. O teste de DELETE foi barrado pelo classificador do modo auto (DELETE em massa em produção, mesmo com ROLLBACK) — a ausência de policy de DELETE foi conferida via `pg_policy`.
+- **Aplicada em produção** via `npx supabase db query --linked -f` (mesmo motivo da 010: não usar `db push`). Conferido: policies `read own row`/`update own row`, triggers `doctors_protect_admin_columns` + `doctors_updated_at`.
+- **Implicação para a monetização (F30–F34):** incremento de `trial_reports_used` e mudança de `subscription_status` têm que vir do servidor (Edge Function com service_role, webhook de pagamento ou RPC SECURITY DEFINER). Um `update` direto do client vai falhar com `42501`.
+- O MCP do Supabase perdeu a sessão OAuth no meio (`Invalid or expired requestState`) — rodar `/mcp` → supabase → Authenticate de novo.
