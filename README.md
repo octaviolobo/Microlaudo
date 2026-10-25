@@ -6,9 +6,9 @@
 
 Da lâmina ao PDF assinado em minutos — não em 15 minutos de Word.
 
-[![Expo SDK](https://img.shields.io/badge/Expo-SDK%2052-000020?logo=expo&logoColor=white)](https://expo.dev)
-[![React Native](https://img.shields.io/badge/React%20Native-0.76-61DAFB?logo=react&logoColor=black)](https://reactnative.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3%20strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Expo SDK](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)](https://expo.dev)
+[![React Native](https://img.shields.io/badge/React%20Native-0.86-61DAFB?logo=react&logoColor=black)](https://reactnative.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0%20strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth%20%2B%20Storage-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![Platform](https://img.shields.io/badge/plataformas-iOS%20%7C%20Android%20%7C%20Web-informational)](#-plataformas)
 [![License](https://img.shields.io/badge/uso-privado-lightgrey)](#-licença)
@@ -64,13 +64,13 @@ O core do produto é um **wizard de 6 passos** que gera um laudo completo:
 
 | Camada | Tecnologia | Por quê |
 |---|---|---|
-| App (iOS / Android / Web) | **Expo SDK 52** + **React Native 0.76** + **React Native Web** | Uma única codebase para as três plataformas |
-| Navegação | **Expo Router v4** (file-based) | Roteamento tipado (`typedRoutes`), funciona igual em mobile e web |
+| App (iOS / Android / Web) | **Expo SDK 57** + **React Native 0.86** + **React Native Web** | Uma única codebase para as três plataformas |
+| Navegação | **Expo Router** (file-based) | Roteamento tipado (`typedRoutes`), funciona igual em mobile e web |
 | Estado global | **Zustand 4** | Stores enxutas (`authStore`, `reportStore`, `doctorStore`, `subscriptionStore`) sem boilerplate de Redux |
-| Backend / BaaS | **Supabase** (Postgres + Auth + Storage) | RLS resolve isolamento multi-tenant e LGPD nativamente, sem servidor próprio |
+| Backend / BaaS | **Supabase** (Postgres + Auth + Storage + Edge Functions) | RLS resolve isolamento multi-tenant e LGPD nativamente, sem servidor próprio |
 | Geração de PDF | **jsPDF** (client-side, desenho imperativo) | Ver [decisão documentada](#-decisões-técnicas-de-destaque) — trocado de `@react-pdf/renderer` após quebra de bundling no Metro |
 | Internacionalização | **react-i18next** | PT-BR como padrão, `common` / `report` / `clinical` como namespaces, pronto para novos idiomas |
-| Tipagem | **TypeScript 5.3 (strict)** | Zero `any` implícito; tipos do banco gerados via `supabase gen types` |
+| Tipagem | **TypeScript 6.0 (strict)** | Zero `any` implícito; tipos do banco gerados via `supabase gen types` |
 | Linting / formatação | ESLint + Prettier + `eslint-config-expo` | |
 | Testes | Jest + `jest-expo` | |
 
@@ -200,21 +200,31 @@ npm run dev:web     # atalho direto para a web
 O desenvolvimento é sessão a sessão, com progresso registrado de forma transparente em [`docs/PROGRESSO.md`](docs/PROGRESSO.md) — incluindo bugs encontrados, decisões revertidas e pendências reais, não só o que "deu certo".
 
 **Concluído:**
-- ✅ Autenticação (Supabase Auth) com guards de rota
+- ✅ Autenticação (Supabase Auth) com guards de rota + login social Google/Facebook (OAuth PKCE) e tela de completar perfil
 - ✅ Schema completo no Postgres com RLS `FORCE` + 3 buckets de Storage privados
+- ✅ Colunas administrativas de `doctors` (`subscription_status`, `trial_reports_used`, `prodoctor_enabled`) protegidas por trigger contra alteração pelo próprio médico
 - ✅ Design system próprio (WCAG AAA) com tokens em `src/constants/theme.ts`
 - ✅ Wizard completo de criação de laudo (6 steps) com persistência real
-- ✅ Cálculo de Score de Nugent e Critérios de Amsel
-- ✅ Geração de PDF real com upload para Storage e download assinado
-- ✅ Perfil do médico (dados pessoais, clínica, idioma)
+- ✅ Cálculo de Score de Nugent e Critérios de Amsel, com sugestão automática de conclusão
+- ✅ Geração de PDF real com upload para Storage e download assinado (web e mobile)
+- ✅ Histórico de laudos: lista, visualização, edição e retomada de rascunhos
+- ✅ Perfil do médico (dados pessoais, clínica, idioma, logo e assinatura)
+- ✅ Exclusão de conta (LGPD) via Edge Function `delete-account`
+- ✅ Integração ProDoctor (autofill de paciente e médico solicitante), liberada por médico via flag `prodoctor_enabled`
+- ✅ Testes unitários (Nugent, Amsel, datas, validação, erros, templates de conclusão, ProDoctor) e pipeline de lint corrigido
+- ✅ Upgrade para Expo SDK 57 e EAS Build configurado
 
 **Em aberto (transparência total, sem esconder dívida técnica):**
-- ⏳ Testes automatizados para `lib/nugent.ts` e `lib/amsel.ts` (lógica pronta e pura, cobertura ainda não escrita)
-- ⏳ Tela de histórico de laudos (`app/(tabs)/history.tsx`) ainda é placeholder
-- ⏳ Upload de logo e assinatura digital no perfil do médico
 - ⏳ Câmera nativa na captura de fotos (hoje só galeria/seleção de arquivo)
-- ⏳ Ajuste de alinhamento de coluna em duas seções do PDF (mesma classe de bug já corrigida na seção de achados)
-- ⏳ Pipeline de lint com incompatibilidade de resolver (`eslint-plugin-import` × TypeScript) a investigar
+- ⏳ Credenciais reais do OAuth (Google Cloud Console / Meta for Developers) e teste de ponta a ponta do login social
+- ⏳ Primeiro build nativo (`eas build`) + ciclo de TestFlight / teste interno no Android
+- ⏳ Ícones e splash definitivos (hoje placeholders)
+- ⏳ Monetização (RevenueCat/Stripe) — `subscription_status`/`trial_reports_used` só podem ser alterados pelo servidor
+- ⏳ Domínio, hospedagem pública da versão web, Política de Privacidade e Termos publicados
+- ⏳ Contas e assets das lojas (Apple Developer, Google Play)
+- ⏳ Monitoramento de erros (Sentry) e atualizações OTA (EAS Update)
+
+O checklist completo de lançamento está em [`docs/PROGRESSO.md`](docs/PROGRESSO.md) (Sessão 15).
 
 ---
 
