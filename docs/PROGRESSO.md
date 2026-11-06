@@ -607,3 +607,20 @@ Branch `feat/prodoctor-flag` (a partir de `chore/expo-sdk-57-upgrade`).
 - **Aplicada em produção** via `npx supabase db query --linked -f` (mesmo motivo da 010: não usar `db push`). Conferido: policies `read own row`/`update own row`, triggers `doctors_protect_admin_columns` + `doctors_updated_at`.
 - **Implicação para a monetização (F30–F34):** incremento de `trial_reports_used` e mudança de `subscription_status` têm que vir do servidor (Edge Function com service_role, webhook de pagamento ou RPC SECURITY DEFINER). Um `update` direto do client vai falhar com `42501`.
 - O MCP do Supabase perdeu a sessão OAuth no meio (`Invalid or expired requestState`) — rodar `/mcp` → supabase → Authenticate de novo.
+
+---
+
+## Sessão 18 — 24 Out 2026
+
+### README atualizado + app Expo vira o `master` + limpeza de branches
+
+- **README** (`46b77f2`): badges e tabela da stack atualizados (Expo SDK 52→57, React Native 0.76→0.86, TypeScript 5.3→6.0, Supabase com Edge Functions). Seção "Status do projeto" reescrita — vários itens listados como pendentes já tinham sido entregues (histórico de laudos, logo/assinatura, testes de Nugent/Amsel, alinhamento do PDF, pipeline de lint). Câmera nativa continua pendente: `expo-camera` está instalado mas não é usado, a captura ainda é só pela galeria.
+- **`master` substituído:** o `origin/master` ainda era a versão Flutter antiga (`f6de644`, 03/04/2026, monorepo `backend/` + `app/`) e **não tinha nenhum ancestral comum** com o histórico Expo — merge/PR normal não era possível. Decisão do usuário: arquivar e substituir.
+  - Flutter preservado no branch `legacy/flutter` e na tag `legacy-flutter-final` (ambos em `f6de644`).
+  - `master` apontado para o app Expo (`46b77f2`) com `git push --force-with-lease=master:f6de644`.
+- **Branches remotos apagados** (todos já contidos no `master`): `chore/expo-sdk-57-upgrade`, `expo-rewrite`, `worktree-agent-a6d4ad0ade0728da6`, `worktree-agent-a776ee5aa54bb9e0a`, `worktree-agent-a7a87e225f248aae3`, `stash-backup-preview-fix`. Este último tinha 2 commits fora do `master` (um stash salvo como branch); conferido que o conteúdo já estava no `f35ee35` antes de apagar.
+- Restam no remoto só `master` e `legacy/flutter`.
+
+**Pendências:**
+- [ ] Conferir se algum deploy automático (Railway do backend Flutter antigo, Vercel da versão web) observa o `master` — o código mudou completamente; se o backend antigo ainda estiver no ar, apontar o deploy para `legacy/flutter` ou desligar.
+- [ ] Continuam valendo as pendências das Sessões 16/17: habilitar `prodoctor_enabled` só na conta da mãe do usuário + teste manual, e credenciais OAuth Google/Facebook.
