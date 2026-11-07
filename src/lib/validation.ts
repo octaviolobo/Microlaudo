@@ -6,6 +6,21 @@ export const PATIENT_NAME_MAX_LENGTH = 200;
 export const REQUESTING_DOCTOR_MAX_LENGTH = 200;
 export const LONG_TEXT_MAX_LENGTH = 5000; // conclusão, descrição microscópica, referência bibliográfica
 
+// Senha — espelha a política do Supabase Auth (Dashboard → Authentication → Policies):
+// mínimo 10, letras + dígitos. O máximo de 72 vem do bcrypt (bytes além disso são
+// ignorados pelo GoTrue). O servidor é a autoridade; isto só dá feedback antes do envio.
+export const PASSWORD_MIN_LENGTH = 10;
+export const PASSWORD_MAX_LENGTH = 72;
+
+export type PasswordIssue = 'tooShort' | 'tooLong' | 'needsLetterAndDigit';
+
+export function getPasswordIssue(password: string): PasswordIssue | null {
+  if (password.length < PASSWORD_MIN_LENGTH) return 'tooShort';
+  if (password.length > PASSWORD_MAX_LENGTH) return 'tooLong';
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) return 'needsLetterAndDigit';
+  return null;
+}
+
 export const CRM_MIN_LENGTH = 4;
 export const CRM_MAX_LENGTH = 20;
 

@@ -13,6 +13,21 @@ import type { Session } from '@supabase/supabase-js';
 // Não faz nada no native — seguro chamar incondicionalmente.
 WebBrowser.maybeCompleteAuthSession();
 
+// Marca que a sessão atual veio de um link de recuperação de senha. Registrado no
+// import do módulo — antes de o supabase-js terminar a troca do ?code= no web
+// (detectSessionInUrl), que emite PASSWORD_RECOVERY uma única vez durante o init.
+// A tela /reset-password só mostra o formulário com essa marca, para que uma sessão
+// comum não vire atalho para trocar a senha sem o link do e-mail.
+let recoverySessionActive = false;
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') recoverySessionActive = true;
+  if (event === 'SIGNED_OUT') recoverySessionActive = false;
+});
+
+export function hasRecoverySession(): boolean {
+  return recoverySessionActive;
+}
+
 export type OAuthProvider = 'google' | 'facebook';
 
 export type RegisterInput = {
@@ -87,7 +102,15 @@ export async function signUp(input: RegisterInput): Promise<SignUpResult> {
     },
   });
 
-  if (error) throw new AppError(ErrorCodes.AUTH_REGISTER_FAILED, error.message, error);
+  if (error) {
+    if (error.code === 'weak_password') {
+      throw new AppError(ErrorCodes.AUTH_WEAK_PASSWORD, error.message, error);
+    }
+    if (error.code === 'user_already_exists' || error.code === 'email_exists') {
+      throw new AppError(ErrorCodes.AUTH_EMAIL_IN_USE, error.message, error);
+    }
+    throw new AppError(ErrorCodes.AUTH_REGISTER_FAILED, error.message, error);
+  }
 
   // session === null significa que o e-mail de confirmação foi enviado
   return { needsEmailConfirmation: data.session === null };
@@ -99,10 +122,37 @@ export async function signOut(): Promise<void> {
 }
 
 export async function sendPasswordReset(email: string): Promise<void> {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'microlaudo://reset-password',
-  });
+  // Native: microlaudo://reset-password · Web: <origin>/reset-password.
+  // As duas URLs precisam estar em Authentication → URL Configuration → Redirect URLs.
+  const redirectTo = AuthSession.makeRedirectUri({ path: 'reset-password' });
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   if (error) throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, error.message, error);
+}
+
+// Native: troca o ?code= do deep link pela sessão de recuperação (o code verifier
+// PKCE ficou no SecureStore deste aparelho — link aberto em outro aparelho falha).
+// No web isso já foi feito pelo supabase-js (detectSessionInUrl).
+export async function exchangeRecoveryCode(code: string): Promise<void> {
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) throw new AppError(ErrorCodes.AUTH_RECOVERY_INVALID, error.message, error);
+}
+
+// Grava a nova senha e encerra TODAS as sessões (scope global), inclusive uma
+// eventualmente roubada — quem pediu o reset entra de novo com a senha nova.
+export async function updatePasswordAndSignOut(newPassword: string): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) {
+    const code = error.code === 'weak_password' || error.code === 'same_password'
+      ? ErrorCodes.AUTH_WEAK_PASSWORD
+      : ErrorCodes.AUTH_PASSWORD_UPDATE_FAILED;
+    throw new AppError(code, error.message, error);
+  }
+  recoverySessionActive = false;
+  const { error: signOutError } = await supabase.auth.signOut({ scope: 'global' });
+  if (signOutError) {
+    // Senha já trocada; falha só no logout global — não desfaz o sucesso.
+    await supabase.auth.signOut({ scope: 'local' });
+  }
 }
 
 export async function getSession(): Promise<Session | null> {

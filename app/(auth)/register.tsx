@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { signUp } from '@/services/auth';
-import { AppError } from '@/lib/errors';
+import { AppError, ErrorCodes } from '@/lib/errors';
+import { getPasswordIssue } from '@/lib/validation';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 
@@ -25,8 +26,9 @@ export function RegisterScreen() {
       setError(t('auth.fillRequired'));
       return;
     }
-    if (password.length < 6) {
-      setError(t('auth.weakPassword'));
+    const passwordIssue = getPasswordIssue(password);
+    if (passwordIssue) {
+      setError(t(`auth.passwordIssue.${passwordIssue}`));
       return;
     }
     try {
@@ -41,7 +43,15 @@ export function RegisterScreen() {
       });
       if (needsEmailConfirmation) setConfirmationSent(true);
     } catch (err) {
-      setError(err instanceof AppError ? t('auth.emailInUse') : t('genericError'));
+      if (err instanceof AppError && err.code === ErrorCodes.AUTH_WEAK_PASSWORD) {
+        setError(t('auth.weakPasswordServer'));
+      } else if (err instanceof AppError && err.code === ErrorCodes.AUTH_EMAIL_IN_USE) {
+        setError(t('auth.emailInUse'));
+      } else if (err instanceof AppError && err.code === ErrorCodes.VALIDATION_FAILED) {
+        setError(err.message);
+      } else {
+        setError(t('genericError'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -90,6 +100,7 @@ export function RegisterScreen() {
         disabled={isLoading}
         accessibilityLabel={t('auth.password')}
       />
+      <Text style={styles.hint}>{t('auth.passwordRules')}</Text>
       <Input
         value={crm}
         onChangeText={setCrm}
@@ -141,5 +152,12 @@ const styles = StyleSheet.create({
     fontFamily: Typography.heading,
     color: Colors.foreground,
     marginBottom: Spacing.lg,
+  },
+  hint: {
+    alignSelf: 'flex-start',
+    fontSize: 13,
+    fontFamily: Typography.body,
+    color: Colors.textMuted,
+    marginBottom: Spacing.sm,
   },
 });

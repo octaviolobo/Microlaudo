@@ -102,6 +102,7 @@ export function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="complete-profile" />
+        <Stack.Screen name="reset-password" />
         <Stack.Screen name="report" />
         <Stack.Screen name="report-usg" />
         <Stack.Screen name="+not-found" />

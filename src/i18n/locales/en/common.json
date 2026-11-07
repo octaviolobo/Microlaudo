@@ -49,11 +49,24 @@
     "confirmEmail": "Account created! Check your email to confirm, then sign in.",
     "invalidCredentials": "Incorrect email or password.",
     "emailInUse": "This email is already in use.",
-    "weakPassword": "Password must be at least 6 characters.",
     "fillRequired": "Please fill in all required fields.",
     "continueWithGoogle": "Continue with Google",
     "continueWithFacebook": "Continue with Facebook",
-    "orDivider": "or"
+    "orDivider": "or",
+    "passwordIssue": {
+      "tooShort": "Password must be at least 10 characters.",
+      "tooLong": "Password must be at most 72 characters.",
+      "needsLetterAndDigit": "Password must contain letters and numbers."
+    },
+    "passwordRules": "Use at least 10 characters, with letters and numbers.",
+    "weakPasswordServer": "Password is too weak or has been leaked. Choose another one.",
+    "passwordMismatch": "Passwords do not match.",
+    "newPasswordTitle": "New password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "savePassword": "Save new password",
+    "passwordUpdated": "Password changed! For security, all sessions were signed out. Sign in again with your new password.",
+    "resetLinkInvalid": "This reset link is invalid or has expired. Request a new one via \"Forgot password\" on the same device where you will open the email."
   },
   "completeProfile": {
     "title": "Complete your profile",
