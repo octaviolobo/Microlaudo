@@ -49,11 +49,24 @@
     "confirmEmail": "Conta criada! Verifique seu e-mail para confirmar e depois faça login.",
     "invalidCredentials": "E-mail ou senha incorretos.",
     "emailInUse": "Este e-mail já está em uso.",
-    "weakPassword": "Senha deve ter pelo menos 6 caracteres.",
     "fillRequired": "Preencha todos os campos obrigatórios.",
     "continueWithGoogle": "Continuar com Google",
     "continueWithFacebook": "Continuar com Facebook",
-    "orDivider": "ou"
+    "orDivider": "ou",
+    "passwordIssue": {
+      "tooShort": "A senha deve ter pelo menos 10 caracteres.",
+      "tooLong": "A senha deve ter no máximo 72 caracteres.",
+      "needsLetterAndDigit": "A senha deve conter letras e números."
+    },
+    "passwordRules": "Use pelo menos 10 caracteres, com letras e números.",
+    "weakPasswordServer": "Senha fraca ou já vazada. Escolha outra senha.",
+    "passwordMismatch": "As senhas não coincidem.",
+    "newPasswordTitle": "Nova senha",
+    "newPassword": "Nova senha",
+    "confirmPassword": "Confirmar nova senha",
+    "savePassword": "Salvar nova senha",
+    "passwordUpdated": "Senha alterada! Por segurança, todas as sessões foram encerradas. Entre de novo com a nova senha.",
+    "resetLinkInvalid": "Este link de redefinição é inválido ou expirou. Peça um novo em \"Esqueci minha senha\", no mesmo aparelho em que vai abrir o e-mail."
   },
   "completeProfile": {
     "title": "Complete seu cadastro",

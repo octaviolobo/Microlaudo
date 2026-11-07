@@ -5,8 +5,11 @@ import {
   CRM_MAX_LENGTH,
   CRM_MIN_LENGTH,
   LONG_TEXT_MAX_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
   PATIENT_NAME_MAX_LENGTH,
   REQUESTING_DOCTOR_MAX_LENGTH,
+  getPasswordIssue,
   isValidCpf,
   isValidSusCard,
   normalizeDigits,
@@ -172,5 +175,29 @@ describe('normalizeDigits', () => {
     expect(normalizeDigits('')).toBeNull();
     expect(normalizeDigits(' . - ')).toBeNull();
     expect(normalizeDigits(undefined)).toBeNull();
+  });
+});
+
+describe('getPasswordIssue', () => {
+  it('aceita senha com letras e dígitos no tamanho mínimo', () => {
+    expect(getPasswordIssue('abcdefghi1')).toBeNull();
+    expect(getPasswordIssue('Senha Forte 2026!')).toBeNull();
+  });
+
+  it('recusa senha curta (espelha o mínimo do Supabase Auth)', () => {
+    expect(PASSWORD_MIN_LENGTH).toBe(10);
+    expect(getPasswordIssue('abcdefgh1')).toBe('tooShort');
+    expect(getPasswordIssue('')).toBe('tooShort');
+  });
+
+  it('recusa senha acima do limite do bcrypt', () => {
+    expect(getPasswordIssue('a1'.repeat(PASSWORD_MAX_LENGTH / 2) + 'x')).toBe('tooLong');
+    expect(getPasswordIssue('a1'.repeat(PASSWORD_MAX_LENGTH / 2))).toBeNull();
+  });
+
+  it('exige letra e dígito', () => {
+    expect(getPasswordIssue('somenteletras')).toBe('needsLetterAndDigit');
+    expect(getPasswordIssue('1234567890')).toBe('needsLetterAndDigit');
+    expect(getPasswordIssue('ééééééééé1')).toBe('needsLetterAndDigit'); // GoTrue só conta A–Z/a–z
   });
 });
