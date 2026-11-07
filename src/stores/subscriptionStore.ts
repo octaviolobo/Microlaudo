@@ -9,6 +9,7 @@ type SubscriptionState = {
   trialUsed: number;
   setStatus: (status: SubscriptionStatus) => void;
   setTrialUsed: (count: number) => void;
+  reset: () => void;
 };
 
 export const useSubscriptionStore = create<SubscriptionState>((set) => ({
@@ -16,6 +17,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set) => ({
   trialUsed: 0,
   setStatus: (status) => set({ status }),
   setTrialUsed: (trialUsed) => set({ trialUsed }),
+  reset: () => set({ status: 'trial', trialUsed: 0 }),
 }));
 
 // Seletor standalone — uso correto: useSubscriptionStore(selectCanFinalize)
