@@ -1,7 +1,9 @@
 const ISO_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
-export function isoToday(): string {
-  return new Date().toISOString().slice(0, 10);
+// Data local do aparelho. toISOString() usaria UTC: no Brasil, depois das 21h o
+// "hoje" virava amanhã (data do exame errada e calendário liberando o dia seguinte).
+export function isoToday(now: Date = new Date()): string {
+  return toISODate(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 export function formatDateBR(iso: string | undefined | null): string {
