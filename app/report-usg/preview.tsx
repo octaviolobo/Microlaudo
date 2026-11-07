@@ -16,6 +16,7 @@ import { calculateAge, formatDateBR } from '@/lib/date';
 import { formatCpf, formatSusCard } from '@/lib/format';
 import { parseUsgContent } from '@/lib/usgContent';
 import { resolveUsgAnalysisText } from '@/lib/usgText';
+import { downloadPdfWeb, pdfFileName } from '@/lib/webPdfDownload';
 
 import type { ReportRow } from '@/types/database';
 
@@ -82,24 +83,6 @@ export function UsgPreviewScreen() {
     }
   }
 
-  // Web: tenta a folha de compartilhamento com o arquivo anexado; se não houver,
-  // abre a URL assinada na própria aba (mesma estratégia do preview da microscopia).
-  async function tryShareReportPdf(url: string): Promise<boolean> {
-    const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-    if (!nav.share || !nav.canShare) return false;
-    try {
-      const blob = await fetch(url).then((r) => r.blob());
-      const file = new File([blob], `laudo-usg-${report?.patient_name ?? 'microlaudo'}.pdf`, {
-        type: 'application/pdf',
-      });
-      if (!nav.canShare({ files: [file] })) return false;
-      await nav.share({ files: [file] });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   async function handleDownloadPdf() {
     if (!report) return;
     try {
@@ -108,8 +91,7 @@ export function UsgPreviewScreen() {
       const path = report.pdf_url ?? (await generateAndUploadReportPdf(report, []));
       setReport((prev) => (prev ? { ...prev, pdf_url: path } : prev));
       const url = await getSignedPdfUrl(path);
-      const shared = await tryShareReportPdf(url);
-      if (!shared) window.location.href = url;
+      await downloadPdfWeb(url, pdfFileName('laudo-usg', report.patient_name));
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {
