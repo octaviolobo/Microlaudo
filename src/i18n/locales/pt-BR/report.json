@@ -20,7 +20,10 @@
       "requestingDoctorDefault": "Dr(a) {{name}}",
       "prodoctorSearching": "Buscando no ProDoctor...",
       "prodoctorNoBirthDate": "Data de nascimento não informada",
-      "prodoctorLoadingDoctor": "Buscando médica do último atendimento..."
+      "prodoctorLoadingDoctor": "Buscando médica do último atendimento...",
+      "examDate": "Data do exame",
+      "cpf": "CPF (opcional)",
+      "susCard": "Cartão SUS (opcional)"
     },
     "photos": {
       "title": "Fotos da Lâmina",
@@ -70,6 +73,75 @@
     "view": "Visualizar",
     "continueDraft": "Continuar rascunho",
     "edit": "Editar",
-    "editConfirm": "Editar este laudo criará uma nova revisão. Continuar?"
+    "editConfirm": "Editar este laudo criará uma nova revisão. Continuar?",
+    "examinedOn": "Exame em {{date}}",
+    "typeUnavailable": "Disponível na versão web"
+  },
+  "reportTypes": {
+    "microscopia": "Microscopia vaginal",
+    "usg_transvaginal": "USG transvaginal"
+  },
+  "usg": {
+    "steps": {
+      "patient": "Dados do Paciente",
+      "analysis": "Análise",
+      "text": "Texto e Opinião",
+      "preview": "Preview do Laudo"
+    },
+    "sections": {
+      "uterus": "Útero",
+      "cervix": "Colo uterino",
+      "endometrium": "Endométrio",
+      "rightOvary": "Ovário direito",
+      "leftOvary": "Ovário esquerdo",
+      "pelvis": "Cavidade pélvica"
+    },
+    "fields": {
+      "absent": "Útero não caracterizado (pós-histerectomia)",
+      "shape": "Forma",
+      "position": "Posição",
+      "deviation": "Centrado / desviado",
+      "contours": "Contornos",
+      "size": "Dimensões",
+      "length": "Comprimento (cm)",
+      "ap": "AP (cm)",
+      "transverse": "Transverso (cm)",
+      "referenceVolume": "Volume normal até (cm³)",
+      "volume": "Volume estimado: {{volume}} cm³",
+      "volumePending": "Volume: preencha as 3 medidas",
+      "volumeAbove": "acima da referência",
+      "myometrium": "Miométrio",
+      "aspect": "Aspecto",
+      "contour": "Contorno",
+      "texture": "Textura",
+      "thickness": "Espessura (mm)",
+      "echogenicity": "Ecogenicidade",
+      "doppler": "Doppler — escore de vascularização",
+      "dopplerNone": "Não realizado",
+      "characterized": "Ovário caracterizado",
+      "parenchyma": "Parênquima",
+      "adnexaFree": "Região anexial sem massas ou coleções",
+      "freeFluid": "Líquido livre",
+      "notes": "Observações (opcional)",
+      "technique": "Técnica"
+    },
+    "text": {
+      "analysis": "Análise",
+      "analysisHelper": "Gerado a partir dos campos. Você pode editar livremente.",
+      "regenerate": "Gerar de novo a partir dos campos",
+      "edited": "Texto editado manualmente — mudanças nos campos não atualizam este texto até você gerar de novo.",
+      "opinion": "Opinião do relatório",
+      "useSuggested": "Usar opinião sugerida"
+    },
+    "preview": {
+      "procedures": "Procedimentos realizados",
+      "findings": "Achados / Descrição",
+      "technique": "Técnica",
+      "analysis": "Análise",
+      "opinion": "Opinião do relatório",
+      "pdfWebOnly": "O PDF do laudo de USG por enquanto só é gerado na versão web."
+    },
+    "invalidNumber": "{{field}}: valor inválido",
+    "fixInvalidFields": "Corrija os campos numéricos marcados antes de continuar."
   }
 }

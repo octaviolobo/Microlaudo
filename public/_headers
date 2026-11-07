@@ -1,0 +1,15 @@
+# Cabeçalhos do Cloudflare Pages (substitui o public/vercel.json).
+# O Pages já serve URLs limpas por padrão (/home → home.html), que era o único
+# ajuste do vercel.json ("cleanUrls"). Rotas desconhecidas caem no index.html
+# (modo SPA, porque o export não gera 404.html) e o expo-router mostra o +not-found.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Bundles com hash no nome: podem ficar em cache para sempre.
+/_expo/static/*
+  Cache-Control: public, max-age=31536000, immutable

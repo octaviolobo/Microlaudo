@@ -37,7 +37,7 @@ function tr(key: string, options?: Record<string, unknown>) {
 // Busca os bytes direto via fetch (em vez de um <img crossOrigin>) — a mesma URL
 // assinada já é usada por um <Image> sem CORS no preview, e reusar via elemento
 // <img> com crossOrigin dispara uma falha de cache do navegador na segunda busca.
-async function loadImageAsDataUrl(url: string): Promise<string> {
+export async function loadImageAsDataUrl(url: string): Promise<string> {
   const blob = await fetch(url).then((r) => r.blob());
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

@@ -103,6 +103,7 @@ export function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="complete-profile" />
         <Stack.Screen name="report" />
+        <Stack.Screen name="report-usg" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

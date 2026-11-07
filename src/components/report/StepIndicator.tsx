@@ -3,22 +3,24 @@ import { useTranslation } from 'react-i18next';
 
 import { Colors, Typography, Spacing } from '@/constants/theme';
 
-const TOTAL_STEPS = 6;
+// Microscopia tem 6 steps; outros tipos de laudo (ex.: USG) passam o próprio total.
+const DEFAULT_TOTAL_STEPS = 6;
 
 type StepIndicatorProps = {
   currentStep: number;
+  totalSteps?: number;
 };
 
-export function StepIndicator({ currentStep }: StepIndicatorProps) {
+export function StepIndicator({ currentStep, totalSteps = DEFAULT_TOTAL_STEPS }: StepIndicatorProps) {
   const { t } = useTranslation('report');
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>
-        {t('nav.step', { current: currentStep, total: TOTAL_STEPS })}
+        {t('nav.step', { current: currentStep, total: totalSteps })}
       </Text>
       <View style={styles.dots}>
-        {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((step) => (
+        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
           <View
             key={step}
             style={[

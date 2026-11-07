@@ -30,3 +30,26 @@ export function daysInMonth(year: number, month: number): number {
 export function firstWeekdayOfMonth(year: number, month: number): number {
   return new Date(year, month, 1).getDay();
 }
+
+// Idade em anos completos na data de referência (ex.: data do exame). null se alguma
+// data for inválida ou se o nascimento for depois da referência.
+export function calculateAge(birthIso: string | null | undefined, referenceIso: string): number | null {
+  const birth = birthIso ? parseISODate(birthIso) : null;
+  const ref = parseISODate(referenceIso);
+  if (!birth || !ref) return null;
+  let age = ref.year - birth.year;
+  if (ref.month < birth.month || (ref.month === birth.month && ref.day < birth.day)) age -= 1;
+  return age >= 0 ? age : null;
+}
+
+const MONTHS_PT = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+];
+
+// "22 de outubro de 2026 às 10:49", no fuso local — rodapé do laudo de USG.
+export function formatDateTimeLongBR(date: Date): string {
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${date.getDate()} de ${MONTHS_PT[date.getMonth()]} de ${date.getFullYear()} às ${hh}:${mm}`;
+}

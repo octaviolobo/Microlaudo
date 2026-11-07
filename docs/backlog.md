@@ -171,6 +171,52 @@ Pronto para a médica parceira testar.
 
 ---
 
+## Sprint USG-Web — Laudo de USG só na versão web (antes do lançamento oficial)
+
+**Objetivo:** colocar no ar, rápido, um segundo tipo de laudo (USG) **apenas na web**, sem mexer no fluxo de microscopia nem no mobile. No lançamento oficial, o mobile ganha a feature trocando uma flag.
+
+**Estratégia:** mesma codebase, tudo mergeado no `master`, com **trava por plataforma** (`Platform.OS === 'web'`) — sem branch longo separado. Padrão já usado em `services/pdf.ts`, `images.ts`, `AssetUploader.tsx`.
+
+**Hospedagem web:** Cloudflare Pages (substitui o Vercel previsto no F45).
+
+### Pré-requisitos (👤)
+
+- [x] **Definir qual USG entra primeiro** → **USG pélvica transvaginal**.
+- [x] **Modelo de laudo real** → recebido; estrutura documentada em [`spec-usg-transvaginal.md`](spec-usg-transvaginal.md).
+- [x] **Decisões da spec**: CPF e cartão SUS opcionais, sem endereço; **sem imagens**; referências de volume com padrão editável. SIGTAP mantido no PDF.
+- [ ] **Assinar Supabase Pro** (~US$ 25/mês) antes de uso com paciente real: o Free pausa após ~7 dias sem requisições, **não tem backup** e só tem 1 GB de Storage. Dados de saúde (LGPD) não podem ficar sem backup.
+
+| # | Feature | Quem faz o quê | Sessões | 👤 Tempo seu |
+|---|---------|----------------|---------|-------------|
+| U01 | ✅ **Migration `014_report_types.sql`** | 🤖 `reports.report_type` (default `'microscopia'`, CHECK com os tipos) + `reports.content JSONB` para campos específicos do USG + `patient_cpf` / `patient_sus_card` (nullable). Insert do USG envia `material`/`method` explicitamente (defaults são de microscopia). RLS atual já cobre. Atualizar `src/types/database.ts`. | 1 | 10 min |
+| U02 | ✅ **Tipos + store + service** | 🤖 `types/report.ts` com `ReportType` e schema do conteúdo USG; `reportStore` ganha `reportType` + `setContent()` e `hydrate()` respeita o tipo; `createReport` aceita `report_type`. `finalizeReport`/revisão/audit_log reaproveitados. | (junto com U01) | — |
+| U03 | ✅ **Trava de plataforma** | 🤖 `src/constants/features.ts` com `REPORT_TYPES_ENABLED` (`usg: Platform.OS === 'web'`). Home: na web, "Novo laudo" abre escolha de tipo; no mobile segue direto para `/report/patient`. Guard no layout das rotas USG (redireciona para home se desabilitado). Histórico: badge de tipo; no mobile, USG aparece como "disponível na versão web". | 1 | 15 min |
+| U04 | ✅ **Telas do laudo USG transvaginal (`app/report-usg/`)** | 🤖 Paciente (formulário atual extraído para componente + CPF/SUS) → Análise (útero, colo, endométrio, ovários, pelve; volume calculado ao vivo) → Texto gerado editável + Opinião → Preview/PDF. Sem imagens. Fluxo de microscopia intocado. Detalhes em `spec-usg-transvaginal.md`. | 1-2 | 30 min (validar campos com a médica) |
+| U05 | ✅ **PDF do USG** | 🤖 Extrair partes comuns de `lib/reportPdf.ts` (cabeçalho/logo, dados do paciente, fotos, assinatura, rodapé) para `reportPdfShared.ts`; criar `reportPdfUsg.ts`. Microscopia deve gerar PDF idêntico ao atual. | 1-2 | 20 min (comparar com modelo) |
+| U06 | ✅ **Testes** | 🤖 Validação do conteúdo USG, geração de PDF, trava (USG bloqueado no mobile), regressão do PDF de microscopia. | (junto com U05) | 5 min |
+| U07 | 🟡 **Deploy web no Cloudflare Pages** | 🤖 Trocar `public/vercel.json` pelos equivalentes do Pages (`public/_redirects` / `_headers`; clean URLs o Pages já faz por padrão), conferir 404 e reload em rotas internas. Build: `npm run build:web`, saída `dist`. 👤 Conectar repo no Pages, configurar `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` (entram no build), domínio, e adicionar a URL do Pages nos Redirect URLs do Supabase Auth / OAuth do Google. | 1 | 45 min |
+| U08 | 🟡 **Keep-alive do projeto Supabase de dev** | 🤖 Cloudflare Worker com Cron Trigger fazendo uma consulta leve a cada ~3 dias para evitar a pausa do plano Free. **Só para dev** — produção fica no Pro. 👤 Deploy do Worker (`wrangler deploy`) e secret da anon key. | (junto com U07) | 15 min |
+
+**Status (06/11/2026):** ✅ código pronto (U01–U06) · 🟡 U07/U08: arquivos prontos no repo, faltam os passos 👤 em [`deploy-cloudflare.md`](deploy-cloudflare.md).
+Decisões de implementação: PDF do USG reaproveita o estilo do PDF de microscopia, mas em arquivo próprio (`src/lib/usgReportPdf.ts`) — a extração das partes comuns de `reportPdf.ts` ficou para depois, para não arriscar o PDF de microscopia agora. PDF do USG só existe na web (jsPDF); a versão HTML/expo-print entra no lançamento mobile.
+
+**Sprint USG-Web: ~5-7 sessões · ~2h20 do seu tempo · ~1-2 semanas**
+
+### No lançamento oficial ("juntar tudo")
+
+- [ ] Trocar `REPORT_TYPES_ENABLED.usg` para `true`.
+- [ ] Criar a versão HTML (expo-print) do PDF do USG — hoje `services/pdf.ts` recusa USG fora da web.
+- [ ] Testar telas USG no celular (layout das seções em tela estreita, geração de PDF no nativo).
+- [ ] Novo build EAS (entra no F44/F45).
+
+---
+
+## Ideias futuras (ainda sem fase definida)
+
+- [ ] **Outros tipos de laudo além de USG** — a Sprint USG-Web cria a base (`report_type` + `content JSONB` + trava por plataforma); novos tipos reaproveitam essa estrutura. Lista e prioridade ainda a definir.
+
+---
+
 ## Resumo Geral
 
 | Fase | Sessões comigo | 👤 Seu tempo | Semanas |

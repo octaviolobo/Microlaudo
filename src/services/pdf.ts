@@ -4,6 +4,7 @@ import * as Print from 'expo-print';
 
 import { AppError, ErrorCodes } from '@/lib/errors';
 import { buildReportPdfBlob, buildReportPdfHtml, type ReportPdfAssets } from '@/lib/reportPdf';
+import { buildUsgReportPdfBlob } from '@/lib/usgReportPdf';
 
 import { supabase } from './supabase';
 import { getProfile } from './profile';
@@ -21,6 +22,17 @@ export async function generateAndUploadReportPdf(
   } = await supabase.auth.getUser();
 
   if (!user) throw new AppError(ErrorCodes.PDF_GENERATION_FAILED, 'Usuário não autenticado');
+
+  // O PDF do USG só existe em jsPDF (web). No mobile o tipo está travado
+  // (src/constants/features.ts); este guard só protege contra chamada indevida.
+  // No lançamento oficial, criar a versão HTML (expo-print) antes de liberar o mobile.
+  const isUsg = report.report_type === 'usg_transvaginal';
+  if (isUsg && Platform.OS !== 'web') {
+    throw new AppError(
+      ErrorCodes.PDF_GENERATION_FAILED,
+      'O PDF do laudo de USG por enquanto só é gerado na versão web',
+    );
+  }
 
   // Na web usamos jsPDF (Blob, ver buildReportPdfBlob); no nativo, jsPDF quebra
   // no Hermes ("Unknown encoding: latin1"), então usamos expo-print para
@@ -50,7 +62,9 @@ export async function generateAndUploadReportPdf(
       }
     }
 
-    if (Platform.OS === 'web') {
+    if (isUsg) {
+      body = await buildUsgReportPdfBlob(report, doctor, assets);
+    } else if (Platform.OS === 'web') {
       body = await buildReportPdfBlob(report, doctor, photoUrls, assets);
     } else {
       const html = await buildReportPdfHtml(report, doctor, photoUrls, assets);

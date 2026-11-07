@@ -1,18 +1,62 @@
+import { USG_TRANSVAGINAL_MATERIAL, USG_TRANSVAGINAL_METHOD } from '@/constants/usg-options';
 import { AppError, ErrorCodes } from '@/lib/errors';
+import { createDefaultUsgContent, parseUsgContent, usgContentToJson, validateUsgContent } from '@/lib/usgContent';
 import {
+  normalizeDigits,
+  validateCpf,
   validateLongText,
   validatePatientName,
   validateRequestingDoctor,
+  validateSusCard,
 } from '@/lib/validation';
 
 import { supabase } from './supabase';
 
-import type { ReportRow, ReportUpdate } from '@/types/database';
-import type { PatientData } from '@/types/report';
+import type { ReportInsert, ReportRow, ReportUpdate } from '@/types/database';
+import type { PatientData, ReportType } from '@/types/report';
 
-export async function createReport(patient: PatientData): Promise<ReportRow> {
+// Valida CPF/cartão SUS e normaliza para só dígitos (formato exigido pela migration 014).
+// Só toca nas chaves presentes no patch, para não apagar valores num update parcial.
+function normalizePatientDocs<T extends { patient_cpf?: string | null; patient_sus_card?: string | null }>(
+  data: T,
+): T {
+  const out = { ...data };
+  if ('patient_cpf' in data) {
+    validateCpf(data.patient_cpf);
+    out.patient_cpf = normalizeDigits(data.patient_cpf);
+  }
+  if ('patient_sus_card' in data) {
+    validateSusCard(data.patient_sus_card);
+    out.patient_sus_card = normalizeDigits(data.patient_sus_card);
+  }
+  return out;
+}
+
+// Campos fixos por tipo na criação. `material`/`method` têm default de microscopia no
+// banco, então tipos novos precisam enviá-los explicitamente.
+function typeDefaults(type: ReportType): Partial<ReportInsert> {
+  switch (type) {
+    case 'usg_transvaginal':
+      return {
+        report_type: type,
+        material: USG_TRANSVAGINAL_MATERIAL,
+        method: USG_TRANSVAGINAL_METHOD,
+        content: usgContentToJson(createDefaultUsgContent()),
+      };
+    case 'microscopia':
+      // Usa o default do banco ('microscopia'): o fluxo de microscopia não depende da
+      // coluna nova existir.
+      return {};
+  }
+}
+
+export async function createReport(
+  patient: PatientData,
+  reportType: ReportType = 'microscopia',
+): Promise<ReportRow> {
   validatePatientName(patient.patient_name);
   validateRequestingDoctor(patient.requesting_doctor);
+  const normalizedPatient = normalizePatientDocs(patient);
 
   const { data: doctor, error: doctorError } = await supabase
     .from('doctors')
@@ -23,7 +67,7 @@ export async function createReport(patient: PatientData): Promise<ReportRow> {
 
   const { data, error } = await supabase
     .from('reports')
-    .insert({ ...patient, doctor_id: doctor.id, status: 'draft' })
+    .insert({ ...normalizedPatient, ...typeDefaults(reportType), doctor_id: doctor.id, status: 'draft' })
     .select()
     .single();
 
@@ -37,10 +81,21 @@ export async function updateReport(id: string, patch: ReportUpdate): Promise<Rep
   validateLongText(patch.conclusion, 'Conclusão');
   validateLongText(patch.microscopic_description, 'Descrição microscópica');
   validateLongText(patch.bibliographic_reference, 'Referência bibliográfica');
+  // `content` só é aceito no formato do USG: parse (forma; campo inválido volta ao default)
+  // + validação (faixas de valores e tamanho dos textos).
+  // O tipo do laudo não muda depois de criado (trigger da migration 014), então não há
+  // `content` de microscopia para validar.
+  // Salva a versão parseada (nunca o objeto cru), para não persistir campos desconhecidos.
+  const safePatch = normalizePatientDocs(patch);
+  if (patch.content != null) {
+    const content = parseUsgContent(patch.content);
+    validateUsgContent(content);
+    safePatch.content = usgContentToJson(content);
+  }
 
   const { data, error } = await supabase
     .from('reports')
-    .update(patch)
+    .update(safePatch)
     .eq('id', id)
     .select()
     .single();

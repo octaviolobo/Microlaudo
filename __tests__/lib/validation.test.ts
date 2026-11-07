@@ -7,10 +7,15 @@ import {
   LONG_TEXT_MAX_LENGTH,
   PATIENT_NAME_MAX_LENGTH,
   REQUESTING_DOCTOR_MAX_LENGTH,
+  isValidCpf,
+  isValidSusCard,
+  normalizeDigits,
+  validateCpf,
   validateCrm,
   validateLongText,
   validatePatientName,
   validateRequestingDoctor,
+  validateSusCard,
 } from '@/lib/validation';
 
 describe('validatePatientName', () => {
@@ -112,5 +117,60 @@ describe('validateCrm', () => {
 
   it('rejeita CRM acima do tamanho máximo', () => {
     expect(() => validateCrm('1'.repeat(CRM_MAX_LENGTH + 1))).toThrow(AppError);
+  });
+});
+
+describe('CPF', () => {
+  it('aceita CPF válido com ou sem pontuação', () => {
+    expect(isValidCpf('529.982.247-25')).toBe(true);
+    expect(isValidCpf('52998224725')).toBe(true);
+  });
+
+  it('rejeita dígito verificador errado', () => {
+    expect(isValidCpf('529.982.247-24')).toBe(false);
+  });
+
+  it('rejeita tamanho errado e dígitos repetidos', () => {
+    expect(isValidCpf('1234567890')).toBe(false);
+    expect(isValidCpf('111.111.111-11')).toBe(false);
+  });
+
+  it('validateCpf: vazio/nulo passa (campo opcional), inválido lança', () => {
+    expect(() => validateCpf(undefined)).not.toThrow();
+    expect(() => validateCpf('')).not.toThrow();
+    expect(() => validateCpf('529.982.247-24')).toThrow(AppError);
+  });
+});
+
+describe('Cartão SUS (CNS)', () => {
+  it('aceita definitivo (1/2) e provisório (7/8/9) válidos', () => {
+    expect(isValidSusCard('100 1234 5678 9004')).toBe(true);
+    expect(isValidSusCard('700123456789002')).toBe(true);
+  });
+
+  it('rejeita soma ponderada inválida', () => {
+    expect(isValidSusCard('100123456789005')).toBe(false);
+  });
+
+  it('rejeita primeiro dígito inválido e tamanho errado', () => {
+    expect(isValidSusCard('300123456789004')).toBe(false);
+    expect(isValidSusCard('10012345678900')).toBe(false);
+  });
+
+  it('validateSusCard: vazio passa, inválido lança', () => {
+    expect(() => validateSusCard(null)).not.toThrow();
+    expect(() => validateSusCard('100123456789005')).toThrow(AppError);
+  });
+});
+
+describe('normalizeDigits', () => {
+  it('remove pontuação e espaços', () => {
+    expect(normalizeDigits('529.982.247-25')).toBe('52998224725');
+  });
+
+  it('vazio vira null', () => {
+    expect(normalizeDigits('')).toBeNull();
+    expect(normalizeDigits(' . - ')).toBeNull();
+    expect(normalizeDigits(undefined)).toBeNull();
   });
 });
