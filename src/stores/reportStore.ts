@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { pointsToMorphotypes } from '@/lib/nugent';
 import { FINDING_LEVELS } from '@/constants/findings-options';
+import { parseUsgContent } from '@/lib/usgContent';
 
 import type { ReportRow } from '@/types/database';
 import type {
@@ -11,7 +12,13 @@ import type {
   AmselCriteria,
   Morphotypes,
   FindingLevel,
+  ReportType,
 } from '@/types/report';
+import type { UsgSection, UsgTransvaginalContent } from '@/types/usg';
+
+function toReportType(value: string): ReportType {
+  return value === 'usg_transvaginal' ? 'usg_transvaginal' : 'microscopia';
+}
 
 function toFindingLevel(value: string | null): FindingLevel | undefined {
   if (!value) return undefined;
@@ -28,6 +35,15 @@ type ReportState = {
   morphotypes: Partial<Morphotypes> | null;
   isDirty: boolean;
   currentStep: number;
+  // Tipo do laudo em edição. Microscopia usa currentReport/morphotypes; USG usa usgContent.
+  reportType: ReportType;
+  usgContent: UsgTransvaginalContent | null;
+  // Inicia um laudo novo do tipo informado (limpa o estado anterior).
+  startReport: (type: ReportType, initialUsgContent?: UsgTransvaginalContent) => void;
+  // Patch raso de uma seção do USG (útero, colo, endométrio, ovários).
+  setUsgSection: <S extends UsgSection>(section: S, patch: Partial<UsgTransvaginalContent[S]>) => void;
+  // Patch dos campos de topo do USG (técnica, líquido livre, texto da análise).
+  setUsgContent: (patch: Partial<Omit<UsgTransvaginalContent, UsgSection | 'version'>>) => void;
   setReportId: (id: string) => void;
   setPatientData: (data: PatientData) => void;
   setFindings: (findings: FindingsPatch) => void;
@@ -45,12 +61,43 @@ type ReportState = {
   reset: () => void;
 };
 
-export const useReportStore = create<ReportState>((set) => ({
+const INITIAL_STATE = {
   reportId: null,
   currentReport: null,
   morphotypes: null,
   isDirty: false,
   currentStep: 1,
+  reportType: 'microscopia' as ReportType,
+  usgContent: null,
+};
+
+export const useReportStore = create<ReportState>((set) => ({
+  ...INITIAL_STATE,
+
+  startReport: (reportType, initialUsgContent) =>
+    set({
+      ...INITIAL_STATE,
+      reportType,
+      usgContent: reportType === 'microscopia' ? null : (initialUsgContent ?? null),
+    }),
+
+  setUsgSection: (section, patch) =>
+    set((state) => {
+      if (!state.usgContent) return {};
+      return {
+        usgContent: {
+          ...state.usgContent,
+          [section]: { ...state.usgContent[section], ...patch },
+        },
+        isDirty: true,
+      };
+    }),
+
+  setUsgContent: (patch) =>
+    set((state) => {
+      if (!state.usgContent) return {};
+      return { usgContent: { ...state.usgContent, ...patch }, isDirty: true };
+    }),
 
   setReportId: (reportId) => set({ reportId }),
 
@@ -121,11 +168,18 @@ export const useReportStore = create<ReportState>((set) => ({
       mobiluncus: report.nugent_mobiluncus,
     });
 
+    const reportType = toReportType(report.report_type);
+
     set({
       reportId: report.id,
+      reportType,
+      usgContent: reportType === 'microscopia' ? null : parseUsgContent(report.content),
       currentReport: {
+        report_type: reportType,
         patient_name: report.patient_name,
         patient_birth_date: report.patient_birth_date ?? undefined,
+        patient_cpf: report.patient_cpf ?? undefined,
+        patient_sus_card: report.patient_sus_card ?? undefined,
         collection_date: report.collection_date,
         requesting_doctor: report.requesting_doctor ?? undefined,
         lactobacilli: toFindingLevel(report.lactobacilli),
@@ -159,5 +213,5 @@ export const useReportStore = create<ReportState>((set) => ({
     });
   },
 
-  reset: () => set({ reportId: null, currentReport: null, morphotypes: null, isDirty: false, currentStep: 1 }),
+  reset: () => set(INITIAL_STATE),
 }));

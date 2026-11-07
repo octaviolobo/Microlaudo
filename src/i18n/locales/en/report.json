@@ -20,7 +20,10 @@
       "requestingDoctorDefault": "Dr. {{name}}",
       "prodoctorSearching": "Searching ProDoctor...",
       "prodoctorNoBirthDate": "Date of birth not provided",
-      "prodoctorLoadingDoctor": "Looking up last attending physician..."
+      "prodoctorLoadingDoctor": "Looking up last attending physician...",
+      "examDate": "Exam date",
+      "cpf": "CPF (optional)",
+      "susCard": "SUS card (optional)"
     },
     "photos": {
       "title": "Slide Photos",
@@ -70,6 +73,75 @@
     "view": "View",
     "continueDraft": "Continue draft",
     "edit": "Edit",
-    "editConfirm": "Editing this report will create a new revision. Continue?"
+    "editConfirm": "Editing this report will create a new revision. Continue?",
+    "examinedOn": "Exam on {{date}}",
+    "typeUnavailable": "Available on the web version"
+  },
+  "reportTypes": {
+    "microscopia": "Vaginal microscopy",
+    "usg_transvaginal": "Transvaginal ultrasound"
+  },
+  "usg": {
+    "steps": {
+      "patient": "Patient Data",
+      "analysis": "Analysis",
+      "text": "Text and Opinion",
+      "preview": "Report Preview"
+    },
+    "sections": {
+      "uterus": "Uterus",
+      "cervix": "Cervix",
+      "endometrium": "Endometrium",
+      "rightOvary": "Right ovary",
+      "leftOvary": "Left ovary",
+      "pelvis": "Pelvic cavity"
+    },
+    "fields": {
+      "absent": "Uterus not visualized (post-hysterectomy)",
+      "shape": "Shape",
+      "position": "Position",
+      "deviation": "Centered / deviated",
+      "contours": "Contours",
+      "size": "Size",
+      "length": "Length (cm)",
+      "ap": "AP (cm)",
+      "transverse": "Transverse (cm)",
+      "referenceVolume": "Normal volume up to (cm³)",
+      "volume": "Estimated volume: {{volume}} cm³",
+      "volumePending": "Volume: fill in the 3 measurements",
+      "volumeAbove": "above reference",
+      "myometrium": "Myometrium",
+      "aspect": "Aspect",
+      "contour": "Contour",
+      "texture": "Texture",
+      "thickness": "Thickness (mm)",
+      "echogenicity": "Echogenicity",
+      "doppler": "Doppler — vascularization score",
+      "dopplerNone": "Not performed",
+      "characterized": "Ovary visualized",
+      "parenchyma": "Parenchyma",
+      "adnexaFree": "Adnexal region without masses or collections",
+      "freeFluid": "Free fluid",
+      "notes": "Notes (optional)",
+      "technique": "Technique"
+    },
+    "text": {
+      "analysis": "Analysis",
+      "analysisHelper": "Generated from the fields. You can edit it freely.",
+      "regenerate": "Regenerate from the fields",
+      "edited": "Text edited manually — field changes won't update it until you regenerate.",
+      "opinion": "Report opinion",
+      "useSuggested": "Use suggested opinion"
+    },
+    "preview": {
+      "procedures": "Procedures performed",
+      "findings": "Findings / Description",
+      "technique": "Technique",
+      "analysis": "Analysis",
+      "opinion": "Report opinion",
+      "pdfWebOnly": "The ultrasound report PDF is currently generated on the web version only."
+    },
+    "invalidNumber": "{{field}}: invalid value",
+    "fixInvalidFields": "Fix the highlighted numeric fields before continuing."
   }
 }

@@ -154,6 +154,7 @@ export type Database = {
           coccobacilli_gram_pos: string | null
           collection_date: string
           conclusion: string | null
+          content: Json | null
           created_at: string
           doctor_id: string
           epithelial_cells: string | null
@@ -171,9 +172,12 @@ export type Database = {
           nugent_mobiluncus: number | null
           nugent_score: number | null
           patient_birth_date: string | null
+          patient_cpf: string | null
           patient_name: string
+          patient_sus_card: string | null
           pdf_url: string | null
           red_blood_cells: string | null
+          report_type: string
           requesting_doctor: string | null
           revision_number: number
           status: string
@@ -193,6 +197,7 @@ export type Database = {
           coccobacilli_gram_pos?: string | null
           collection_date: string
           conclusion?: string | null
+          content?: Json | null
           created_at?: string
           doctor_id: string
           epithelial_cells?: string | null
@@ -210,9 +215,12 @@ export type Database = {
           nugent_mobiluncus?: number | null
           nugent_score?: number | null
           patient_birth_date?: string | null
+          patient_cpf?: string | null
           patient_name: string
+          patient_sus_card?: string | null
           pdf_url?: string | null
           red_blood_cells?: string | null
+          report_type?: string
           requesting_doctor?: string | null
           revision_number?: number
           status?: string
@@ -232,6 +240,7 @@ export type Database = {
           coccobacilli_gram_pos?: string | null
           collection_date?: string
           conclusion?: string | null
+          content?: Json | null
           created_at?: string
           doctor_id?: string
           epithelial_cells?: string | null
@@ -249,9 +258,12 @@ export type Database = {
           nugent_mobiluncus?: number | null
           nugent_score?: number | null
           patient_birth_date?: string | null
+          patient_cpf?: string | null
           patient_name?: string
+          patient_sus_card?: string | null
           pdf_url?: string | null
           red_blood_cells?: string | null
+          report_type?: string
           requesting_doctor?: string | null
           revision_number?: number
           status?: string

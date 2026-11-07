@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-// Aliased: o módulo já importa o `File` global do DOM (Web File API) em
-// tryShareReportPdf() — precisamos dos dois nomes distintos no mesmo arquivo.
+// Aliased para não confundir com o `File` global do DOM.
 import { File as ExpoFile, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
@@ -16,6 +15,7 @@ import { generateAndUploadReportPdf, getSignedPdfUrl } from '@/services/pdf';
 import { classifyNugentScore } from '@/lib/nugent';
 import { evaluateAmsel } from '@/lib/amsel';
 import { AppError } from '@/lib/errors';
+import { downloadPdfWeb, pdfFileName } from '@/lib/webPdfDownload';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 import { FINDINGS_FIELDS } from '@/constants/findings-options';
 
@@ -121,29 +121,7 @@ export function PreviewScreen() {
     }
   }
 
-  // Tenta compartilhar o PDF como arquivo (folha nativa do SO, com o PDF anexado)
-  // em vez de só um link. Retorna false se o navegador não suportar ou o usuário
-  // cancelar, para o chamador cair no fallback de abrir a URL assinada.
-  async function tryShareReportPdf(url: string): Promise<boolean> {
-    const nav = navigator as Navigator & {
-      canShare?: (data: ShareData) => boolean;
-    };
-    if (!nav.share || !nav.canShare) return false;
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const file = new File([blob], `laudo-${report?.patient_name ?? 'microlaudo'}.pdf`, {
-        type: 'application/pdf',
-      });
-      if (!nav.canShare({ files: [file] })) return false;
-      await nav.share({ files: [file] });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  // Equivalente nativo de tryShareReportPdf: baixa o PDF assinado para um
+  // Mobile: baixa o PDF assinado para um
   // arquivo local (a folha de compartilhamento nativa do iOS/Android exige
   // uma URI de arquivo, não aceita URLs remotas) e abre a folha do sistema.
   async function shareReportPdfNative(url: string): Promise<void> {
@@ -163,11 +141,7 @@ export function PreviewScreen() {
       setReport((prev) => (prev ? { ...prev, pdf_url: path } : prev));
       const url = await getSignedPdfUrl(path);
       if (Platform.OS === 'web') {
-        // Só recorre à navegação na própria aba se o compartilhamento nativo
-        // (com o arquivo já anexado) não estiver disponível — abrir uma aba
-        // nova aqui é bloqueado por vários navegadores mobile.
-        const shared = await tryShareReportPdf(url);
-        if (!shared) window.location.href = url;
+        await downloadPdfWeb(url, pdfFileName('laudo', report.patient_name));
       } else {
         await shareReportPdfNative(url);
       }

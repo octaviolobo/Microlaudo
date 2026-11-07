@@ -160,9 +160,9 @@ describe('isoToday', () => {
     expect(isoToday()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
-  it('começa com o ano atual (UTC)', () => {
-    const currentYearUtc = new Date().getUTCFullYear();
-    expect(isoToday().startsWith(String(currentYearUtc))).toBe(true);
+  it('começa com o ano atual (local)', () => {
+    const currentYear = new Date().getFullYear();
+    expect(isoToday().startsWith(String(currentYear))).toBe(true);
   });
 
   it('é parseável por parseISODate (round-trip)', () => {
@@ -171,5 +171,12 @@ describe('isoToday', () => {
     expect(parsed).not.toBeNull();
     if (!parsed) return;
     expect(toISODate(parsed.year, parsed.month, parsed.day)).toBe(today);
+  });
+});
+
+describe('isoToday — fuso local', () => {
+  it('usa a data local, não UTC (22h no Brasil ainda é o mesmo dia)', () => {
+    const lateEvening = new Date(2026, 10, 6, 23, 30);
+    expect(isoToday(lateEvening)).toBe('2026-11-06');
   });
 });

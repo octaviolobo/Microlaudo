@@ -1,0 +1,7 @@
+name = "microlaudo-supabase-keepalive"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+# A cada 3 dias, às 12:00 UTC (bem dentro da janela de ~7 dias do plano Free).
+[triggers]
+crons = ["0 12 */3 * *"]

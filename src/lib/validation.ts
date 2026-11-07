@@ -56,3 +56,50 @@ export function validateCrm(crm: string | null | undefined): void {
     );
   }
 }
+
+// ─── CPF e cartão SUS (opcionais) ─────────────────────────────────
+// Guardados só com dígitos (migration 014 tem CHECK de formato). Os normalizadores
+// tiram pontuação e espaços; string vazia vira null (campo opcional não preenchido).
+
+export function normalizeDigits(value: string | null | undefined): string | null {
+  const digits = (value ?? '').replace(/\D/g, '');
+  return digits.length > 0 ? digits : null;
+}
+
+export function isValidCpf(value: string): boolean {
+  const cpf = value.replace(/\D/g, '');
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+  const digits = cpf.split('').map(Number);
+  for (const pos of [9, 10]) {
+    let sum = 0;
+    for (let i = 0; i < pos; i++) sum += digits[i] * (pos + 1 - i);
+    const check = ((sum * 10) % 11) % 10;
+    if (check !== digits[pos]) return false;
+  }
+  return true;
+}
+
+// Cartão Nacional de Saúde (CNS): 15 dígitos, começa com 1, 2 (definitivo) ou 7, 8, 9
+// (provisório), e a soma ponderada (pesos 15 → 1) é múltipla de 11.
+export function isValidSusCard(value: string): boolean {
+  const cns = value.replace(/\D/g, '');
+  if (!/^[12789]\d{14}$/.test(cns)) return false;
+  let sum = 0;
+  for (let i = 0; i < 15; i++) sum += Number(cns[i]) * (15 - i);
+  return sum % 11 === 0;
+}
+
+export function validateCpf(value: string | null | undefined): void {
+  const digits = normalizeDigits(value);
+  if (digits && !isValidCpf(digits)) {
+    throw new AppError(ErrorCodes.VALIDATION_FAILED, 'CPF inválido — confira os números digitados');
+  }
+}
+
+export function validateSusCard(value: string | null | undefined): void {
+  const digits = normalizeDigits(value);
+  if (digits && !isValidSusCard(digits)) {
+    throw new AppError(ErrorCodes.VALIDATION_FAILED, 'Cartão SUS inválido — confira os 15 números');
+  }
+}

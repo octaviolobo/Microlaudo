@@ -1,6 +1,12 @@
+import type { UsgTransvaginalContent } from './usg';
+
 export type FindingLevel = 'ausente' | 'raros' | 'alguns' | 'numerosos';
 
 export type ReportStatus = 'draft' | 'completed';
+
+// Tipo do laudo (coluna reports.report_type, migration 014). Microscopia usa as colunas
+// tipadas; os demais tipos guardam os campos específicos em reports.content (JSONB).
+export type ReportType = 'microscopia' | 'usg_transvaginal';
 
 export type MorphotypeLevel = '0' | '1+' | '2+' | '3+' | '4+';
 
@@ -50,6 +56,9 @@ export type PatientData = {
   patient_birth_date?: string;
   collection_date: string;
   requesting_doctor?: string;
+  // Opcionais; salvos só com dígitos (ver normalizeDigits em src/lib/validation.ts).
+  patient_cpf?: string;
+  patient_sus_card?: string;
 };
 
 export type Report = {
@@ -57,11 +66,14 @@ export type Report = {
   doctor_id: string;
   status: ReportStatus;
   revision_number: number;
+  report_type: ReportType;
   // Dados do paciente (Step 1)
   patient_name: string;
   patient_birth_date?: string;
   collection_date: string;
   requesting_doctor?: string;
+  patient_cpf?: string;
+  patient_sus_card?: string;
   material: string;
   method: string;
   // Achados (Step 3)
@@ -91,6 +103,8 @@ export type Report = {
   // Conclusão (Step 5)
   conclusion?: string;
   bibliographic_reference?: string;
+  // Campos específicos de tipos não-microscopia (ex.: UsgTransvaginalContent)
+  content?: UsgTransvaginalContent;
   // PDF (Step 6)
   pdf_url?: string;
   evaluation_date?: string;

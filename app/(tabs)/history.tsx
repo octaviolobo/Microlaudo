@@ -10,8 +10,14 @@ import { listReportsByDoctor } from '@/services/reports';
 import { AppError } from '@/lib/errors';
 import { formatDateBR } from '@/lib/date';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
+import { isReportTypeEnabled } from '@/constants/features';
 
 import type { ReportRow } from '@/types/database';
+import type { ReportType } from '@/types/report';
+
+function reportTypeOf(report: ReportRow): ReportType {
+  return report.report_type === 'usg_transvaginal' ? 'usg_transvaginal' : 'microscopia';
+}
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -62,12 +68,16 @@ export function HistoryScreen() {
   );
 
   function handleOpen(report: ReportRow) {
-    hydrate(report);
-    if (report.status === 'completed') {
-      router.push('/report/preview');
-    } else {
-      router.push('/report/patient');
+    const type = reportTypeOf(report);
+    // Laudo de um tipo ainda não liberado nesta plataforma (ex.: USG no mobile antes do
+    // lançamento oficial): aparece na lista, mas só abre onde o tipo está habilitado.
+    if (!isReportTypeEnabled(type)) {
+      setError(t('history.typeUnavailable'));
+      return;
     }
+    hydrate(report);
+    const base = type === 'microscopia' ? '/report' : '/report-usg';
+    router.push(report.status === 'completed' ? `${base}/preview` : `${base}/patient`);
   }
 
   const renderItem = ({ item }: { item: ReportRow }) => {
@@ -75,6 +85,8 @@ export function HistoryScreen() {
     const badgeStyle = isCompleted ? styles.badgeCompleted : styles.badgeDraft;
     const badgeTextStyle = isCompleted ? styles.badgeCompletedText : styles.badgeDraftText;
     const statusLabel = isCompleted ? t('status.completed') : t('status.draft');
+    const type = reportTypeOf(item);
+    const typeEnabled = isReportTypeEnabled(type);
 
     return (
       <TouchableOpacity
@@ -93,19 +105,27 @@ export function HistoryScreen() {
           </View>
         </View>
         <View style={styles.cardMeta}>
+          <Text style={styles.typeText}>{t(`reportTypes.${type}`)}</Text>
           <Text style={styles.metaText}>
-            {t('history.collectedOn', { date: formatDateBR(item.collection_date) })}
+            ·{' '}
+            {t(type === 'microscopia' ? 'history.collectedOn' : 'history.examinedOn', {
+              date: formatDateBR(item.collection_date),
+            })}
           </Text>
           {item.revision_number > 1 && (
             <Text style={styles.metaText}>· {t('revision', { number: item.revision_number })}</Text>
           )}
         </View>
-        <View style={styles.cardAction}>
-          <Text style={styles.actionText}>
-            {isCompleted ? t('history.view') : t('history.continueDraft')}
-          </Text>
-          <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
-        </View>
+        {typeEnabled ? (
+          <View style={styles.cardAction}>
+            <Text style={styles.actionText}>
+              {isCompleted ? t('history.view') : t('history.continueDraft')}
+            </Text>
+            <Ionicons name="chevron-forward" size={16} color={Colors.primary} />
+          </View>
+        ) : (
+          <Text style={styles.metaText}>{t('history.typeUnavailable')}</Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -228,6 +248,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: Spacing.sm,
+  },
+  typeText: {
+    fontSize: 13,
+    fontFamily: Typography.bodyMedium,
+    color: Colors.primary,
+    marginRight: 4,
   },
   metaText: {
     fontSize: 13,
