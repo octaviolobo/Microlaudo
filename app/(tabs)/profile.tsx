@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { getProfile, updateProfile } from '@/services/profile';
 import { signOut } from '@/services/auth';
 import { deleteAccount } from '@/services/account';
+import { clearUserScopedState } from '@/stores/userScopedState';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox, Select } from '@/components/ui';
 import { AssetUploader } from '@/components/profile/AssetUploader';
@@ -110,6 +111,7 @@ export function ProfileScreen() {
     try {
       await signOut();
     } finally {
+      clearUserScopedState();
       clearAuth();
       router.replace('/(auth)/login');
     }
@@ -182,6 +184,7 @@ export function ProfileScreen() {
       } catch {
         // sessão já pode estar inválida no servidor — segue o fluxo
       }
+      clearUserScopedState();
       clearAuth();
       router.replace('/(auth)/login');
     } catch (err) {
