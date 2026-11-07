@@ -3,3 +3,5 @@ node_modules/
 dist/
 web-build/
 supabase/functions/
+brag-output/
+src/types/database.generated.ts

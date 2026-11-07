@@ -7,8 +7,8 @@ Substitui o Vercel previsto no F45. Faz parte da Sprint USG-Web (U07/U08 em `doc
 ## 1. Antes do primeiro deploy com paciente real
 
 - [ ] **Supabase Pro** no projeto de produção (o Free pausa e não tem backup — ver backlog).
-- [ ] Migration `014_report_types.sql` aplicada no projeto de produção (SQL Editor do dashboard) e
-      tipos regenerados (`npm run db:types`).
+- [x] Migration `014_report_types.sql` aplicada no projeto de produção (SQL Editor do dashboard) e
+      tipos regenerados (`npm run db:types`). ✅ Feito em 06/11/2026.
 
 ## 2. Criar o projeto no Pages (👤 uma vez)
 

@@ -65,3 +65,5 @@ build/
 
 expo-env.d.ts
 # @end expo-cli
+# Saida local do /brag (videos de divulgacao)
+brag-output/

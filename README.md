@@ -160,8 +160,10 @@ npm install
 cp .env.example .env
 # preencher EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_ANON_KEY
 
-# 3. Rodar as migrations no seu projeto Supabase
-npm run db:migrate
+# 3. Aplicar as migrations no seu projeto Supabase
+#    Projeto novo e vazio: npx supabase db push
+#    Projeto existente (o de produção): rodar só a migration nova no SQL Editor
+#    — `npm run db:migrate` bloqueia o push de propósito (ver tabela abaixo)
 
 # 4. Subir o app
 npm run dev        # abre o menu do Expo (escolher iOS / Android / Web)
@@ -179,8 +181,9 @@ npm run dev:web     # atalho direto para a web
 | `npm run types` | Checagem de tipos (`tsc --noEmit`) |
 | `npm run verify` | `lint` + `types` juntos (gate de qualidade) |
 | `npm run test` / `npm run test:watch` | Testes com Jest |
-| `npm run db:migrate` / `db:reset` / `db:seed` | Migrations no Supabase |
-| `npm run db:types` | Gera `src/types/database.ts` a partir do schema |
+| `npm run db:migrate` | Bloqueado: o histórico de migrations de produção usa outra numeração e o `db push` reaplicaria tudo. Rodar a migration nova no SQL Editor |
+| `npm run db:reset` / `db:seed` | Banco local (Docker) |
+| `npm run db:types` | Regenera `src/types/database.generated.ts` a partir do projeto linkado (rodar depois de cada migration) |
 | `npm run audit` | `npm audit` restrito a dependências de produção |
 
 ---

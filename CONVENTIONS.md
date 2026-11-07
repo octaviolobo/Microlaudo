@@ -714,8 +714,7 @@ cp .env.example .env
 # Editar .env com suas chaves do Supabase, RevenueCat, Stripe
 
 # 3. Supabase local (precisa do Docker)
-npx supabase start
-npm run db:migrate
+npx supabase start      # aplica as migrations no banco local
 npm run db:seed
 
 # 4. Gerar tipos do banco
@@ -741,17 +740,19 @@ npm run lint         # Verifica estilo de código
 npm run build:ios       # Build iOS via EAS
 npm run build:android   # Build Android via EAS
 npm run build:web       # Export web estático
-
-npm run db:migrate      # Aplica migrations no Supabase de produção
 ```
+
+Migration nova em produção: rodar o SQL no SQL Editor do dashboard e depois
+`npm run db:types`. Não usar `supabase db push` (ver "Banco de dados").
 
 ### Banco de dados
 
 ```bash
-npm run db:migrate   # Aplica migrations pendentes
 npm run db:reset     # Dropa e recria tudo (⚠️ só local!)
 npm run db:seed      # Popula com dados fake
-npm run db:types     # Regenera src/types/database.ts
+npm run db:types     # Regenera src/types/database.generated.ts (projeto linkado)
+# npm run db:migrate fica bloqueado de propósito: o histórico remoto usa
+# timestamps e não 001…NNN, então o `db push` reaplicaria todas as migrations.
 ```
 
 ---
