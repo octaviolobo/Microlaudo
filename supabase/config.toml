@@ -17,7 +17,7 @@ enabled = true
 port = 54323
 api_url = "http://127.0.0.1"
 
-[inbucket]
+[local_smtp]
 enabled = true
 port = 54324
 
@@ -34,9 +34,9 @@ refresh_token_reuse_interval = 10
 enable_signup = true
 
 [auth.email]
-enable_signup = true
+enabled = true
 double_confirm_changes = true
 enable_confirmations = true
 
 [auth.sms]
-enable_signup = false
+enabled = false
