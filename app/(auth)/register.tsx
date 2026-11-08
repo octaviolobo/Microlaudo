@@ -125,7 +125,7 @@ export function RegisterScreen() {
       />
       <Button
         label={t('auth.alreadyHaveAccount')}
-        onPress={() => router.back()}
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/login'))}
         variant="secondary"
         disabled={isLoading}
         fullWidth

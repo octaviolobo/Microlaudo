@@ -72,7 +72,7 @@ export function ForgotPasswordScreen() {
       />
       <Button
         label={t('auth.backToLogin')}
-        onPress={() => router.back()}
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/(auth)/login'))}
         variant="secondary"
         disabled={isLoading}
         size="sm"
