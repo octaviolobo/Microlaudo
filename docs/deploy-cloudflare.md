@@ -7,6 +7,11 @@ Substitui o Vercel previsto no F45. Faz parte da Sprint USG-Web (U07/U08 em `doc
 ## 1. Antes do primeiro deploy com paciente real
 
 - [ ] **Supabase Pro** no projeto de produção (o Free pausa e não tem backup — ver backlog).
+- [ ] **SMTP próprio** no Supabase (Authentication → Emails → SMTP Settings — ex.: Resend com
+      domínio verificado). O SMTP padrão só envia para membros do time e ~2 e-mails/hora: sem isso,
+      médicos não recebem confirmação de cadastro nem link de redefinição de senha.
+- [ ] Política de senha no Supabase (Authentication → Policies): mínimo 10, *Letters and digits*
+      (o app valida igual — `getPasswordIssue` em `src/lib/validation.ts`).
 - [x] Migration `014_report_types.sql` aplicada no projeto de produção (SQL Editor do dashboard) e
       tipos regenerados (`npm run db:types`). ✅ Feito em 06/11/2026.
 
@@ -35,6 +40,11 @@ Edge Functions.
 
 Cada push no `master` publica em produção; cada PR ganha uma URL de preview.
 
+**Proteger os previews (obrigatório — eles usam o Supabase de produção):** Pages → projeto →
+Settings → General → **Access policy → Enable**. Isso cria uma aplicação no Cloudflare Access
+cobrindo `*.microlaudo.pages.dev` (previews); só quem passar no login do Access abre. Conferir em
+Zero Trust → Access → Applications que a política permite só o seu e-mail.
+
 ## 3. Domínio e Auth (👤)
 
 1. Pages → **Custom domains** → adicionar o domínio (ex.: `app.microlaudo.com.br`).
@@ -49,7 +59,11 @@ antiga.
 
 ## 4. O que já está no repositório
 
-- `public/_headers`: cabeçalhos de segurança + cache longo dos bundles com hash. O `vercel.json`
+- `public/_headers`: CSP fechada (só o próprio site + o Supabase), HSTS, anti-iframe,
+  `noindex` em `*.pages.dev` e cache longo dos bundles com hash. Testada com
+  `npx wrangler pages dev dist` (login, foto, PDF, histórico, perfil sem violações no console).
+  Se algo novo for bloqueado, o console mostra `violates the following Content Security Policy`
+  com a diretiva — ajustar lá e explicar no comentário do arquivo. O `vercel.json`
   saiu: seu único ajuste (`cleanUrls`) o Pages já faz por padrão.
 - Rotas desconhecidas: o export não gera `404.html`, então o Pages entra em modo SPA e serve o
   `index.html`, e o expo-router mostra a tela `+not-found`.
