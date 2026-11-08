@@ -12,12 +12,9 @@ skills-lock.json
 # MCP config com tokens
 .mcp.json
 
-# Ambiente
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Ambiente — qualquer .env* (o EAS também usa este arquivo, porque não há .easignore)
+.env*
+!.env.example
 
 # iOS
 ios/
@@ -67,3 +64,6 @@ expo-env.d.ts
 # @end expo-cli
 # Saida local do /brag (videos de divulgacao)
 brag-output/
+
+# Estado local do wrangler (pages dev)
+.wrangler/

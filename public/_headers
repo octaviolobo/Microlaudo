@@ -2,13 +2,36 @@
 # O Pages já serve URLs limpas por padrão (/home → home.html), que era o único
 # ajuste do vercel.json ("cleanUrls"). Rotas desconhecidas caem no index.html
 # (modo SPA, porque o export não gera 404.html) e o expo-router mostra o +not-found.
+#
+# CSP — o que cada fonte libera e por quê:
+#   script-src  'self' + hash do único script inline do export do Expo
+#               (globalThis.__EXPO_ROUTER_HYDRATE__=true;). Se o Expo mudar esse
+#               script, o console mostra a violação com o hash novo: atualizar aqui.
+#   style-src   'unsafe-inline' é obrigatório: o react-native-web injeta os estilos
+#               em <style> em tempo de execução.
+#   img-src     blob:/data: para fotos escolhidas e preview; Supabase para URLs
+#               assinadas de fotos, logo e assinatura.
+#   connect-src Supabase (REST, Auth, Storage, Edge Functions) + blob:/data: — o
+#               upload lê a foto escolhida com fetch(blob:...).
+#   worker-src  blob: — jsPDF/compressão de imagem criam workers a partir de blob.
+#   Fontes ficam em /assets (expo-google-fonts empacota os .ttf), sem Google Fonts.
+#   Se o projeto Supabase mudar, trocar o host abaixo.
 
 /*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-67fhrP0+BkBqmgGGXTtgiVO/9EQs3QruYNU/7fnRkI8='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://flxxotkhgjpxlpphazcd.supabase.co; font-src 'self' data:; connect-src 'self' blob: data: https://flxxotkhgjpxlpphazcd.supabase.co wss://flxxotkhgjpxlpphazcd.supabase.co; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=(), usb=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+
+# Previews e o domínio *.pages.dev não devem aparecer em buscadores.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex, nofollow
 
 # Bundles com hash no nome: podem ficar em cache para sempre.
 /_expo/static/*
