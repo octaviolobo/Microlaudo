@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { signIn, signInWithOAuth } from '@/services/auth';
-import { AppError } from '@/lib/errors';
+import { AppError, ErrorCodes } from '@/lib/errors';
+import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 
@@ -18,20 +19,31 @@ export function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaReset, setCaptchaReset] = useState(0);
 
   async function handleLogin() {
     if (!email.trim() || !password) {
       setError(t('auth.fillRequired'));
       return;
     }
+    if (CAPTCHA_ENABLED && !captchaToken) {
+      setError(t('auth.captchaRequired'));
+      return;
+    }
     try {
       setIsLoading(true);
       setError(null);
-      await signIn(email.trim(), password);
+      await signIn(email.trim(), password, captchaToken ?? undefined);
     } catch (err) {
-      setError(err instanceof AppError ? t('auth.invalidCredentials') : t('genericError'));
+      if (err instanceof AppError && err.code === ErrorCodes.AUTH_CAPTCHA_FAILED) {
+        setError(t('auth.captchaFailed'));
+      } else {
+        setError(err instanceof AppError ? t('auth.invalidCredentials') : t('genericError'));
+      }
     } finally {
       setIsLoading(false);
+      setCaptchaReset((n) => n + 1);
     }
   }
 
@@ -73,6 +85,8 @@ export function LoginScreen() {
         onSubmitEditing={handleLogin}
         accessibilityLabel={t('auth.password')}
       />
+
+      <Turnstile onToken={setCaptchaToken} resetKey={captchaReset} />
 
       <Button
         label={t('auth.login')}

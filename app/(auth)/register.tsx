@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { signUp } from '@/services/auth';
 import { AppError, ErrorCodes } from '@/lib/errors';
 import { getPasswordIssue } from '@/lib/validation';
+import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 
@@ -20,6 +21,8 @@ export function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaReset, setCaptchaReset] = useState(0);
 
   async function handleRegister() {
     if (!fullName.trim() || !email.trim() || !password || !crm.trim()) {
@@ -31,6 +34,10 @@ export function RegisterScreen() {
       setError(t(`auth.passwordIssue.${passwordIssue}`));
       return;
     }
+    if (CAPTCHA_ENABLED && !captchaToken) {
+      setError(t('auth.captchaRequired'));
+      return;
+    }
     try {
       setIsLoading(true);
       setError(null);
@@ -40,10 +47,13 @@ export function RegisterScreen() {
         full_name: fullName.trim(),
         crm: crm.trim(),
         rqe: rqe.trim() || undefined,
+        captchaToken: captchaToken ?? undefined,
       });
       if (needsEmailConfirmation) setConfirmationSent(true);
     } catch (err) {
-      if (err instanceof AppError && err.code === ErrorCodes.AUTH_WEAK_PASSWORD) {
+      if (err instanceof AppError && err.code === ErrorCodes.AUTH_CAPTCHA_FAILED) {
+        setError(t('auth.captchaFailed'));
+      } else if (err instanceof AppError && err.code === ErrorCodes.AUTH_WEAK_PASSWORD) {
         setError(t('auth.weakPasswordServer'));
       } else if (err instanceof AppError && err.code === ErrorCodes.AUTH_EMAIL_IN_USE) {
         setError(t('auth.emailInUse'));
@@ -54,6 +64,7 @@ export function RegisterScreen() {
       }
     } finally {
       setIsLoading(false);
+      setCaptchaReset((n) => n + 1);
     }
   }
 
@@ -116,6 +127,8 @@ export function RegisterScreen() {
         disabled={isLoading}
         accessibilityLabel={t('auth.rqeOptional')}
       />
+
+      <Turnstile onToken={setCaptchaToken} resetKey={captchaReset} />
 
       <Button
         label={t('auth.register')}

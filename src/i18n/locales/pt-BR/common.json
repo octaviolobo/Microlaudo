@@ -66,7 +66,10 @@
     "confirmPassword": "Confirmar nova senha",
     "savePassword": "Salvar nova senha",
     "passwordUpdated": "Senha alterada! Por segurança, todas as sessões foram encerradas. Entre de novo com a nova senha.",
-    "resetLinkInvalid": "Este link de redefinição é inválido ou expirou. Peça um novo em \"Esqueci minha senha\", no mesmo aparelho em que vai abrir o e-mail."
+    "resetLinkInvalid": "Este link de redefinição é inválido ou expirou. Peça um novo em \"Esqueci minha senha\", no mesmo aparelho em que vai abrir o e-mail.",
+    "captchaRequired": "Confirme que você não é um robô.",
+    "captchaFailed": "A verificação anti-robô falhou ou expirou. Tente de novo.",
+    "captchaLoadFailed": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e recarregue a página."
   },
   "completeProfile": {
     "title": "Complete seu cadastro",

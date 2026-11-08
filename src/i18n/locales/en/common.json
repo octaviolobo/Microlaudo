@@ -66,7 +66,10 @@
     "confirmPassword": "Confirm new password",
     "savePassword": "Save new password",
     "passwordUpdated": "Password changed! For security, all sessions were signed out. Sign in again with your new password.",
-    "resetLinkInvalid": "This reset link is invalid or has expired. Request a new one via \"Forgot password\" on the same device where you will open the email."
+    "resetLinkInvalid": "This reset link is invalid or has expired. Request a new one via \"Forgot password\" on the same device where you will open the email.",
+    "captchaRequired": "Please confirm you are not a robot.",
+    "captchaFailed": "The anti-bot check failed or expired. Please try again.",
+    "captchaLoadFailed": "Could not load the anti-bot check. Check your connection and reload the page."
   },
   "completeProfile": {
     "title": "Complete your profile",

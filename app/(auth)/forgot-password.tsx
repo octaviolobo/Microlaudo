@@ -4,7 +4,8 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { sendPasswordReset } from '@/services/auth';
-import { AppError } from '@/lib/errors';
+import { AppError, ErrorCodes } from '@/lib/errors';
+import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 
@@ -15,21 +16,32 @@ export function ForgotPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaReset, setCaptchaReset] = useState(0);
 
   async function handleSend() {
     if (!email.trim()) {
       setError(t('auth.fillRequired'));
       return;
     }
+    if (CAPTCHA_ENABLED && !captchaToken) {
+      setError(t('auth.captchaRequired'));
+      return;
+    }
     try {
       setIsLoading(true);
       setError(null);
-      await sendPasswordReset(email.trim());
+      await sendPasswordReset(email.trim(), captchaToken ?? undefined);
       setSent(true);
     } catch (err) {
-      setError(err instanceof AppError ? err.message : t('genericError'));
+      if (err instanceof AppError && err.code === ErrorCodes.AUTH_CAPTCHA_FAILED) {
+        setError(t('auth.captchaFailed'));
+      } else {
+        setError(err instanceof AppError ? err.message : t('genericError'));
+      }
     } finally {
       setIsLoading(false);
+      setCaptchaReset((n) => n + 1);
     }
   }
 
@@ -63,6 +75,8 @@ export function ForgotPasswordScreen() {
         onSubmitEditing={handleSend}
         accessibilityLabel={t('auth.email')}
       />
+
+      <Turnstile onToken={setCaptchaToken} resetKey={captchaReset} />
 
       <Button
         label={t('auth.sendLink')}

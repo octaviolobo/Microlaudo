@@ -36,15 +36,29 @@ export type RegisterInput = {
   full_name: string;
   crm: string;
   rqe?: string;
+  captchaToken?: string;
 };
+
+// Supabase devolve captcha_failed quando o CAPTCHA está ligado e o token falta,
+// expirou ou já foi usado.
+function isCaptchaError(error: { code?: string } | null): boolean {
+  return error?.code === 'captcha_failed';
+}
 
 export type SignUpResult = {
   needsEmailConfirmation: boolean;
 };
 
-export async function signIn(email: string, password: string): Promise<void> {
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, error.message, error);
+export async function signIn(email: string, password: string, captchaToken?: string): Promise<void> {
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+    options: { captchaToken },
+  });
+  if (error) {
+    const code = isCaptchaError(error) ? ErrorCodes.AUTH_CAPTCHA_FAILED : ErrorCodes.AUTH_LOGIN_FAILED;
+    throw new AppError(code, error.message, error);
+  }
 }
 
 // Login/cadastro via provedor social (Google/Facebook). Mesmo fluxo cobre
@@ -94,6 +108,7 @@ export async function signUp(input: RegisterInput): Promise<SignUpResult> {
     email: input.email,
     password: input.password,
     options: {
+      captchaToken: input.captchaToken,
       data: {
         full_name: input.full_name,
         crm: input.crm,
@@ -103,6 +118,9 @@ export async function signUp(input: RegisterInput): Promise<SignUpResult> {
   });
 
   if (error) {
+    if (isCaptchaError(error)) {
+      throw new AppError(ErrorCodes.AUTH_CAPTCHA_FAILED, error.message, error);
+    }
     if (error.code === 'weak_password') {
       throw new AppError(ErrorCodes.AUTH_WEAK_PASSWORD, error.message, error);
     }
@@ -121,12 +139,15 @@ export async function signOut(): Promise<void> {
   if (error) throw new AppError(ErrorCodes.AUTH_LOGOUT_FAILED, error.message, error);
 }
 
-export async function sendPasswordReset(email: string): Promise<void> {
+export async function sendPasswordReset(email: string, captchaToken?: string): Promise<void> {
   // Native: microlaudo://reset-password · Web: <origin>/reset-password.
   // As duas URLs precisam estar em Authentication → URL Configuration → Redirect URLs.
   const redirectTo = AuthSession.makeRedirectUri({ path: 'reset-password' });
-  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
-  if (error) throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, error.message, error);
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo, captchaToken });
+  if (error) {
+    const code = isCaptchaError(error) ? ErrorCodes.AUTH_CAPTCHA_FAILED : ErrorCodes.AUTH_LOGIN_FAILED;
+    throw new AppError(code, error.message, error);
+  }
 }
 
 // Native: troca o ?code= do deep link pela sessão de recuperação (o code verifier
