@@ -14,11 +14,12 @@
 #   connect-src Supabase (REST, Auth, Storage, Edge Functions) + blob:/data: — o
 #               upload lê a foto escolhida com fetch(blob:...).
 #   worker-src  blob: — jsPDF/compressão de imagem criam workers a partir de blob.
+#   challenges.cloudflare.com (script-src/frame-src) — widget do Turnstile.
 #   Fontes ficam em /assets (expo-google-fonts empacota os .ttf), sem Google Fonts.
 #   Se o projeto Supabase mudar, trocar o host abaixo.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-67fhrP0+BkBqmgGGXTtgiVO/9EQs3QruYNU/7fnRkI8='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://flxxotkhgjpxlpphazcd.supabase.co; font-src 'self' data:; connect-src 'self' blob: data: https://flxxotkhgjpxlpphazcd.supabase.co wss://flxxotkhgjpxlpphazcd.supabase.co; worker-src 'self' blob:; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-67fhrP0+BkBqmgGGXTtgiVO/9EQs3QruYNU/7fnRkI8=' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://flxxotkhgjpxlpphazcd.supabase.co; font-src 'self' data:; connect-src 'self' blob: data: https://flxxotkhgjpxlpphazcd.supabase.co wss://flxxotkhgjpxlpphazcd.supabase.co; worker-src 'self' blob:; frame-src 'self' blob: https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

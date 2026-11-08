@@ -57,6 +57,29 @@ Zero Trust → Access → Applications que a política permite só o seu e-mail.
 Sem o passo 2, o login (e-mail de confirmação, recuperação de senha e Google) volta para a URL
 antiga.
 
+## 3b. Turnstile — CAPTCHA no login, cadastro e reset (👤, só web)
+
+**A ordem importa:** o site no ar precisa já mandar o token antes de o Supabase passar a exigir.
+Ao contrário, ninguém consegue entrar.
+
+1. Cloudflare Dashboard → **Turnstile** → **Add widget**: modo *Managed*; hostnames = domínio final,
+   `microlaudo.pages.dev` e `localhost` (para dev contra produção). Anotar *site key* e *secret key*.
+2. Pages → Settings → Environment variables (*Production* e *Preview*):
+   `EXPO_PUBLIC_TURNSTILE_SITE_KEY` = site key → **novo deploy**. Conferir que o widget aparece no
+   login, cadastro e "Esqueci minha senha".
+3. Só então: Supabase → **Authentication → Attack Protection → Enable Captcha protection** →
+   provedor *Turnstile* → colar a **secret key** (nunca no repositório nem no Pages).
+4. Testar login, cadastro e reset no domínio publicado.
+
+Com o CAPTCHA ligado no Supabase:
+- **App nativo para de autenticar** (login/cadastro/reset exigem token e o nativo não tem widget).
+  Antes de publicar builds nativos: widget do Turnstile numa WebView em `Turnstile.tsx`.
+- Dev local precisa da site key real (com `localhost` nos hostnames do widget). Para testar só a
+  renderização com o CAPTCHA desligado, a chave de teste `1x00000000000000000000AA` sempre aprova.
+- Login social (Google/Facebook) e troca de senha pelo link não pedem CAPTCHA.
+- Os erros de console vindos do iframe `challenges.cloudflare.com` (Permissions-Policy,
+  TrustedScript, sandbox `about:blank`) são internos do Turnstile e não são violações da nossa CSP.
+
 ## 4. O que já está no repositório
 
 - `public/_headers`: CSP fechada (só o próprio site + o Supabase), HSTS, anti-iframe,
