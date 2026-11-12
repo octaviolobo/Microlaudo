@@ -1,6 +1,6 @@
 {
   "title": "MicroLaudo",
-  "subtitle": "Vaginal microscopy reports",
+  "subtitle": "Gynecological reports",
   "newReport": "New Report",
   "next": "Next",
   "back": "Back",
@@ -19,13 +19,14 @@
   "selectPlaceholder": "Select...",
   "datePlaceholder": "DD-MM-YYYY",
   "calendar": {
-    "weekdaysShort": ["S", "M", "T", "W", "T", "F", "S"],
+    "weekdaysShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     "months": [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ],
     "today": "Today",
     "clear": "Clear",
+    "done": "Done",
     "selectYear": "Select year"
   },
   "auth": {

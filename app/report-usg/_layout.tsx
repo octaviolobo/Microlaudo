@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors, Typography } from '@/constants/theme';
 import { isReportTypeEnabled } from '@/constants/features';
 import { useAuth } from '@/hooks/useAuth';
+import { useDoctorStore } from '@/stores/doctorStore';
 import { useReportStore } from '@/stores/reportStore';
 
 // Fluxo do laudo de USG transvaginal (docs/spec-usg-transvaginal.md §4).
@@ -17,8 +18,10 @@ export function ReportUsgLayout() {
   const { isAuthenticated } = useAuth();
   const reportType = useReportStore((state) => state.reportType);
   const usgContent = useReportStore((state) => state.usgContent);
+  const doctor = useDoctorStore((s) => s.doctor);
 
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+  if (doctor && !doctor.crm) return <Redirect href="/complete-profile" />;
   if (!isReportTypeEnabled('usg_transvaginal')) return <Redirect href="/(tabs)/home" />;
   if (reportType !== 'usg_transvaginal' || !usgContent) return <Redirect href="/(tabs)/home" />;
 
