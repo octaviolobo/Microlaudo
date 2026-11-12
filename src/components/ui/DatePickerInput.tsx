@@ -32,7 +32,15 @@ type DatePickerInputProps = {
   accessibilityLabel?: string;
 };
 
+type DayCell = {
+  iso: string;
+  day: number;
+  inMonth: boolean;
+};
+
 const YEAR_PAGE_SIZE = 12;
+// Grade sempre com 6 semanas: o cartão não muda de altura ao trocar de mês.
+const GRID_CELLS = 42;
 
 export function DatePickerInput({
   value,
@@ -49,33 +57,72 @@ export function DatePickerInput({
 
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<'days' | 'years'>('days');
+  // Data escolhida dentro do calendário; só vai pro formulário ao tocar em "Concluir".
+  const [draft, setDraft] = useState(value);
 
-  const parsedValue = parseISODate(value);
-  const parsedToday = parseISODate(isoToday())!;
-  const [viewYear, setViewYear] = useState(parsedValue?.year ?? parsedToday.year);
-  const [viewMonth, setViewMonth] = useState(parsedValue?.month ?? parsedToday.month);
-  const [yearPageStart, setYearPageStart] = useState(
-    (parsedValue?.year ?? parsedToday.year) - Math.floor(YEAR_PAGE_SIZE / 2)
-  );
+  const todayIso = isoToday();
+  const parsedToday = parseISODate(todayIso)!;
+  const [viewYear, setViewYear] = useState(parsedToday.year);
+  const [viewMonth, setViewMonth] = useState(parsedToday.month);
+  const [yearPageStart, setYearPageStart] = useState(parsedToday.year - Math.floor(YEAR_PAGE_SIZE / 2));
 
   const borderColor = error ? Colors.error : Colors.inputBorder;
   const weekdaysShort = t('calendar.weekdaysShort', { returnObjects: true }) as string[];
   const months = t('calendar.months', { returnObjects: true }) as string[];
 
-  const cells = useMemo(() => {
-    const total = daysInMonth(viewYear, viewMonth);
+  // Inclui os dias finais do mês anterior e os iniciais do próximo (em cinza), como num calendário de parede.
+  const cells = useMemo<DayCell[]>(() => {
     const leading = firstWeekdayOfMonth(viewYear, viewMonth);
-    const list: (number | null)[] = Array.from({ length: leading }, () => null);
-    for (let day = 1; day <= total; day += 1) list.push(day);
+    const prevMonth = viewMonth === 0 ? 11 : viewMonth - 1;
+    const prevYear = viewMonth === 0 ? viewYear - 1 : viewYear;
+    const prevTotal = daysInMonth(prevYear, prevMonth);
+    const nextMonth = viewMonth === 11 ? 0 : viewMonth + 1;
+    const nextYear = viewMonth === 11 ? viewYear + 1 : viewYear;
+
+    const list: DayCell[] = [];
+    for (let i = leading - 1; i >= 0; i -= 1) {
+      const day = prevTotal - i;
+      list.push({ iso: toISODate(prevYear, prevMonth, day), day, inMonth: false });
+    }
+    const total = daysInMonth(viewYear, viewMonth);
+    for (let day = 1; day <= total; day += 1) {
+      list.push({ iso: toISODate(viewYear, viewMonth, day), day, inMonth: true });
+    }
+    for (let day = 1; list.length < GRID_CELLS; day += 1) {
+      list.push({ iso: toISODate(nextYear, nextMonth, day), day, inMonth: false });
+    }
     return list;
   }, [viewYear, viewMonth]);
 
+  const weeks = useMemo(() => {
+    const rows: DayCell[][] = [];
+    for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
+    return rows;
+  }, [cells]);
+
+  function isOutOfRange(iso: string) {
+    if (maximumDate && iso > maximumDate) return true;
+    if (minimumDate && iso < minimumDate) return true;
+    return false;
+  }
+
+  function isYearOutOfRange(year: number) {
+    if (maximumDate && `${year}-01-01` > maximumDate) return true;
+    if (minimumDate && `${year}-12-31` < minimumDate) return true;
+    return false;
+  }
+
+  function showMonthOf(iso: string) {
+    const parsed = parseISODate(iso) ?? parsedToday;
+    setViewYear(parsed.year);
+    setViewMonth(parsed.month);
+    setYearPageStart(parsed.year - Math.floor(YEAR_PAGE_SIZE / 2));
+  }
+
   function openPicker() {
     if (disabled) return;
-    const base = parsedValue ?? parsedToday;
-    setViewYear(base.year);
-    setViewMonth(base.month);
-    setYearPageStart(base.year - Math.floor(YEAR_PAGE_SIZE / 2));
+    setDraft(value);
+    showMonthOf(value || todayIso);
     setMode('days');
     setOpen(true);
   }
@@ -94,17 +141,10 @@ export function DatePickerInput({
     setViewYear(year);
   }
 
-  function isDisabledDay(day: number) {
-    const iso = toISODate(viewYear, viewMonth, day);
-    if (maximumDate && iso > maximumDate) return true;
-    if (minimumDate && iso < minimumDate) return true;
-    return false;
-  }
-
-  function handleSelectDay(day: number) {
-    if (isDisabledDay(day)) return;
-    onChange(toISODate(viewYear, viewMonth, day));
-    setOpen(false);
+  function handleSelectDay(cell: DayCell) {
+    if (isOutOfRange(cell.iso)) return;
+    setDraft(cell.iso);
+    if (!cell.inMonth) showMonthOf(cell.iso);
   }
 
   function handleSelectYear(year: number) {
@@ -113,10 +153,18 @@ export function DatePickerInput({
   }
 
   function handleToday() {
-    const iso = isoToday();
-    if (maximumDate && iso > maximumDate) return;
-    if (minimumDate && iso < minimumDate) return;
-    onChange(iso);
+    if (isOutOfRange(todayIso)) return;
+    setDraft(todayIso);
+    showMonthOf(todayIso);
+  }
+
+  function handleClear() {
+    onChange('');
+    setOpen(false);
+  }
+
+  function handleDone() {
+    if (draft !== value) onChange(draft);
     setOpen(false);
   }
 
@@ -145,25 +193,22 @@ export function DatePickerInput({
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <TouchableWithoutFeedback onPress={() => setOpen(false)}>
-          <View style={styles.backdrop} />
-        </TouchableWithoutFeedback>
+        <View style={styles.overlay}>
+          <TouchableWithoutFeedback onPress={() => setOpen(false)}>
+            <View style={styles.backdrop} />
+          </TouchableWithoutFeedback>
 
-        <View style={styles.sheet}>
-          <View style={styles.sheetHandle} />
+          <View style={styles.card}>
+            <View style={styles.header}>
+              <NavButton
+                icon="chevron-back"
+                label={t('back')}
+                onPress={() =>
+                  mode === 'days' ? changeMonth(-1) : setYearPageStart((y) => y - YEAR_PAGE_SIZE)
+                }
+              />
 
-          {mode === 'days' ? (
-            <>
-              <View style={styles.header}>
-                <Pressable
-                  onPress={() => changeMonth(-1)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('back')}
-                  style={styles.headerNavButton}
-                >
-                  <Ionicons name="chevron-back" size={20} color={Colors.foreground} />
-                </Pressable>
-
+              {mode === 'days' ? (
                 <Pressable
                   onPress={() => setMode('years')}
                   accessibilityRole="button"
@@ -173,124 +218,151 @@ export function DatePickerInput({
                   <Text style={styles.headerTitle}>
                     {months[viewMonth]} {viewYear}
                   </Text>
+                  <Ionicons name="chevron-down" size={14} color={Colors.textMuted} />
                 </Pressable>
+              ) : (
+                <Text style={styles.headerTitle}>
+                  {yearPageStart} – {yearPageStart + YEAR_PAGE_SIZE - 1}
+                </Text>
+              )}
 
-                <Pressable
-                  onPress={() => changeMonth(1)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('next')}
-                  style={styles.headerNavButton}
-                >
-                  <Ionicons name="chevron-forward" size={20} color={Colors.foreground} />
-                </Pressable>
-              </View>
+              <NavButton
+                icon="chevron-forward"
+                label={t('next')}
+                onPress={() =>
+                  mode === 'days' ? changeMonth(1) : setYearPageStart((y) => y + YEAR_PAGE_SIZE)
+                }
+              />
+            </View>
 
-              <View style={styles.weekdaysRow}>
-                {weekdaysShort.map((wd, i) => (
-                  <Text key={`${wd}-${i}`} style={styles.weekdayText}>
-                    {wd}
-                  </Text>
+            <View style={styles.divider} />
+
+            {mode === 'days' ? (
+              <>
+                <View style={styles.row}>
+                  {weekdaysShort.map((wd, i) => (
+                    <Text key={`${wd}-${i}`} style={[styles.cell, styles.weekdayText]}>
+                      {wd}
+                    </Text>
+                  ))}
+                </View>
+
+                {weeks.map((week) => (
+                  <View key={week[0].iso} style={styles.row}>
+                    {week.map((cell) => {
+                      const isSelected = cell.iso === draft;
+                      const isToday = cell.iso === todayIso;
+                      const outOfRange = isOutOfRange(cell.iso);
+
+                      return (
+                        <View key={cell.iso} style={styles.cell}>
+                          <Pressable
+                            onPress={() => handleSelectDay(cell)}
+                            disabled={outOfRange}
+                            accessibilityRole="button"
+                            accessibilityLabel={formatDateBR(cell.iso)}
+                            accessibilityState={{ selected: isSelected, disabled: outOfRange }}
+                            style={({ hovered, pressed }: { hovered?: boolean; pressed: boolean }) => [
+                              styles.day,
+                              (hovered || pressed) && !isSelected && !outOfRange && styles.dayHover,
+                              isToday && !isSelected && styles.dayToday,
+                              isSelected && styles.daySelected,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.dayText,
+                                !cell.inMonth && styles.dayTextOutside,
+                                outOfRange && styles.dayTextDisabled,
+                                isToday && !isSelected && styles.dayTextToday,
+                                isSelected && styles.dayTextSelected,
+                              ]}
+                            >
+                              {cell.day}
+                            </Text>
+                          </Pressable>
+                        </View>
+                      );
+                    })}
+                  </View>
                 ))}
-              </View>
-
-              <View style={styles.daysGrid}>
-                {cells.map((day, index) => {
-                  if (day === null) return <View key={`empty-${index}`} style={styles.dayCell} />;
-
-                  const iso = toISODate(viewYear, viewMonth, day);
-                  const isSelected = iso === value;
-                  const isToday = iso === isoToday();
-                  const disabledDay = isDisabledDay(day);
-
+              </>
+            ) : (
+              <View style={styles.yearsGrid}>
+                {Array.from({ length: YEAR_PAGE_SIZE }, (_, i) => yearPageStart + i).map((year) => {
+                  const isSelected = year === viewYear;
+                  const yearDisabled = isYearOutOfRange(year);
                   return (
                     <Pressable
-                      key={iso}
-                      onPress={() => handleSelectDay(day)}
-                      disabled={disabledDay}
+                      key={year}
+                      onPress={() => handleSelectYear(year)}
+                      disabled={yearDisabled}
                       accessibilityRole="button"
-                      accessibilityLabel={formatDateBR(iso)}
-                      accessibilityState={{ selected: isSelected, disabled: disabledDay }}
-                      style={[
-                        styles.dayCell,
-                        isSelected && styles.dayCellSelected,
-                        isToday && !isSelected && styles.dayCellToday,
-                      ]}
+                      accessibilityState={{ selected: isSelected, disabled: yearDisabled }}
+                      style={[styles.yearCell, isSelected && styles.daySelected]}
                     >
                       <Text
                         style={[
-                          styles.dayText,
+                          styles.yearText,
+                          yearDisabled && styles.dayTextDisabled,
                           isSelected && styles.dayTextSelected,
-                          disabledDay && styles.dayTextDisabled,
                         ]}
                       >
-                        {day}
+                        {year}
                       </Text>
                     </Pressable>
                   );
                 })}
               </View>
+            )}
 
-              <View style={styles.footer}>
-                <Pressable onPress={() => onChange('')} accessibilityRole="button">
-                  <Text style={styles.footerActionText}>{t('calendar.clear')}</Text>
+            <View style={styles.footer}>
+              <View style={styles.footerLinks}>
+                <Pressable onPress={handleClear} accessibilityRole="button" style={styles.footerLink}>
+                  <Text style={styles.footerLinkText}>{t('calendar.clear')}</Text>
                 </Pressable>
-                <Pressable onPress={handleToday} accessibilityRole="button">
-                  <Text style={styles.footerActionText}>{t('calendar.today')}</Text>
-                </Pressable>
-              </View>
-            </>
-          ) : (
-            <>
-              <View style={styles.header}>
-                <Pressable
-                  onPress={() => setYearPageStart((y) => y - YEAR_PAGE_SIZE)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('back')}
-                  style={styles.headerNavButton}
-                >
-                  <Ionicons name="chevron-back" size={20} color={Colors.foreground} />
-                </Pressable>
-
-                <Text style={styles.headerTitle}>
-                  {yearPageStart} — {yearPageStart + YEAR_PAGE_SIZE - 1}
-                </Text>
-
-                <Pressable
-                  onPress={() => setYearPageStart((y) => y + YEAR_PAGE_SIZE)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('next')}
-                  style={styles.headerNavButton}
-                >
-                  <Ionicons name="chevron-forward" size={20} color={Colors.foreground} />
+                <Pressable onPress={handleToday} accessibilityRole="button" style={styles.footerLink}>
+                  <Text style={styles.footerLinkText}>{t('calendar.today')}</Text>
                 </Pressable>
               </View>
-
-              <View style={styles.yearsGrid}>
-                {Array.from({ length: YEAR_PAGE_SIZE }, (_, i) => yearPageStart + i).map((year) => (
-                  <Pressable
-                    key={year}
-                    onPress={() => handleSelectYear(year)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: year === viewYear }}
-                    style={[styles.yearCell, year === viewYear && styles.yearCellSelected]}
-                  >
-                    <Text
-                      style={[styles.yearText, year === viewYear && styles.yearTextSelected]}
-                    >
-                      {year}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </>
-          )}
+              <Pressable
+                onPress={handleDone}
+                accessibilityRole="button"
+                style={({ pressed }) => [styles.doneButton, pressed && styles.doneButtonPressed]}
+              >
+                <Text style={styles.doneText}>{t('calendar.done')}</Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       </Modal>
     </View>
   );
 }
 
-const CELL_SIZE = 40;
+function NavButton({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: 'chevron-back' | 'chevron-forward';
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={6}
+      style={({ pressed }) => [styles.navButton, pressed && styles.dayHover]}
+    >
+      <Ionicons name={icon} size={18} color={Colors.foreground} />
+    </Pressable>
+  );
+}
+
+const DAY_SIZE = 38;
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -336,132 +408,171 @@ const styles = StyleSheet.create({
     color: Colors.error,
     marginTop: Spacing.xs,
   },
-  // Modal
+  // ─── Modal ───────────────────────────────────────────────
+  overlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: Spacing.md,
+  },
   backdrop: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(22, 78, 99, 0.35)',
   },
-  sheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+  card: {
+    width: '100%',
+    maxWidth: 360,
     backgroundColor: Colors.surface,
-    borderTopLeftRadius: Radius.lg,
-    borderTopRightRadius: Radius.lg,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.xl,
-  },
-  sheetHandle: {
-    width: 40,
-    height: 4,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.border,
-    alignSelf: 'center',
-    marginVertical: Spacing.sm,
+    borderRadius: 20,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.md,
+    shadowColor: Colors.foreground,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.18,
+    shadowRadius: 28,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.sm,
   },
-  headerNavButton: {
-    width: TouchTarget.min,
-    height: TouchTarget.min,
+  navButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.inputBorder,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: Colors.surface,
   },
   headerTitleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
+    borderRadius: Radius.md,
   },
   headerTitle: {
     fontSize: 16,
     fontFamily: Typography.headingSemiBold,
     color: Colors.foreground,
-    textTransform: 'capitalize',
   },
-  weekdaysRow: {
+  divider: {
+    height: 1,
+    backgroundColor: Colors.inputBorder,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+    opacity: 0.6,
+  },
+  row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.xs,
   },
-  weekdayText: {
-    width: CELL_SIZE,
-    textAlign: 'center',
-    fontSize: 12,
-    fontFamily: Typography.bodyMedium,
-    color: Colors.textMuted,
-  },
-  daysGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-  dayCell: {
-    width: CELL_SIZE,
-    height: CELL_SIZE,
+  cell: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: Radius.full,
+    paddingVertical: 3,
   },
-  dayCellSelected: {
+  weekdayText: {
+    textAlign: 'center',
+    fontSize: 13,
+    fontFamily: Typography.body,
+    color: Colors.textSubtle,
+    paddingVertical: Spacing.sm,
+  },
+  day: {
+    width: DAY_SIZE,
+    height: DAY_SIZE,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  dayHover: {
+    backgroundColor: Colors.surfaceMuted,
+  },
+  dayToday: {
+    borderColor: Colors.primary,
+  },
+  daySelected: {
     backgroundColor: Colors.primary,
-  },
-  dayCellToday: {
-    borderWidth: 1,
     borderColor: Colors.primary,
   },
   dayText: {
-    fontSize: 14,
-    fontFamily: Typography.body,
+    fontSize: 15,
+    fontFamily: Typography.bodyMedium,
     color: Colors.text,
   },
-  dayTextSelected: {
-    fontFamily: Typography.bodyMedium,
-    color: Colors.primaryForeground,
+  dayTextOutside: {
+    color: Colors.textSubtle,
+    fontFamily: Typography.body,
   },
   dayTextDisabled: {
-    color: Colors.textSubtle,
+    color: Colors.inputBorder,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: Spacing.md,
-    marginTop: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  footerActionText: {
-    fontSize: 14,
-    fontFamily: Typography.bodyMedium,
+  dayTextToday: {
     color: Colors.primary,
-    padding: Spacing.xs,
+  },
+  dayTextSelected: {
+    color: Colors.primaryForeground,
+    fontFamily: Typography.bodyBold,
   },
   yearsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.sm,
+    paddingTop: Spacing.sm,
   },
   yearCell: {
-    width: '30%',
-    paddingVertical: Spacing.sm,
+    width: '31%',
+    paddingVertical: 12,
     marginBottom: Spacing.sm,
-    borderRadius: Radius.md,
+    borderRadius: 10,
     alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'transparent',
     backgroundColor: Colors.surfaceMuted,
   },
-  yearCellSelected: {
-    backgroundColor: Colors.primary,
-  },
   yearText: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: Typography.bodyMedium,
     color: Colors.text,
   },
-  yearTextSelected: {
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.sm,
+  },
+  footerLinks: {
+    flexDirection: 'row',
+  },
+  footerLink: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  footerLinkText: {
+    fontSize: 14,
+    fontFamily: Typography.bodyMedium,
+    color: Colors.textMuted,
+  },
+  doneButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: Spacing.lg,
+  },
+  doneButtonPressed: {
+    opacity: 0.85,
+  },
+  doneText: {
+    fontSize: 14,
+    fontFamily: Typography.headingSemiBold,
     color: Colors.primaryForeground,
   },
 });

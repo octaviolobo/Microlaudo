@@ -1,10 +1,19 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Colors, Typography } from '@/constants/theme';
+import { useAuth } from '@/hooks/useAuth';
+import { useDoctorStore } from '@/stores/doctorStore';
 
+// Mesmas guardas das abas: sem sessão vai pro login (inclusive deep link/URL digitada
+// na web), e sem CRM vai completar o cadastro antes de emitir laudo.
 export function ReportLayout() {
   const { t } = useTranslation('report');
+  const { isAuthenticated } = useAuth();
+  const doctor = useDoctorStore((s) => s.doctor);
+
+  if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
+  if (doctor && !doctor.crm) return <Redirect href="/complete-profile" />;
 
   return (
     <Stack

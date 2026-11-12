@@ -1,6 +1,6 @@
 {
   "title": "MicroLaudo",
-  "subtitle": "Laudos de microscopia vaginal",
+  "subtitle": "Laudos ginecológicos",
   "newReport": "Novo Laudo",
   "next": "Próximo",
   "back": "Voltar",
@@ -19,13 +19,14 @@
   "selectPlaceholder": "Selecionar...",
   "datePlaceholder": "DD-MM-AAAA",
   "calendar": {
-    "weekdaysShort": ["D", "S", "T", "Q", "Q", "S", "S"],
+    "weekdaysShort": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
     "months": [
       "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ],
     "today": "Hoje",
     "clear": "Limpar",
+    "done": "Concluir",
     "selectYear": "Selecionar ano"
   },
   "auth": {
