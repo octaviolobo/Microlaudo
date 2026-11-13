@@ -142,6 +142,26 @@
     "paywallTitle": "Assine para finalizar",
     "paywallBody": "Seu laudo grátis já foi usado. O rascunho fica salvo: assine e finalize quando quiser.",
     "viewPlans": "Ver planos",
-    "finalizeToDownload": "Finalize o laudo para baixar o PDF."
+    "finalizeToDownload": "Finalize o laudo para baixar o PDF.",
+    "methodTitle": "Forma de pagamento",
+    "methodCard": "Cartão de crédito",
+    "methodCardHint": "Renova sozinho a cada ciclo",
+    "methodInvoice": "Pix ou boleto",
+    "methodInvoiceHint": "Você recebe uma fatura a cada ciclo",
+    "documentLabel": "CPF ou CNPJ (para a nota fiscal)",
+    "documentInvalid": "CPF ou CNPJ inválido. Confira os números.",
+    "redirecting": "Abrindo a fatura...",
+    "gatewayError": "Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.",
+    "gatewayRejected": "O sistema de pagamento recusou os dados. Confira o CPF ou CNPJ.",
+    "pendingShort": "Assinatura aguardando o pagamento da fatura",
+    "pendingBody": "Assim que a fatura for paga, o plano é liberado sozinho (pode levar alguns minutos). Perdeu a fatura? Gere uma nova abaixo.",
+    "newInvoice": "Gerar nova fatura",
+    "checkoutDone": "Pagamento enviado! A confirmação pode levar alguns minutos.",
+    "cancel": "Cancelar assinatura",
+    "cancelConfirm": "Cancelar a assinatura? Você continua com acesso até o fim do período já pago e não será cobrado de novo.",
+    "cancelConfirmButton": "Sim, cancelar",
+    "cancelKeep": "Manter assinatura",
+    "cancelDone": "Assinatura cancelada. O acesso continua até o fim do período pago.",
+    "cancelError": "Não foi possível cancelar agora. Tente de novo."
   }
 }

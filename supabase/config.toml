@@ -40,3 +40,7 @@ enable_confirmations = true
 
 [auth.sms]
 enabled = false
+
+# Webhook do Asaas: autenticado pelo header asaas-access-token, não por JWT.
+[functions.billing-webhook]
+verify_jwt = false

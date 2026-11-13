@@ -23,9 +23,11 @@ export function annualMonthlyEquivalentCents(): number {
   return Math.round(PLAN_PRICES_CENTS.annual / 12);
 }
 
-// Liga o botão "Assinar" quando o checkout do gateway (Edge Function) estiver no ar.
-// Até lá, a tela de planos mostra os preços e um aviso de "em breve".
-export const BILLING_CHECKOUT_ENABLED = false;
+// Liga o checkout (Edge Function billing-checkout → fatura do Asaas). Desligado, a
+// tela de planos mostra os preços e um aviso de "em breve". Controlado por env para
+// testar o sandbox localmente sem expor a cobrança em produção:
+//   EXPO_PUBLIC_BILLING_CHECKOUT=1 npx expo start --web
+export const BILLING_CHECKOUT_ENABLED = process.env.EXPO_PUBLIC_BILLING_CHECKOUT === '1';
 
 // Contato mostrado enquanto o checkout não existe (e-mail da IGARATECH).
 export const BILLING_CONTACT_EMAIL = 'microlaudo@gmail.com';

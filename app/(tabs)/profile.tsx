@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { getProfile, updateProfile } from '@/services/profile';
 import { signOut } from '@/services/auth';
 import { deleteAccount } from '@/services/account';
+import { cancelSubscription } from '@/services/billing';
 import { clearUserScopedState } from '@/stores/userScopedState';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox, Select } from '@/components/ui';
@@ -53,6 +54,28 @@ export function ProfileScreen() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Cancelamento da assinatura (Asaas)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const canCancel =
+    billing?.provider === 'asaas' && (billing.status === 'active' || billing.status === 'past_due');
+
+  async function handleCancelSubscription() {
+    try {
+      setIsCanceling(true);
+      setCancelMessage(null);
+      await cancelSubscription();
+      await useSubscriptionStore.getState().refresh();
+      setShowCancelConfirm(false);
+      setCancelMessage({ text: t('billing.cancelDone'), type: 'success' });
+    } catch {
+      setCancelMessage({ text: t('billing.cancelError'), type: 'error' });
+    } finally {
+      setIsCanceling(false);
+    }
+  }
 
   // Carrega perfil ao montar
   useEffect(() => {
@@ -223,6 +246,32 @@ export function ProfileScreen() {
         fullWidth
         icon="card-outline"
       />
+      {canCancel && !showCancelConfirm && (
+        <View style={styles.cancelRow}>
+          <Button label={t('billing.cancel')} onPress={() => setShowCancelConfirm(true)} variant="secondary" fullWidth />
+        </View>
+      )}
+      {canCancel && showCancelConfirm && (
+        <View style={styles.cancelRow}>
+          <MessageBox message={t('billing.cancelConfirm')} type="warning" />
+          <Button
+            label={t('billing.cancelConfirmButton')}
+            onPress={handleCancelSubscription}
+            variant="danger"
+            loading={isCanceling}
+            disabled={isCanceling}
+            fullWidth
+          />
+          <Button
+            label={t('billing.cancelKeep')}
+            onPress={() => setShowCancelConfirm(false)}
+            variant="secondary"
+            disabled={isCanceling}
+            fullWidth
+          />
+        </View>
+      )}
+      {cancelMessage && <MessageBox message={cancelMessage.text} type={cancelMessage.type} />}
 
       {/* ── Dados Pessoais ─────────────────────────────── */}
       <Text style={styles.sectionTitle}>{t('profile.personalData')}</Text>
@@ -413,6 +462,10 @@ export function ProfileScreen() {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+  cancelRow: {
+    marginTop: Spacing.sm,
+    gap: Spacing.sm,
+  },
   container: {
     padding: Spacing.lg,
     paddingBottom: Spacing.xxl,

@@ -142,6 +142,26 @@
     "paywallTitle": "Subscribe to finalize",
     "paywallBody": "Your free report has been used. The draft is saved: subscribe and finalize whenever you like.",
     "viewPlans": "View plans",
-    "finalizeToDownload": "Finalize the report to download the PDF."
+    "finalizeToDownload": "Finalize the report to download the PDF.",
+    "methodTitle": "Payment method",
+    "methodCard": "Credit card",
+    "methodCardHint": "Renews automatically every cycle",
+    "methodInvoice": "Pix or boleto",
+    "methodInvoiceHint": "You get an invoice every cycle",
+    "documentLabel": "CPF or CNPJ (for the tax invoice)",
+    "documentInvalid": "Invalid CPF or CNPJ. Check the numbers.",
+    "redirecting": "Opening the invoice...",
+    "gatewayError": "Couldn't reach the payment system. Please try again shortly.",
+    "gatewayRejected": "The payment system rejected the details. Check the CPF or CNPJ.",
+    "pendingShort": "Subscription waiting for the invoice to be paid",
+    "pendingBody": "As soon as the invoice is paid, the plan is unlocked automatically (it may take a few minutes). Lost the invoice? Generate a new one below.",
+    "newInvoice": "Generate new invoice",
+    "checkoutDone": "Payment sent! Confirmation may take a few minutes.",
+    "cancel": "Cancel subscription",
+    "cancelConfirm": "Cancel the subscription? You keep access until the end of the paid period and won't be charged again.",
+    "cancelConfirmButton": "Yes, cancel",
+    "cancelKeep": "Keep subscription",
+    "cancelDone": "Subscription canceled. Access continues until the end of the paid period.",
+    "cancelError": "Couldn't cancel right now. Please try again."
   }
 }
