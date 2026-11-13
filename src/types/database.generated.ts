@@ -60,7 +60,6 @@ export type Database = {
           prodoctor_enabled: boolean
           rqe: string | null
           signature_url: string | null
-          subscription_status: string
           trial_reports_used: number
           updated_at: string
           user_id: string | null
@@ -80,7 +79,6 @@ export type Database = {
           prodoctor_enabled?: boolean
           rqe?: string | null
           signature_url?: string | null
-          subscription_status?: string
           trial_reports_used?: number
           updated_at?: string
           user_id?: string | null
@@ -100,7 +98,6 @@ export type Database = {
           prodoctor_enabled?: boolean
           rqe?: string | null
           signature_url?: string | null
-          subscription_status?: string
           trial_reports_used?: number
           updated_at?: string
           user_id?: string | null
@@ -158,6 +155,8 @@ export type Database = {
           doctor_id: string
           epithelial_cells: string | null
           evaluation_date: string | null
+          finalized_identity: string | null
+          first_finalized_at: string | null
           fungal_elements: string | null
           id: string
           lactobacilli: string | null
@@ -201,6 +200,8 @@ export type Database = {
           doctor_id: string
           epithelial_cells?: string | null
           evaluation_date?: string | null
+          finalized_identity?: string | null
+          first_finalized_at?: string | null
           fungal_elements?: string | null
           id?: string
           lactobacilli?: string | null
@@ -244,6 +245,8 @@ export type Database = {
           doctor_id?: string
           epithelial_cells?: string | null
           evaluation_date?: string | null
+          finalized_identity?: string | null
+          first_finalized_at?: string | null
           fungal_elements?: string | null
           id?: string
           lactobacilli?: string | null
@@ -279,12 +282,70 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          doctor_id: string
+          id: string
+          plan: string
+          provider: string
+          provider_customer_id: string | null
+          provider_subscription_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          doctor_id: string
+          id?: string
+          plan: string
+          provider: string
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          doctor_id?: string
+          id?: string
+          plan?: string
+          provider?: string
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: true
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_billing_status: {
+        Args: never
+        Returns: {
+          current_period_end: string
+          has_active_subscription: boolean
+          plan: string
+          provider: string
+          status: string
+          trial_report_limit: number
+          trial_reports_used: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

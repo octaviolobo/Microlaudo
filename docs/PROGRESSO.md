@@ -624,3 +624,31 @@ Branch `feat/prodoctor-flag` (a partir de `chore/expo-sdk-57-upgrade`).
 **Pendências:**
 - [ ] Conferir se algum deploy automático (Railway do backend Flutter antigo, Vercel da versão web) observa o `master` — o código mudou completamente; se o backend antigo ainda estiver no ar, apontar o deploy para `legacy/flutter` ou desligar.
 - [ ] Continuam valendo as pendências das Sessões 16/17: habilitar `prodoctor_enabled` só na conta da mãe do usuário + teste manual, e credenciais OAuth Google/Facebook.
+
+---
+
+## Sessão 19 — 12 Nov 2026
+
+### Monetização, parte 1: base independente de gateway
+
+Branch `feat/monetizacao-base` (empilhada em `chore/expo-sdk57-patches`, que corrige o jest).
+
+**Decisões do usuário:** teste grátis de **1 laudo**; **R$49/mês** e **R$399/ano**; web primeiro (IAP/RevenueCat quando o app for às lojas); paywall só no **finalizar**. Gateway em estudo (pesquisa de taxas: Asaas recomendado por ter cartão recorrente + Pix Automático + NFS-e por API; Stripe sem Pix recorrente nem NFS-e).
+
+- **`supabase/migrations/015_monetization.sql`**:
+  - tabela `subscriptions` (1 por médico; `provider` asaas/apple/google/manual; status pending/active/past_due/canceled/expired; `current_period_end`). RLS: médico só lê a própria; escrita só service_role/postgres.
+  - `doctors.subscription_status` removida (status vem de `subscriptions`); `trial_reports_used` fica.
+  - `reports.first_finalized_at` + `finalized_identity` (md5 de nome/nascimento/coleta/CPF na 1ª finalização).
+  - trigger `reports_enforce_entitlement` (SECURITY DEFINER, decide pelo `auth.role()`): laudo nasce rascunho; 1ª finalização sem assinatura gasta o teste de forma atômica; sem teste → `PT402 PAYWALL_REQUIRED` (HTTP 402). Re-finalizar sem assinatura só com o mesmo paciente. Funções auxiliares no schema `private` (não exposto pelo PostgREST).
+  - RPC `get_billing_status()`.
+  - Backfill: laudos já finalizados marcam `first_finalized_at` e contam no teste.
+- **Testada no remoto (SP) numa transação com ROLLBACK**, 13 cenários ok (insert completed barrado, contador e marca imutáveis, 2º laudo → PT402, re-finalização mesmo/outro paciente, client não cria assinatura nem chama `private.*`, assinante ilimitado, isolamento entre médicos). **Ainda não aplicada.**
+- App: `src/services/billing.ts`, `subscriptionStore` reescrito (carrega no login), tela **`app/plans.tsx`** (funciona deslogado), `BillingStatusBanner` na Home/Perfil, paywall nas prévias de microscopia e USG (botão "Baixar PDF" só em laudo finalizado), `finalizeReport` converte PT402 em `PAYWALL_REQUIRED`. Botão "Assinar" mostra "em breve" até `BILLING_CHECKOUT_ENABLED`.
+- Verificação: lint 0 erros, types ok, jest 183/183 (11 novos em `__tests__/services/billing.test.ts`).
+- Supabase CLI estava linkado ao projeto **antigo** (`flxxotkhgjpxlpphazcd`); re-linkado para São Paulo (`okkemcrsrngahyzaddkr`) em 12/11.
+
+**Pendências:**
+- [ ] Aplicar a migration 015 em produção **junto** com o deploy do front (o front atual não sabe tratar o 402).
+- [ ] Cortesia para as médicas que já usam (senão caem no paywall): `INSERT INTO subscriptions (doctor_id, provider, plan, status) VALUES (<id>, 'manual', 'annual', 'active');`
+- [ ] Escolher o gateway; integrar checkout + webhook (Edge Functions) + emissão de NFS-e.
+- [ ] Política de privacidade §9 e Termos de Uso com as regras comerciais.

@@ -10,8 +10,10 @@ import { clearUserScopedState } from '@/stores/userScopedState';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox, Select } from '@/components/ui';
 import { AssetUploader } from '@/components/profile/AssetUploader';
+import { BillingStatusBanner } from '@/components/billing/BillingStatusBanner';
 import { useAuthStore } from '@/stores/authStore';
 import { useDoctorStore } from '@/stores/doctorStore';
+import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 
 import type { SelectOption } from '@/components/ui';
@@ -28,6 +30,7 @@ export function ProfileScreen() {
   const setDoctor = useDoctorStore((s) => s.setDoctor);
   const isLoading = useDoctorStore((s) => s.isLoading);
   const setLoading = useDoctorStore((s) => s.setLoading);
+  const billing = useSubscriptionStore((s) => s.billing);
 
   // Campos do formulário
   const [fullName, setFullName] = useState('');
@@ -76,6 +79,7 @@ export function ProfileScreen() {
       }
     }
     loadProfile();
+    void useSubscriptionStore.getState().refresh();
   }, []);
 
   async function handleSave() {
@@ -208,6 +212,17 @@ export function ProfileScreen() {
       showsVerticalScrollIndicator={false}
     >
       <Text style={styles.pageTitle}>{t('profile.title')}</Text>
+
+      {/* ── Assinatura ─────────────────────────────────── */}
+      <Text style={styles.sectionTitle}>{t('billing.section')}</Text>
+      {billing && <BillingStatusBanner billing={billing} showPlansLink={false} />}
+      <Button
+        label={t('billing.viewPlans')}
+        onPress={() => router.push('/plans')}
+        variant="secondary"
+        fullWidth
+        icon="card-outline"
+      />
 
       {/* ── Dados Pessoais ─────────────────────────────── */}
       <Text style={styles.sectionTitle}>{t('profile.personalData')}</Text>

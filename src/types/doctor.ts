@@ -1,5 +1,3 @@
-import type { SubscriptionStatus } from './subscription';
-
 export type Doctor = {
   id: string;
   user_id: string;
@@ -19,9 +17,8 @@ export type Doctor = {
   // Integração ProDoctor (autofill de paciente) — só habilitado manualmente
   // por um administrador, ver supabase/migrations/010_doctors_prodoctor_flag.sql
   prodoctor_enabled: boolean;
-  // Trial e assinatura
+  // Laudos já gastos do teste grátis (status da assinatura: get_billing_status())
   trial_reports_used: number;
-  subscription_status: SubscriptionStatus;
   created_at: string;
   updated_at: string;
 };

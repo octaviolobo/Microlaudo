@@ -10,6 +10,7 @@ import {
   validateSusCard,
 } from '@/lib/validation';
 
+import { isPaywallError } from './billing';
 import { supabase } from './supabase';
 
 import type { ReportInsert, ReportRow, ReportUpdate } from '@/types/database';
@@ -135,7 +136,16 @@ export async function finalizeReport(id: string): Promise<ReportRow> {
   if (isRefinalizing) {
     patch.revision_number = (current.revision_number ?? 1) + 1;
   }
-  const updated = await updateReport(id, patch);
+  let updated: ReportRow;
+  try {
+    updated = await updateReport(id, patch);
+  } catch (err) {
+    // Trigger reports_enforce_entitlement (migration 015): sem teste e sem assinatura.
+    if (err instanceof AppError && isPaywallError(err.cause)) {
+      throw new AppError(ErrorCodes.PAYWALL_REQUIRED, 'Assinatura necessária para finalizar o laudo', err.cause);
+    }
+    throw err;
+  }
   void logReportFinalized(id, updated.revision_number);
   return updated;
 }
