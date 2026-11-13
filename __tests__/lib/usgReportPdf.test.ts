@@ -33,7 +33,6 @@ const doctor = {
   default_reference: null,
   preferred_language: 'pt-BR',
   prodoctor_enabled: false,
-  subscription_status: 'trial',
   trial_reports_used: 0,
   created_at: '2026-11-06T00:00:00Z',
   updated_at: '2026-11-06T00:00:00Z',

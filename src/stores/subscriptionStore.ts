@@ -1,27 +1,46 @@
 import { create } from 'zustand';
 
-import { TRIAL_REPORT_LIMIT } from '@/constants/plans';
+import { getBillingStatus } from '@/services/billing';
 
-import type { SubscriptionStatus } from '@/types/subscription';
+import type { BillingStatus } from '@/types/subscription';
 
 type SubscriptionState = {
-  status: SubscriptionStatus;
-  trialUsed: number;
-  setStatus: (status: SubscriptionStatus) => void;
-  setTrialUsed: (count: number) => void;
+  // null = ainda não carregou (ou falhou). A UI não bloqueia nada nesse estado:
+  // quem decide de verdade é o servidor no momento de finalizar.
+  billing: BillingStatus | null;
+  setBilling: (billing: BillingStatus | null) => void;
+  refresh: () => Promise<BillingStatus | null>;
   reset: () => void;
 };
 
 export const useSubscriptionStore = create<SubscriptionState>((set) => ({
-  status: 'trial',
-  trialUsed: 0,
-  setStatus: (status) => set({ status }),
-  setTrialUsed: (trialUsed) => set({ trialUsed }),
-  reset: () => set({ status: 'trial', trialUsed: 0 }),
+  billing: null,
+  setBilling: (billing) => set({ billing }),
+  refresh: async () => {
+    try {
+      const billing = await getBillingStatus();
+      set({ billing });
+      return billing;
+    } catch {
+      return null;
+    }
+  },
+  reset: () => set({ billing: null }),
 }));
 
-// Seletor standalone — uso correto: useSubscriptionStore(selectCanFinalize)
+export function trialRemaining(billing: BillingStatus): number {
+  return Math.max(0, billing.trialReportLimit - billing.trialReportsUsed);
+}
+
+// Pode finalizar um laudo NOVO? (Re-finalizar o mesmo paciente é liberado pelo
+// servidor mesmo sem assinatura — a UI não tenta prever esse caso.)
+// Status desconhecido → true: deixa o servidor responder em vez de travar à toa.
+export function canFinalizeNew(billing: BillingStatus | null): boolean {
+  if (!billing) return true;
+  return billing.hasActiveSubscription || trialRemaining(billing) > 0;
+}
+
+// Seletor standalone — uso: useSubscriptionStore(selectCanFinalize)
 export function selectCanFinalize(state: SubscriptionState): boolean {
-  if (state.status === 'active') return true;
-  return state.status === 'trial' && state.trialUsed < TRIAL_REPORT_LIMIT;
+  return canFinalizeNew(state.billing);
 }

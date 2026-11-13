@@ -2,10 +2,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { BillingStatusBanner } from '@/components/billing/BillingStatusBanner';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import { enabledReportTypes } from '@/constants/features';
 import { createDefaultUsgContent } from '@/lib/usgContent';
 import { useReportStore } from '@/stores/reportStore';
+import { useSubscriptionStore } from '@/stores/subscriptionStore';
 
 import type { ReportType } from '@/types/report';
 
@@ -13,6 +15,7 @@ export function HomeScreen() {
   const { t } = useTranslation('common');
   const { t: tr } = useTranslation('report');
   const reportTypes = enabledReportTypes();
+  const billing = useSubscriptionStore((s) => s.billing);
 
   // Laudo novo começa com o estado limpo do tipo escolhido. Microscopia mantém o
   // comportamento de antes (abre direto o step 1), só limpando o store se o último
@@ -34,6 +37,9 @@ export function HomeScreen() {
         <Text style={styles.title}>{t('title')}</Text>
         <Text style={styles.subtitle}>{t('subtitle')}</Text>
       </View>
+
+      {/* Teste grátis / assinatura. Assinante ativo não precisa do aviso. */}
+      {billing && !billing.hasActiveSubscription && <BillingStatusBanner billing={billing} />}
 
       {/* Mobile (só microscopia): um botão, igual a antes. Web: um botão por tipo de laudo. */}
       {reportTypes.map((type) => (

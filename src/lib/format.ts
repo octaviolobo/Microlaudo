@@ -26,3 +26,15 @@ export function formatSusCard(digits: string): string {
   if (d.length !== 15) return digits;
   return `${d.slice(0, 3)} ${d.slice(3, 7)} ${d.slice(7, 11)} ${d.slice(11)}`;
 }
+
+// 4900 → "R$ 49"; 3325 → "R$ 33,25"; 123400 → "R$ 1.234". Sem Intl: o Hermes do
+// Android nem sempre traz os dados de locale.
+export function formatCentsBRL(cents: number): string {
+  const reais = Math.floor(Math.abs(cents) / 100);
+  const centavos = Math.abs(cents) % 100;
+  const inteiro = String(reais).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const sinal = cents < 0 ? '-' : '';
+  return centavos === 0
+    ? `${sinal}R$ ${inteiro}`
+    : `${sinal}R$ ${inteiro},${String(centavos).padStart(2, '0')}`;
+}

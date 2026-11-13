@@ -37,7 +37,7 @@ MicroLaudo é um aplicativo multiplataforma (iOS, Android, Web) para médicos gi
 | RF16 | Salvar PDF localmente no dispositivo | Alta |
 | RF17 | Histórico de laudos com busca (por paciente, data) | Alta |
 | RF18 | Visualizar e reimprimir laudos antigos | Alta |
-| RF19 | Sistema de assinatura paga (mensal/anual) com trial limitado a 2 laudos | Alta |
+| RF19 | Sistema de assinatura paga (mensal/anual) com teste grátis de 1 laudo | Alta |
 | RF20 | Internacionalização (PT-BR como padrão, preparado para outros idiomas) | Média |
 | RF21 | Editar laudo finalizado: volta a rascunho, gera novo PDF ao re-finalizar, incrementa número da revisão. Não consome cota do trial novamente. | Alta |
 | RF22 | Exclusão de conta com remoção total de dados (exigência LGPD + Apple) | Alta |
@@ -385,9 +385,14 @@ Análise completa: `docs/analise-seguranca.md`
 
 | Plano | Preço Sugerido | Laudos |
 |-------|---------------|--------|
-| **Trial** | Grátis | 2 laudos finalizados (lifetime) |
-| **Mensal** | R$ 49–79/mês | Ilimitados |
-| **Anual** | R$ 399–699/ano (~30% desc.) | Ilimitados |
+| **Teste grátis** | Grátis | 1 laudo finalizado (lifetime) |
+| **Mensal** | R$ 49/mês | Ilimitados |
+| **Anual** | R$ 399/ano (32% desc., R$ 33,25/mês) | Ilimitados |
+
+Preços de lançamento decididos em 12/11/2026 (baratos enquanto não há base de usuários).
+O paywall trava só **finalizar** (o PDF só sai de laudo finalizado). Regras no servidor:
+`supabase/migrations/015_monetization.sql`. Gateway web em avaliação (Asaas recomendado:
+cartão recorrente, Pix Automático e NFS-e pela API).
 
 ---
 
@@ -398,7 +403,7 @@ Análise completa: `docs/analise-seguranca.md`
 | PDF complexo demais para client-side | Alto | Fallback: Edge Function com Puppeteer |
 | RLS mal configurado em tabela nova | Crítico | Checklist pré-deploy + teste cruzado |
 | Bucket Storage público por acidente | Crítico | Todos PRIVATE + teste GET sem token = 403 |
-| Apple/Google cortam 30% da subscription | Alto | Considerar no pricing. Web com preço menor. |
+| Apple/Google cortam 15% da subscription (Small Business Program; 30% acima de US$1M/ano) | Alto | Considerar no pricing. Web com preço menor. |
 | Scope creep com IA | Médio | Não incluir na v1. Reavaliar após validação. |
 | Dev solo = bus factor 1 | Alto | Documentar tudo. Serviços gerenciados. |
 

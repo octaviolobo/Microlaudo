@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+
+jest.mock('@/services/supabase', () => ({ supabase: {} }));
 
 import { useDoctorStore } from '@/stores/doctorStore';
 import { useReportStore } from '@/stores/reportStore';
@@ -15,16 +17,22 @@ function dirtyStores() {
   useReportStore.getState().setReportId('report-do-medico-a');
   useReportStore.getState().setPatientData({ patient_name: 'Paciente A' } as never);
   useDoctorStore.getState().setDoctor({ id: 'doctor-a' } as DoctorRow);
-  useSubscriptionStore.getState().setStatus('active');
-  useSubscriptionStore.getState().setTrialUsed(3);
+  useSubscriptionStore.getState().setBilling({
+    hasActiveSubscription: true,
+    plan: 'monthly',
+    status: 'active',
+    provider: 'asaas',
+    currentPeriodEnd: '2026-12-12T00:00:00Z',
+    trialReportsUsed: 1,
+    trialReportLimit: 1,
+  });
 }
 
 function expectClean() {
   expect(useReportStore.getState().reportId).toBeNull();
   expect(useReportStore.getState().currentReport).toBeNull();
   expect(useDoctorStore.getState().doctor).toBeNull();
-  expect(useSubscriptionStore.getState().status).toBe('trial');
-  expect(useSubscriptionStore.getState().trialUsed).toBe(0);
+  expect(useSubscriptionStore.getState().billing).toBeNull();
 }
 
 describe('userScopedState', () => {

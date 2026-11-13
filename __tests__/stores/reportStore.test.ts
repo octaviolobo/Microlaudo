@@ -46,6 +46,8 @@ function baseRow(overrides: Partial<ReportRow> = {}): ReportRow {
     status: 'draft',
     revision_number: 1,
     evaluation_date: null,
+    first_finalized_at: null,
+    finalized_identity: null,
     created_at: '2026-11-06T00:00:00Z',
     updated_at: '2026-11-06T00:00:00Z',
     ...overrides,

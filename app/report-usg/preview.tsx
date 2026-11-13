@@ -11,7 +11,8 @@ import { Colors, Typography, Spacing } from '@/constants/theme';
 import { useReportStore } from '@/stores/reportStore';
 import { finalizeReport, getReport, updateReport } from '@/services/reports';
 import { generateAndUploadReportPdf, getSignedPdfUrl } from '@/services/pdf';
-import { AppError } from '@/lib/errors';
+import { AppError, ErrorCodes } from '@/lib/errors';
+import { canFinalizeNew, useSubscriptionStore } from '@/stores/subscriptionStore';
 import { calculateAge, formatDateBR } from '@/lib/date';
 import { formatCpf, formatSusCard } from '@/lib/format';
 import { parseUsgContent } from '@/lib/usgContent';
@@ -49,8 +50,18 @@ export function UsgPreviewScreen() {
       .finally(() => setIsLoading(false));
   }, [reportId, tc]);
 
+  // Paywall (migration 015): sem teste e sem assinatura, finalizar um laudo novo leva à
+  // tela de planos. Re-finalizar (edição) não é previsto aqui: o servidor decide.
+  function openPaywall() {
+    router.push({ pathname: '/plans', params: { reason: 'paywall' } });
+  }
+
   async function handleFinalize() {
     if (!reportId || !report) return;
+    if (!report.first_finalized_at && !canFinalizeNew(useSubscriptionStore.getState().billing)) {
+      openPaywall();
+      return;
+    }
     try {
       setIsFinalizing(true);
       setError(null);
@@ -59,9 +70,15 @@ export function UsgPreviewScreen() {
       if (!finalized.pdf_url || isDirty) {
         await generateAndUploadReportPdf(finalized, []);
       }
+      void useSubscriptionStore.getState().refresh();
       reset();
       router.replace('/(tabs)/home');
     } catch (err) {
+      if (err instanceof AppError && err.code === ErrorCodes.PAYWALL_REQUIRED) {
+        void useSubscriptionStore.getState().refresh();
+        openPaywall();
+        return;
+      }
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {
       setIsFinalizing(false);
@@ -175,14 +192,19 @@ export function UsgPreviewScreen() {
         {error && <MessageBox message={error} type="error" />}
 
         <View style={p.divider} />
-        <Button
-          label={isGeneratingPdf ? tc('loading') : t('steps.preview.download')}
-          onPress={handleDownloadPdf}
-          variant="secondary"
-          loading={isGeneratingPdf}
-          fullWidth
-          icon="document-text-outline"
-        />
+        {/* PDF só de laudo finalizado: o paywall fica no finalizar (migration 015). */}
+        {report.status === 'completed' ? (
+          <Button
+            label={isGeneratingPdf ? tc('loading') : t('steps.preview.download')}
+            onPress={handleDownloadPdf}
+            variant="secondary"
+            loading={isGeneratingPdf}
+            fullWidth
+            icon="document-text-outline"
+          />
+        ) : (
+          <MessageBox message={tc('billing.finalizeToDownload')} type="info" />
+        )}
       </ScrollView>
 
       <View style={s.nav}>

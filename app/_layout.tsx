@@ -22,6 +22,7 @@ import { getSession, subscribeToAuthChanges } from '@/services/auth';
 import { getProfile } from '@/services/profile';
 import { useAuthStore } from '@/stores/authStore';
 import { useDoctorStore } from '@/stores/doctorStore';
+import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import { syncUserScopedState } from '@/stores/userScopedState';
 
 SplashScreen.preventAutoHideAsync();
@@ -64,6 +65,7 @@ export function RootLayout() {
         setSession(session);
         setUser(session?.user ?? null);
         if (!session) return;
+        void useSubscriptionStore.getState().refresh();
         setIsDoctorBootLoading(true);
         return getProfile()
           .then(setDoctor)
@@ -85,8 +87,10 @@ export function RootLayout() {
       syncUserScopedState(session?.user.id ?? null);
       setSession(session);
       setUser(session?.user ?? null);
-      if (session) refreshDoctorProfile();
-      else setDoctor(null);
+      if (session) {
+        refreshDoctorProfile();
+        void useSubscriptionStore.getState().refresh();
+      } else setDoctor(null);
     });
 
     return () => subscription.unsubscribe();
@@ -110,6 +114,7 @@ export function RootLayout() {
         <Stack.Screen name="reset-password" />
         <Stack.Screen name="report" />
         <Stack.Screen name="report-usg" />
+        <Stack.Screen name="plans" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
