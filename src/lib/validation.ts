@@ -95,6 +95,29 @@ export function isValidCpf(value: string): boolean {
   return true;
 }
 
+export function isValidCnpj(value: string): boolean {
+  const cnpj = value.replace(/\D/g, '');
+  if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+  const digits = cnpj.split('').map(Number);
+  const weights = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  for (const pos of [12, 13]) {
+    const w = weights.slice(13 - pos);
+    let sum = 0;
+    for (let i = 0; i < pos; i++) sum += digits[i] * w[i];
+    const rest = sum % 11;
+    if ((rest < 2 ? 0 : 11 - rest) !== digits[pos]) return false;
+  }
+  return true;
+}
+
+// Documento do pagador (nota fiscal / Asaas): CPF (11 dígitos) ou CNPJ (14).
+export function isValidCpfCnpj(value: string): boolean {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length === 11) return isValidCpf(digits);
+  if (digits.length === 14) return isValidCnpj(digits);
+  return false;
+}
+
 // Cartão Nacional de Saúde (CNS): 15 dígitos, começa com 1, 2 (definitivo) ou 7, 8, 9
 // (provisório), e a soma ponderada (pesos 15 → 1) é múltipla de 11.
 export function isValidSusCard(value: string): boolean {

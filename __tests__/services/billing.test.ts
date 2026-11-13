@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 import { annualDiscountPercent, annualMonthlyEquivalentCents, TRIAL_REPORT_LIMIT } from '@/constants/plans';
 import { formatCentsBRL } from '@/lib/format';
+import { isValidCnpj, isValidCpfCnpj } from '@/lib/validation';
 import { isPaywallError, mapBillingStatus } from '@/services/billing';
 import { canFinalizeNew, trialRemaining } from '@/stores/subscriptionStore';
 
@@ -110,5 +111,19 @@ describe('preços', () => {
   it('anual: 32% de desconto e R$33,25/mês', () => {
     expect(annualDiscountPercent()).toBe(32);
     expect(annualMonthlyEquivalentCents()).toBe(3325);
+  });
+});
+
+describe('documento do pagador', () => {
+  it('CNPJ', () => {
+    expect(isValidCnpj('66.173.331/0001-31')).toBe(true);
+    expect(isValidCnpj('66.173.331/0001-32')).toBe(false);
+    expect(isValidCnpj('11111111111111')).toBe(false);
+  });
+
+  it('CPF ou CNPJ', () => {
+    expect(isValidCpfCnpj('529.982.247-25')).toBe(true);
+    expect(isValidCpfCnpj('66173331000131')).toBe(true);
+    expect(isValidCpfCnpj('5299822472')).toBe(false);
   });
 });

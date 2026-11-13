@@ -652,3 +652,17 @@ Branch `feat/monetizacao-base` (empilhada em `chore/expo-sdk57-patches`, que cor
 - [ ] Cortesia para as médicas que já usam (senão caem no paywall): `INSERT INTO subscriptions (doctor_id, provider, plan, status) VALUES (<id>, 'manual', 'annual', 'active');`
 - [ ] Escolher o gateway; integrar checkout + webhook (Edge Functions) + emissão de NFS-e.
 - [ ] Política de privacidade §9 e Termos de Uso com as regras comerciais.
+
+### Monetização, parte 2: checkout Asaas (sandbox)
+
+Branch `feat/asaas-checkout` (sobre `feat/monetizacao-base`). Guia completo: `docs/pagamentos-asaas.md`.
+
+- **Produção (12/11):** migration 015 aplicada pelo usuário via CLI; cortesia `manual`/anual para as 2 médicas.
+- **Gateway escolhido: Asaas.** API de assinaturas direta (não o Checkout hospedado: o `CHECKOUT_PAID` não traz o id da assinatura). Cliente exige CPF/CNPJ → pedido no app, guardado só no Asaas.
+- Edge Functions: `billing-checkout` (cria cliente + assinatura, devolve `invoiceUrl`), `billing-webhook` (token `asaas-access-token`, idempotente por id do evento em `billing_events`, `verify_jwt = false`), `billing-cancel`. `delete-account` agora cancela a assinatura no Asaas antes de apagar a conta.
+- Lógica pura em `supabase/functions/_shared/billingLogic.ts` (planos, CPF/CNPJ, período = vencimento + ciclo + 3 dias, decisão por evento), testada pelo jest (16 casos). `deno check` ok nas funções novas (erro de tipo pré-existente em `purgeBucket` do delete-account).
+- Migration 016: policies de service_role em `subscriptions` (FORCE RLS) + tabela `billing_events`.
+- App: formulário de checkout em `/plans` (forma de pagamento + CPF/CNPJ), estado "aguardando pagamento", cancelamento no Perfil. Checkout só com `EXPO_PUBLIC_BILLING_CHECKOUT=1`.
+- Verificação: lint 0 erros, types ok, jest 201/201.
+
+**Pendências:** aplicar a 016, criar `ASAAS_WEBHOOK_TOKEN`, deploy das 4 funções, cadastrar o webhook no Asaas, teste ponta a ponta no sandbox, NFS-e (dados fiscais com o contador), virar para produção.

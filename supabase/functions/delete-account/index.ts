@@ -13,11 +13,16 @@
 //   3. Insere linha em audit_log { event_type: 'account.deleted', actor_id }
 //      antes de deletar o usuário — audit_log não tem FK para auth.users, então
 //      sobrevive à exclusão.
+//   0. Assinatura Asaas ativa/pendente é cancelada no gateway ANTES de tudo —
+//      senão o médico seguiria sendo cobrado depois de apagar a conta. Se o
+//      cancelamento falhar, a exclusão para (500) e nada é apagado.
 //   4. Chama admin.auth.admin.deleteUser(user_id): o ON DELETE CASCADE em
 //      doctors.user_id / reports.doctor_id / report_images.report_id limpa
 //      todas as tabelas do public schema.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+import { AsaasError, asaas } from '../_shared/asaas.ts';
 
 const BUCKETS = ['report-images', 'report-pdfs', 'doctor-assets'] as const;
 
@@ -159,6 +164,26 @@ Deno.serve(async (req: Request) => {
   });
 
   try {
+    // 0. Cancela a cobrança recorrente no gateway
+    const { data: doctor } = await admin.from('doctors').select('id').eq('user_id', userId).maybeSingle();
+    if (doctor) {
+      const { data: sub, error: subError } = await admin
+        .from('subscriptions')
+        .select('provider, provider_subscription_id, status')
+        .eq('doctor_id', doctor.id)
+        .maybeSingle();
+      if (subError) throw new Error(`Falha ao ler subscriptions: ${subError.message}`);
+      if (sub?.provider === 'asaas' && sub.provider_subscription_id && sub.status !== 'expired') {
+        try {
+          await asaas('DELETE', `/subscriptions/${sub.provider_subscription_id}`);
+        } catch (err) {
+          if (!(err instanceof AsaasError && err.status === 404)) {
+            throw new Error(`Falha ao cancelar assinatura no Asaas: ${err instanceof Error ? err.message : err}`);
+          }
+        }
+      }
+    }
+
     // 1. Purga os buckets (namespaced por {user_id}/)
     for (const bucket of BUCKETS) {
       await purgeBucket(admin, bucket, userId);

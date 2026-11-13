@@ -31,6 +31,8 @@ export function describeBilling(billing: BillingStatus, t: TFunction): { message
     return { message: t('billing.activeUntil', { plan, date }), tone: 'success' };
   }
 
+  if (billing.status === 'pending') return { message: t('billing.pendingShort'), tone: 'info' };
+
   const remaining = trialRemaining(billing);
   if (remaining > 0) return { message: t('billing.trialRemaining', { count: remaining }), tone: 'info' };
   return { message: t('billing.trialExhausted'), tone: 'warning' };
