@@ -165,12 +165,14 @@
     "cancelError": "Couldn't cancel right now. Please try again."
   },
   "legal": {
+    "termsOfUse": "Terms of Use",
     "privacyPolicy": "Privacy Policy",
     "opensInBrowser": "Opens in the browser",
     "notice": {
-      "register": "By creating your account, you acknowledge that you have read our",
-      "social": "Signing in with Google or Facebook for the first time creates your account, and you acknowledge that you have read our",
-      "subscribe": "Your CPF/CNPJ, name and email are sent to Asaas for billing and invoicing. Learn more in our"
+      "register": "By creating your account, you agree to the [terms] and acknowledge that you have read the [privacy].",
+      "social": "Signing in with Google or Facebook for the first time creates your account, and you agree to the [terms] and acknowledge that you have read the [privacy].",
+      "subscribe": "By subscribing, you agree to automatic renewal and to the cancellation and refund rules in the [terms]. Your CPF/CNPJ, name and email are sent to Asaas for billing and invoicing ([privacy]).",
+      "standalone": "[terms] · [privacy]"
     }
   }
 }

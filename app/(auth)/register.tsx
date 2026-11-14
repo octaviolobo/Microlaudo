@@ -8,7 +8,7 @@ import { AppError, ErrorCodes } from '@/lib/errors';
 import { getPasswordIssue } from '@/lib/validation';
 import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
-import { PrivacyNotice } from '@/components/legal/PrivacyNotice';
+import { LegalNotice } from '@/components/legal/LegalNotice';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 
 export function RegisterScreen() {
@@ -131,7 +131,7 @@ export function RegisterScreen() {
 
       <Turnstile onToken={setCaptchaToken} resetKey={captchaReset} />
 
-      <PrivacyNotice context="register" />
+      <LegalNotice context="register" />
 
       <Button
         label={t('auth.register')}
