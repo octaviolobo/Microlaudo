@@ -14,9 +14,13 @@
 // seguidas o Asaas pausa a fila, então só devolvemos erro (para ele tentar de
 // novo) em falha nossa de banco; evento sem assinatura conhecida é registrado
 // e respondido com 200.
+//
+// Estorno/chargeback: além de cortar o acesso, apaga a assinatura no Asaas.
+// Estornar uma cobrança não cancela a assinatura lá, e a próxima renovação
+// cobraria o cartão de novo (e o webhook reativaria o plano).
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
-import { adminClient, jsonResponse } from '../_shared/asaas.ts';
+import { AsaasError, adminClient, asaas, jsonResponse } from '../_shared/asaas.ts';
 import { actionForEvent, applyAction, safeEqual } from '../_shared/billingLogic.ts';
 
 import type { Plan, SubscriptionStatus } from '../_shared/billingLogic.ts';
@@ -108,5 +112,18 @@ Deno.serve(async (req: Request) => {
     return jsonResponse(500, { error: 'storage_error' });
   }
 
-  return finish(`${action.kind}:${patch.status}`);
+  let suffix = '';
+  if (action.kind === 'revoke') {
+    try {
+      await asaas('DELETE', `/subscriptions/${subscriptionId}`);
+    } catch (err) {
+      if (!(err instanceof AsaasError && err.status === 404)) {
+        // Acesso já cortado; a assinatura no Asaas precisa ser removida à mão.
+        console.error('[billing-webhook] falha ao apagar assinatura após estorno', subscriptionId, String(err));
+        suffix = ':asaas_delete_failed';
+      }
+    }
+  }
+
+  return finish(`${action.kind}:${patch.status}${suffix}`);
 });

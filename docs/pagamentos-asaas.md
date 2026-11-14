@@ -23,8 +23,10 @@ App (/plans)                 Edge Function             Asaas
   cada ciclo, e o médico escolhe como pagar.
 - O CPF/CNPJ fica só no Asaas (exigido para criar o cliente e para a NFS-e).
 - Renovação vencida → `past_due`, com acesso até o fim do período pago + 3 dias.
-  Estorno/chargeback → `expired` na hora. Assinatura apagada → `canceled` até o
-  fim do período.
+  Estorno/chargeback → `expired` na hora **e a assinatura é apagada no Asaas**
+  (estornar não cancela a assinatura lá; a renovação cobraria de novo). Se o
+  `DELETE` falhar, `billing_events.result` termina em `:asaas_delete_failed` →
+  remover à mão no painel. Assinatura apagada → `canceled` até o fim do período.
 - Cancelar (Perfil → Cancelar assinatura) → `billing-cancel` apaga a assinatura
   no Asaas e mantém o acesso até o fim do período.
 - Excluir a conta cancela a assinatura no Asaas antes de apagar qualquer coisa.

@@ -3,6 +3,9 @@
 // Cancela a assinatura Asaas do médico autenticado. O acesso continua até o fim
 // do período já pago (status `canceled`); uma assinatura que nunca foi paga
 // (`pending`) vira `expired` direto.
+//
+// Linha já `canceled`/`expired` (ex.: estorno) ainda tenta apagar no Asaas,
+// para nenhuma renovação ficar viva por lá; o status não muda.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
 import { AsaasError, CORS_HEADERS, adminClient, asaas, authenticatedUser, jsonResponse } from '../_shared/asaas.ts';
@@ -29,13 +32,13 @@ Deno.serve(async (req: Request) => {
     if (!row || row.provider !== 'asaas' || !row.provider_subscription_id) {
       return jsonResponse(404, { error: 'no_subscription' });
     }
-    if (row.status === 'canceled' || row.status === 'expired') return jsonResponse(200, { status: row.status });
-
     try {
       await asaas('DELETE', `/subscriptions/${row.provider_subscription_id}`);
     } catch (err) {
       if (!(err instanceof AsaasError && err.status === 404)) throw err;
     }
+
+    if (row.status === 'canceled' || row.status === 'expired') return jsonResponse(200, { status: row.status });
 
     const status = row.status === 'pending' ? 'expired' : 'canceled';
     const { error } = await admin.from('subscriptions').update({ status }).eq('id', row.id);
