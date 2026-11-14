@@ -665,4 +665,7 @@ Branch `feat/asaas-checkout` (sobre `feat/monetizacao-base`). Guia completo: `do
 - App: formulário de checkout em `/plans` (forma de pagamento + CPF/CNPJ), estado "aguardando pagamento", cancelamento no Perfil. Checkout só com `EXPO_PUBLIC_BILLING_CHECKOUT=1`.
 - Verificação: lint 0 erros, types ok, jest 201/201.
 
-**Pendências:** aplicar a 016, criar `ASAAS_WEBHOOK_TOKEN`, deploy das 4 funções, cadastrar o webhook no Asaas, teste ponta a ponta no sandbox, NFS-e (dados fiscais com o contador), virar para produção.
+- **13/11:** PRs #20 e #21 no master; 016 aplicada, 4 funções no ar, webhook cadastrado. **Teste ponta a ponta no sandbox OK** (preview do Pages): paywall no 2º laudo → cartão → `PAYMENT_CONFIRMED` → `active` até vencimento + 1 mês + 3 dias; excluir a conta → `SUBSCRIPTION_DELETED` do Asaas, sem linha órfã. Problemas do caminho (variáveis do Preview com o projeto antigo, chave anon errada, Turnstile sem site key, cadastro desligado no Supabase, retorno sem `ASAAS_CALLBACK_URL`) documentados em `docs/pagamentos-asaas.md` → Diagnóstico.
+- Conta de produção do Asaas criada (verificação pelo sócio), chave/URL de produção e webhook de produção configurados.
+
+**Pendências:** `EXPO_PUBLIC_BILLING_CHECKOUT=1` em Production no Pages + teste real com estorno; NFS-e (dados fiscais com o contador); Termos e Política com as regras comerciais.
