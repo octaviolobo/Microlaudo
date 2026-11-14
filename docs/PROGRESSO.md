@@ -668,4 +668,37 @@ Branch `feat/asaas-checkout` (sobre `feat/monetizacao-base`). Guia completo: `do
 - **13/11:** PRs #20 e #21 no master; 016 aplicada, 4 funções no ar, webhook cadastrado. **Teste ponta a ponta no sandbox OK** (preview do Pages): paywall no 2º laudo → cartão → `PAYMENT_CONFIRMED` → `active` até vencimento + 1 mês + 3 dias; excluir a conta → `SUBSCRIPTION_DELETED` do Asaas, sem linha órfã. Problemas do caminho (variáveis do Preview com o projeto antigo, chave anon errada, Turnstile sem site key, cadastro desligado no Supabase, retorno sem `ASAAS_CALLBACK_URL`) documentados em `docs/pagamentos-asaas.md` → Diagnóstico.
 - Conta de produção do Asaas criada (verificação pelo sócio), chave/URL de produção e webhook de produção configurados.
 
-**Pendências:** `EXPO_PUBLIC_BILLING_CHECKOUT=1` em Production no Pages + teste real com estorno; NFS-e (dados fiscais com o contador); Termos e Política com as regras comerciais.
+**Pendências:** resolvidas na Sessão 20 (exceto NFS-e).
+
+---
+
+## Sessão 20 — 13–14 Nov 2026
+
+### Cobrança ligada em produção + web completo (domínio, Política, Termos)
+
+**Cobrança em produção (microlaudo.com):**
+- Secrets do Supabase trocados para a conta de **produção** do Asaas (`ASAAS_API_KEY`, `ASAAS_API_URL=https://api.asaas.com`, novo `ASAAS_WEBHOOK_TOKEN`, `ASAAS_CALLBACK_URL=https://microlaudo.com/plans?checkout=done`); webhook de produção cadastrado; `EXPO_PUBLIC_BILLING_CHECKOUT=1` no ambiente Production do Pages.
+- **Teste real com cartão:** checkout → `PAYMENT_CONFIRMED` (`activate:active`, acesso até vencimento + 1 mês + 3 dias) → retorno automático da fatura para `/plans` → **estorno** pelo painel → `PAYMENT_REFUNDED` (`revoke:expired`, acesso cortado na hora).
+- **Bug achado no teste:** estornar não cancela a assinatura no Asaas (a renovação cobraria de novo e o webhook reativaria o plano). **PR #24:** o webhook apaga a assinatura no Asaas em estorno/chargeback (falha vira `revoke:expired:asaas_delete_failed`); `billing-cancel` também apaga com a linha já `expired`/`canceled`; `billing-checkout` apaga qualquer assinatura anterior sem acesso antes de criar outra. Funções deployadas.
+- Tropeços registrados no Diagnóstico de `docs/pagamentos-asaas.md`: `$` da chave do Asaas interpretado pelo PowerShell (usar aspas simples), variáveis do Pages sumindo durante instabilidade da API de Workers da Cloudflare (não publicar durante incidente), chave inválida → `invalid_access_token`.
+
+**PRs mergeados:**
+- **#22** docs: guia do Asaas (sandbox × produção, Site exigido para o callback, `--yes` na CLI, variáveis do Pages por ambiente, roteiro de teste, diagnóstico, custos, checklist de produção).
+- **#23** contato da tela de planos com o e-mail do domínio.
+- **#24** estorno apaga a assinatura no Asaas (acima).
+- **#25** Política de Privacidade versionada e publicada em `/privacidade` (`scripts/build-legal.js` gera o HTML no `build:web`); links no app.
+- **#26** `emailRedirectTo` no cadastro (web): o link de confirmação volta para a origem e, com PKCE, o médico já entra logado.
+- **#27** CSP libera o Cloudflare Web Analytics (sem cookies); citado na Política §14.
+- **#29** Termos de Uso publicados em `/termos` (CRM ativo, não diagnostica, preços, renovação automática, cancelamento, arrependimento de 7 dias na 1ª contratação, estorno); `PrivacyNotice` → `LegalNotice`, aviso curto no login social.
+- **#30** Turnstile com `appearance: 'interaction-only'` (a caixa só aparece quando o Cloudflare pede interação).
+- Faxina: 14 branches remotas já incorporadas apagadas; ficam só `master` e `legacy/flutter`.
+
+**Configuração feita pelo usuário:** Site URL do Supabase no domínio; "Allow new users to sign up" ligado; `www` redireciona para a raiz; assinatura do teste removida no Asaas.
+
+**Pendências:**
+- [ ] NFS-e automática (dados fiscais da IGARATECH com o contador).
+- [ ] Revisão jurídica da Política (DPO, prazo de backup) e dos Termos (limitação de responsabilidade, arrependimento de 7 dias, enquadramento regulatório).
+- [ ] Pedido da marca "MicroLaudo" no INPI.
+- [ ] `prodoctor_enabled` na conta da mãe do usuário (depende das credenciais da API do ProDoctor, sem acesso no momento).
+- [ ] Apagar o projeto antigo do Supabase (`flxxotkhgjpxlpphazcd`) e a chave Brevo ligada a ele.
+- [ ] Depois: Sentry (sem dado de paciente), OAuth Google/Facebook, caminho das lojas (Sessões 11, 12 e 15).
