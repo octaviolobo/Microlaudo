@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { signIn, signInWithOAuth } from '@/services/auth';
 import { AppError, ErrorCodes } from '@/lib/errors';
+import { PrivacyNotice } from '@/components/legal/PrivacyNotice';
 import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';
@@ -120,6 +121,8 @@ export function LoginScreen() {
         fullWidth
         accessibilityLabel={t('auth.continueWithFacebook')}
       />
+
+      <PrivacyNotice context="social" />
 
       <Button
         label={t('auth.register')}

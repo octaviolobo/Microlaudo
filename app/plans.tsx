@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BillingStatusBanner } from '@/components/billing/BillingStatusBanner';
 import { Button, Input, MessageBox } from '@/components/ui';
+import { PrivacyNotice } from '@/components/legal/PrivacyNotice';
 import {
   BILLING_CHECKOUT_ENABLED,
   BILLING_CONTACT_EMAIL,
@@ -184,6 +185,7 @@ export function PlansScreen() {
             required
             error={documentError ?? undefined}
           />
+          <PrivacyNotice context="subscribe" />
         </>
       )}
 
