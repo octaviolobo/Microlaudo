@@ -170,7 +170,7 @@
     "opensInBrowser": "Abre no navegador",
     "notice": {
       "register": "Ao criar sua conta, você concorda com os [terms] e declara que leu a [privacy].",
-      "social": "Ao entrar com Google ou Facebook pela primeira vez, sua conta é criada, e você concorda com os [terms] e declara que leu a [privacy].",
+      "social": "Ao continuar com Google ou Facebook, você concorda com os [terms] e declara que leu a [privacy].",
       "subscribe": "Ao assinar, você concorda com a renovação automática e as regras de cancelamento e reembolso dos [terms]. Seu CPF/CNPJ, nome e e-mail vão para o Asaas para a cobrança e a nota fiscal ([privacy]).",
       "standalone": "[terms] · [privacy]"
     }

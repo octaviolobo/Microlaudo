@@ -170,7 +170,7 @@
     "opensInBrowser": "Opens in the browser",
     "notice": {
       "register": "By creating your account, you agree to the [terms] and acknowledge that you have read the [privacy].",
-      "social": "Signing in with Google or Facebook for the first time creates your account, and you agree to the [terms] and acknowledge that you have read the [privacy].",
+      "social": "By continuing with Google or Facebook, you agree to the [terms] and acknowledge that you have read the [privacy].",
       "subscribe": "By subscribing, you agree to automatic renewal and to the cancellation and refund rules in the [terms]. Your CPF/CNPJ, name and email are sent to Asaas for billing and invoicing ([privacy]).",
       "standalone": "[terms] · [privacy]"
     }
