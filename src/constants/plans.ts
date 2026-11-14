@@ -29,5 +29,6 @@ export function annualMonthlyEquivalentCents(): number {
 //   EXPO_PUBLIC_BILLING_CHECKOUT=1 npx expo start --web
 export const BILLING_CHECKOUT_ENABLED = process.env.EXPO_PUBLIC_BILLING_CHECKOUT === '1';
 
-// Contato mostrado enquanto o checkout não existe (e-mail da IGARATECH).
-export const BILLING_CONTACT_EMAIL = 'microlaudo@gmail.com';
+// Contato mostrado enquanto o checkout não existe. Encaminhado pelo Cloudflare
+// Email Routing para o Gmail da IGARATECH (docs/deploy-cloudflare.md, seção 3a).
+export const BILLING_CONTACT_EMAIL = 'contato@microlaudo.com';
