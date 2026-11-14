@@ -9,8 +9,8 @@
 // Fluxo:
 //   1. JWT → usuário → linha de doctors (client admin).
 //   2. Já tem acesso (assinatura ativa/cortesia/cancelada no prazo) → 409.
-//   3. Assinatura Asaas pendente de checkout anterior → apagada no Asaas (evita
-//      duas cobranças abertas).
+//   3. Assinatura Asaas anterior sem acesso (pendente, expirada, estornada) →
+//      apagada no Asaas (evita duas cobranças abertas).
 //   4. Cliente Asaas: reaproveita o salvo (atualizando o documento) ou cria,
 //      com externalReference = doctors.id.
 //   5. Cria a assinatura (1º vencimento hoje) e grava `subscriptions` como
@@ -83,7 +83,7 @@ Deno.serve(async (req: Request) => {
       (current.current_period_end === null || new Date(current.current_period_end) > new Date());
     if (hasAccess) return jsonResponse(409, { error: 'already_subscribed' });
 
-    if (current?.provider === 'asaas' && current.status === 'pending' && current.provider_subscription_id) {
+    if (current?.provider === 'asaas' && current.provider_subscription_id) {
       try {
         await asaas('DELETE', `/subscriptions/${current.provider_subscription_id}`);
       } catch (err) {
