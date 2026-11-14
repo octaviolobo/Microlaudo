@@ -99,6 +99,17 @@ export async function signInWithOAuth(provider: OAuthProvider): Promise<void> {
   if (exchangeError) throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, exchangeError.message, exchangeError);
 }
 
+// Para onde o link de confirmação do e-mail leva.
+// Web: a origem de onde o médico se cadastrou (produção, preview ou local). Com
+// PKCE, o supabase-js troca o ?code= ao abrir e o médico já entra logado, se for
+// o mesmo navegador. A origem precisa estar em Redirect URLs; senão o Supabase
+// usa o Site URL.
+// Native: undefined → Site URL (site web). Ainda não há tratamento do link de
+// confirmação no app.
+function signUpRedirectTo(): string | undefined {
+  return Platform.OS === 'web' ? AuthSession.makeRedirectUri() : undefined;
+}
+
 // O perfil do médico é criado pelo trigger handle_new_user (migration 001).
 // Passamos os dados via user_metadata para o trigger ler.
 export async function signUp(input: RegisterInput): Promise<SignUpResult> {
@@ -109,6 +120,7 @@ export async function signUp(input: RegisterInput): Promise<SignUpResult> {
     password: input.password,
     options: {
       captchaToken: input.captchaToken,
+      emailRedirectTo: signUpRedirectTo(),
       data: {
         full_name: input.full_name,
         crm: input.crm,
