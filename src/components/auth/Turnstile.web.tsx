@@ -69,6 +69,9 @@ export function Turnstile({ onToken, resetKey }: TurnstileProps) {
         widgetIdRef.current = window.turnstile.render(el, {
           sitekey: SITE_KEY,
           theme: 'light',
+          // Só aparece quando o Cloudflare precisa de um clique; na maioria das
+          // vezes a verificação roda invisível e o token chega sem caixa na tela.
+          appearance: 'interaction-only',
           callback: (token: string) => onTokenRef.current(token),
           'expired-callback': () => onTokenRef.current(null),
           'error-callback': () => onTokenRef.current(null),
@@ -104,15 +107,16 @@ export function Turnstile({ onToken, resetKey }: TurnstileProps) {
 }
 
 const styles = StyleSheet.create({
+  // Sem altura mínima: com appearance 'interaction-only' o widget costuma
+  // ficar oculto, e uma caixa reservada deixaria um buraco no formulário.
   wrapper: {
     alignSelf: 'center',
-    minHeight: 65,
-    marginVertical: Spacing.sm,
   },
   error: {
     fontSize: 13,
     fontFamily: Typography.body,
     color: Colors.error,
     textAlign: 'center',
+    marginVertical: Spacing.sm,
   },
 });
