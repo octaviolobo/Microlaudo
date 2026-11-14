@@ -4,7 +4,8 @@
 //
 // O Markdown em docs/legal/ é a fonte única. Este script roda no `build:web`
 // (antes do `expo export`, que copia public/ para dist/), e o Cloudflare Pages
-// serve public/privacidade.html em https://microlaudo.com/privacidade — página
+// serve public/privacidade.html em https://microlaudo.com/privacidade (e
+// public/termos.html em /termos) — página
 // estática, sem JavaScript e sem login, como as lojas exigem.
 //
 // Converte só o subconjunto de Markdown usado nesses documentos: títulos (#, ##,
@@ -23,8 +24,16 @@ const PAGES = [
     source: 'docs/legal/politica-privacidade.md',
     output: 'public/privacidade.html',
     slug: 'privacidade',
+    label: 'Política de Privacidade',
     description:
       'Como o MicroLaudo coleta, usa, armazena, compartilha e elimina dados pessoais, conforme a LGPD.',
+  },
+  {
+    source: 'docs/legal/termos-de-uso.md',
+    output: 'public/termos.html',
+    slug: 'termos',
+    label: 'Termos de Uso',
+    description: 'Regras de uso, planos, pagamento, cancelamento e responsabilidades no MicroLaudo.',
   },
 ];
 
@@ -193,6 +202,7 @@ table { border-collapse: collapse; width: 100%; font-size: 15px; }
 th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
 th { background: var(--surface); font-weight: 600; }
 tbody tr:last-child td { border-bottom: 0; }
+footer .legal-links { margin: 0 0 8px; }
 footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; padding: 20px 0 32px; }
 @media (max-width: 600px) {
   h1 { font-size: 25px; }
@@ -211,7 +221,10 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14
 <main class="wrap">
 ${body.replace('<hr>', `<nav class="toc" aria-label="Sumário"><strong>Sumário</strong><ol>\n${nav}\n</ol></nav>`)}
 </main>
-<footer><div class="wrap">IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA · CNPJ 66.173.331/0001-31</div></footer>
+<footer><div class="wrap">
+<p class="legal-links">${PAGES.map((p) => (p.slug === slug ? `<span>${escapeHtml(p.label)}</span>` : `<a href="/${p.slug}">${escapeHtml(p.label)}</a>`)).join(' · ')}</p>
+IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA · CNPJ 66.173.331/0001-31
+</div></footer>
 </body>
 </html>
 `;

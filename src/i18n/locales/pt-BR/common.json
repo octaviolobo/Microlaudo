@@ -165,12 +165,14 @@
     "cancelError": "Não foi possível cancelar agora. Tente de novo."
   },
   "legal": {
+    "termsOfUse": "Termos de Uso",
     "privacyPolicy": "Política de Privacidade",
     "opensInBrowser": "Abre no navegador",
     "notice": {
-      "register": "Ao criar sua conta, você declara que leu e compreendeu a nossa",
-      "social": "Ao entrar com Google ou Facebook pela primeira vez, sua conta é criada e você declara que leu a nossa",
-      "subscribe": "Seu CPF/CNPJ, nome e e-mail são enviados ao Asaas para a cobrança e a nota fiscal. Saiba mais na"
+      "register": "Ao criar sua conta, você concorda com os [terms] e declara que leu a [privacy].",
+      "social": "Ao continuar com Google ou Facebook, você concorda com os [terms] e declara que leu a [privacy].",
+      "subscribe": "Ao assinar, você concorda com a renovação automática e as regras de cancelamento e reembolso dos [terms]. Seu CPF/CNPJ, nome e e-mail vão para o Asaas para a cobrança e a nota fiscal ([privacy]).",
+      "standalone": "[terms] · [privacy]"
     }
   }
 }
