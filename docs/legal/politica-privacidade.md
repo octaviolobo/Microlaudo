@@ -6,7 +6,7 @@
 > internas**: o gerador (`scripts/build-legal.js`) não os publica na página
 > `microlaudo.com/privacidade`.
 
-**Última atualização:** 13 de novembro de 2026
+**Última atualização:** 14 de novembro de 2026
 
 Esta Política de Privacidade explica como o **MicroLaudo** (aplicativo para iOS,
 Android e versão web) coleta, usa, armazena, compartilha e elimina dados
@@ -153,7 +153,7 @@ Os dados são compartilhados somente na medida necessária:
 | Prestador | Finalidade | Dados envolvidos |
 |---|---|---|
 | **Supabase** | Banco de dados, autenticação, armazenamento de arquivos e funções de servidor. **Os dados ficam armazenados em servidores na região de São Paulo (Brasil).** | Todos os dados descritos na seção 4 |
-| **Cloudflare** | Hospedagem da versão web e verificação anti-robô (Turnstile) nas telas de login e cadastro da versão web | Endereço IP e dados técnicos do navegador; nenhum dado de Paciente |
+| **Cloudflare** | Hospedagem da versão web, verificação anti-robô (Turnstile) nas telas de login e cadastro, e estatística agregada de visitas ao site (Web Analytics, sem cookies) | Endereço IP e dados técnicos do navegador; nenhum dado de Paciente |
 | **Asaas** (Asaas Gestão Financeira Instituição de Pagamento S.A.) | Processamento das assinaturas e cobranças (cartão de crédito, Pix ou boleto) e emissão de nota fiscal. Os dados de pagamento são digitados diretamente na página de fatura do Asaas | Nome, e-mail e CPF/CNPJ do Médico; plano e valores. **Nenhum dado de Paciente** |
 | **Brevo** | Envio de e-mails transacionais (confirmação de cadastro, recuperação de senha) | E-mail e nome do Médico; nenhum dado de Paciente |
 | **Google** | Login com conta Google, se você escolher; recebimento dos e-mails enviados aos nossos endereços de contato | Dados do perfil Google; conteúdo das mensagens que você nos enviar |
@@ -328,6 +328,11 @@ O MicroLaudo não usa cookies de publicidade nem de análise de uso.
   (*localStorage*), necessário para manter você conectado. O verificador
   anti-robô da Cloudflare (Turnstile) pode usar dados técnicos do navegador
   estritamente para distinguir pessoas de robôs.
+- **Estatística de visitas (versão web):** usamos o Cloudflare Web Analytics
+  para contar visitas e medir o tempo de carregamento das páginas. Ele não usa
+  cookies, não identifica quem visita e não acompanha você em outros sites;
+  recebe apenas dados técnicos da visita (página, navegador, país aproximado).
+  Não envolve nenhum dado de Paciente.
 
 ## 15. Encarregado de dados (DPO)
 
