@@ -648,9 +648,9 @@ Branch `feat/monetizacao-base` (empilhada em `chore/expo-sdk57-patches`, que cor
 - Supabase CLI estava linkado ao projeto **antigo** (`flxxotkhgjpxlpphazcd`); re-linkado para São Paulo (`okkemcrsrngahyzaddkr`) em 12/11.
 
 **Pendências:**
-- [ ] Aplicar a migration 015 em produção **junto** com o deploy do front (o front atual não sabe tratar o 402).
-- [ ] Cortesia para as médicas que já usam (senão caem no paywall): `INSERT INTO subscriptions (doctor_id, provider, plan, status) VALUES (<id>, 'manual', 'annual', 'active');`
-- [ ] Escolher o gateway; integrar checkout + webhook (Edge Functions) + emissão de NFS-e.
+- [x] Aplicar a migration 015 em produção **junto** com o deploy do front (o front atual não sabe tratar o 402).
+- [x] Cortesia para as médicas que já usam (senão caem no paywall): `INSERT INTO subscriptions (doctor_id, provider, plan, status) VALUES (<id>, 'manual', 'annual', 'active');`
+- [x] Escolher o gateway; integrar checkout + webhook (Edge Functions). (NFS-e ainda pendente: dados fiscais com o contador.)
 - [ ] Política de privacidade §9 e Termos de Uso com as regras comerciais.
 
 ### Monetização, parte 2: checkout Asaas (sandbox)
