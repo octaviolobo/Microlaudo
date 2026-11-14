@@ -254,7 +254,7 @@ haverá novas cobranças.
 | Dados da conta do Médico e laudos (incluindo dados de Pacientes, fotos e PDFs) | Enquanto a conta estiver ativa, ou até que o Médico exclua o laudo ou a conta |
 | Registros de pagamento (histórico de eventos da cobrança, identificadores e valores) | **5 anos** após o pagamento, mesmo após a exclusão da conta, para cumprir a legislação fiscal e tributária (art. 16, I, da LGPD) |
 | Registros de auditoria | **5 anos** após o evento, mesmo após a exclusão da conta, para segurança e exercício regular de direitos (art. 16, I e II, da LGPD). Não contêm conteúdo clínico |
-| Cópias de segurança (*backups*) do provedor | Eliminadas automaticamente ao fim do ciclo de retenção do provedor, de até 30 dias **[PENDENTE: confirmar prazo do plano contratado]** |
+| Cópias de segurança (*backups*) do provedor | Backups diários mantidos pelo provedor de infraestrutura por até **7 dias** e eliminados automaticamente depois desse prazo |
 
 **Guarda do prontuário:** a legislação e as normas do Conselho Federal de
 Medicina impõem ao médico prazos de guarda de prontuário. O MicroLaudo **não
@@ -334,17 +334,18 @@ O MicroLaudo não usa cookies de publicidade nem de análise de uso.
   recebe apenas dados técnicos da visita (página, navegador, país aproximado).
   Não envolve nenhum dado de Paciente.
 
-## 15. Encarregado de dados (DPO)
+## 15. Encarregado pelo tratamento de dados pessoais (DPO)
 
-> **[PENDENTE — revisão jurídica]** A dispensa da Resolução CD/ANPD nº 2/2022
-> pode não valer para quem faz "tratamento de alto risco" (o art. 4º cita
-> dados sensíveis). Confirmar com advogado se é preciso indicar um
-> encarregado; se for, basta trocar este parágrafo pelo nome e contato dele.
+A IGARATECH indicou como encarregado pelo tratamento de dados pessoais, nos
+termos do art. 41 da LGPD:
 
-Por se tratar de agente de tratamento de pequeno porte, a IGARATECH está
-dispensada da indicação formal de encarregado (Resolução CD/ANPD nº 2/2022,
-art. 11). Disponibilizamos o canal **privacidade@microlaudo.com** para comunicação
-com titulares e com a ANPD.
+- **Encarregado:** Octavio Lobo
+- **Contato:** privacidade@microlaudo.com
+
+O encarregado recebe reclamações e comunicações dos titulares, presta
+esclarecimentos, adota providências, recebe comunicações da Autoridade
+Nacional de Proteção de Dados (ANPD) e orienta a equipe sobre as práticas de
+proteção de dados.
 
 ## 16. Alterações nesta Política
 
@@ -365,4 +366,4 @@ Código de Defesa do Consumidor, quando aplicável.
 - CNPJ: 66.173.331/0001-31
 - Site: https://microlaudo.com
 - Atendimento: contato@microlaudo.com
-- Privacidade: privacidade@microlaudo.com
+- Privacidade e encarregado de dados (Octavio Lobo): privacidade@microlaudo.com
