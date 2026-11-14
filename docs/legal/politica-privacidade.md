@@ -254,7 +254,7 @@ haverá novas cobranças.
 | Dados da conta do Médico e laudos (incluindo dados de Pacientes, fotos e PDFs) | Enquanto a conta estiver ativa, ou até que o Médico exclua o laudo ou a conta |
 | Registros de pagamento (histórico de eventos da cobrança, identificadores e valores) | **5 anos** após o pagamento, mesmo após a exclusão da conta, para cumprir a legislação fiscal e tributária (art. 16, I, da LGPD) |
 | Registros de auditoria | **5 anos** após o evento, mesmo após a exclusão da conta, para segurança e exercício regular de direitos (art. 16, I e II, da LGPD). Não contêm conteúdo clínico |
-| Cópias de segurança (*backups*) do provedor | Eliminadas automaticamente ao fim do ciclo de retenção do provedor, de até 30 dias **[PENDENTE: confirmar prazo do plano contratado]** |
+| Cópias de segurança (*backups*) do provedor | Backups diários mantidos pelo provedor de infraestrutura por até **7 dias** e eliminados automaticamente depois desse prazo |
 
 **Guarda do prontuário:** a legislação e as normas do Conselho Federal de
 Medicina impõem ao médico prazos de guarda de prontuário. O MicroLaudo **não
