@@ -10,6 +10,7 @@ import { cancelSubscription } from '@/services/billing';
 import { clearUserScopedState } from '@/stores/userScopedState';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox, Select } from '@/components/ui';
+import { PrivacyNotice } from '@/components/legal/PrivacyNotice';
 import { AssetUploader } from '@/components/profile/AssetUploader';
 import { BillingStatusBanner } from '@/components/billing/BillingStatusBanner';
 import { useAuthStore } from '@/stores/authStore';
@@ -398,6 +399,8 @@ export function ProfileScreen() {
       />
 
       <View style={styles.divider} />
+
+      <PrivacyNotice context="standalone" />
 
       <Button
         label={t('profile.logout')}

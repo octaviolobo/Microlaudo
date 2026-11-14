@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de Privacidade do MicroLaudo</title>
+<meta name="description" content="Como o MicroLaudo coleta, usa, armazena, compartilha e elimina dados pessoais, conforme a LGPD.">
+<link rel="canonical" href="https://microlaudo.com/privacidade">
+<link rel="icon" href="/favicon.ico">
+<style>
+:root {
+  --bg: #ffffff; --surface: #f4f8fa; --text: #1b2428; --muted: #55656c;
+  --border: #dbe4e8; --accent: #0e7490; --accent-strong: #0891b2;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1719; --surface: #172226; --text: #e4ecef; --muted: #9db0b7;
+    --border: #2a3a40; --accent: #5ccde6; --accent-strong: #22b8d6;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+header { border-bottom: 1px solid var(--border); }
+header .wrap { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; padding-bottom: 14px; }
+.brand { font-weight: 700; font-size: 18px; color: var(--accent-strong); text-decoration: none; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+main { padding: 32px 0 64px; }
+h1 { font-size: 30px; line-height: 1.25; margin: 0 0 12px; }
+h2 { font-size: 21px; line-height: 1.3; margin: 40px 0 12px; padding-top: 8px; scroll-margin-top: 16px; }
+h3 { font-size: 17px; margin: 28px 0 8px; scroll-margin-top: 16px; }
+p, ul { margin: 0 0 14px; }
+ul { padding-left: 22px; }
+li { margin-bottom: 6px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+code { font-size: 14px; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 28px 0; }
+nav.toc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin: 24px 0 8px; }
+nav.toc strong { display: block; margin-bottom: 6px; }
+nav.toc ol { margin: 0; padding-left: 0; list-style: none; columns: 2; column-gap: 24px; font-size: 15px; }
+nav.toc li { break-inside: avoid; margin-bottom: 4px; }
+.table { overflow-x: auto; margin: 0 0 18px; border: 1px solid var(--border); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+th { background: var(--surface); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; padding: 20px 0 32px; }
+@media (max-width: 600px) {
+  h1 { font-size: 25px; }
+  nav.toc ol { columns: 1; }
+  table { font-size: 14px; }
+  th, td { padding: 8px 10px; min-width: 140px; }
+}
+@media print {
+  header, nav.toc, footer { display: none; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="/">MicroLaudo</a></div></header>
+<main class="wrap">
+<h1>Política de Privacidade do MicroLaudo</h1>
+<p><strong>Última atualização:</strong> 13 de novembro de 2026</p>
+<p>Esta Política de Privacidade explica como o <strong>MicroLaudo</strong> (aplicativo para iOS, Android e versão web) coleta, usa, armazena, compartilha e elimina dados pessoais, em conformidade com a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 — &quot;LGPD&quot;).</p>
+<p>Ao criar uma conta e usar o MicroLaudo, você declara que leu e compreendeu esta Política.</p>
+<nav class="toc" aria-label="Sumário"><strong>Sumário</strong><ol>
+<li><a href="#1-quem-somos">1. Quem somos</a></li>
+<li><a href="#2-a-quem-o-microlaudo-se-destina">2. A quem o MicroLaudo se destina</a></li>
+<li><a href="#3-papeis-no-tratamento-de-dados-controlador-e-operador">3. Papéis no tratamento de dados: controlador e operador</a></li>
+<li><a href="#4-quais-dados-coletamos">4. Quais dados coletamos</a></li>
+<li><a href="#5-para-que-usamos-os-dados-e-com-qual-base-legal">5. Para que usamos os dados e com qual base legal</a></li>
+<li><a href="#6-com-quem-compartilhamos-os-dados">6. Com quem compartilhamos os dados</a></li>
+<li><a href="#7-transferencia-internacional-de-dados">7. Transferência internacional de dados</a></li>
+<li><a href="#8-como-protegemos-os-dados">8. Como protegemos os dados</a></li>
+<li><a href="#9-pagamentos-e-assinatura">9. Pagamentos e assinatura</a></li>
+<li><a href="#10-por-quanto-tempo-guardamos-os-dados">10. Por quanto tempo guardamos os dados</a></li>
+<li><a href="#11-exclusao-da-conta">11. Exclusão da conta</a></li>
+<li><a href="#12-seus-direitos">12. Seus direitos</a></li>
+<li><a href="#13-dados-de-criancas-e-adolescentes">13. Dados de crianças e adolescentes</a></li>
+<li><a href="#14-cookies-e-armazenamento-local">14. Cookies e armazenamento local</a></li>
+<li><a href="#15-encarregado-de-dados-dpo">15. Encarregado de dados (DPO)</a></li>
+<li><a href="#16-alteracoes-nesta-politica">16. Alterações nesta Política</a></li>
+<li><a href="#17-legislacao-e-foro">17. Legislação e foro</a></li>
+<li><a href="#18-contato">18. Contato</a></li>
+</ol></nav>
+<h2 id="1-quem-somos">1. Quem somos</h2>
+<p>O MicroLaudo é desenvolvido e operado por:</p>
+<ul>
+<li><strong>IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA</strong></li>
+<li><strong>CNPJ:</strong> 66.173.331/0001-31</li>
+<li><strong>Site:</strong> <a href="https://microlaudo.com">https://microlaudo.com</a></li>
+<li><strong>E-mail de contato:</strong> <a href="mailto:contato@microlaudo.com">contato@microlaudo.com</a></li>
+<li><strong>E-mail de privacidade:</strong> <a href="mailto:privacidade@microlaudo.com">privacidade@microlaudo.com</a></li>
+</ul>
+<p>Neste documento, &quot;MicroLaudo&quot;, &quot;nós&quot; e &quot;nosso&quot; referem-se à IGARATECH. &quot;Você&quot; ou &quot;Médico&quot; refere-se ao profissional de saúde que usa o aplicativo. &quot;Paciente&quot; refere-se à pessoa cujos dados constam nos laudos emitidos pelo Médico.</p>
+<h2 id="2-a-quem-o-microlaudo-se-destina">2. A quem o MicroLaudo se destina</h2>
+<p>O MicroLaudo é uma ferramenta profissional destinada <strong>exclusivamente a médicos</strong> com registro ativo no Conselho Regional de Medicina (CRM), maiores de 18 anos, para a elaboração de laudos ginecológicos (microscopia de secreção vaginal e ultrassonografia transvaginal). Pacientes não usam o aplicativo nem criam conta.</p>
+<h2 id="3-papeis-no-tratamento-de-dados-controlador-e-operador">3. Papéis no tratamento de dados: controlador e operador</h2>
+<p>A LGPD distingue quem <strong>decide</strong> sobre o tratamento (controlador) de quem <strong>executa</strong> o tratamento em nome de outro (operador). No MicroLaudo, os papéis são estes:</p>
+<div class="table"><table>
+<thead><tr><th scope="col">Dados</th><th scope="col">Controlador</th><th scope="col">Operador</th></tr></thead>
+<tbody>
+<tr><td>Dados do Médico (cadastro, conta, uso)</td><td>IGARATECH</td><td>—</td></tr>
+<tr><td>Dados do Paciente inseridos nos laudos</td><td><strong>O Médico</strong></td><td>IGARATECH</td></tr>
+</tbody>
+</table></div>
+<p>Isso significa que:</p>
+<ul>
+<li><strong>Quanto aos seus próprios dados</strong>, a IGARATECH é a controladora e responde diretamente a você.</li>
+<li><strong>Quanto aos dados dos Pacientes</strong>, quem decide coletá-los, para qual finalidade e por quanto tempo é o Médico, no exercício da relação médico-paciente. A IGARATECH apenas armazena e processa esses dados para prestar o serviço, seguindo as instruções do Médico, e não os utiliza para nenhuma finalidade própria.</li>
+<li>Cabe ao Médico garantir que possui base legal para tratar os dados dos seus Pacientes, informá-los quando aplicável e atender às obrigações éticas e legais da profissão, incluindo o sigilo médico e a guarda de prontuário.</li>
+</ul>
+<h2 id="4-quais-dados-coletamos">4. Quais dados coletamos</h2>
+<h3 id="4-1-dados-do-medico">4.1 Dados do Médico</h3>
+<div class="table"><table>
+<thead><tr><th scope="col">Dado</th><th scope="col">Como é obtido</th></tr></thead>
+<tbody>
+<tr><td>Nome completo, CRM e RQE (opcional)</td><td>Informados no cadastro</td></tr>
+<tr><td>E-mail e senha (armazenada apenas em forma criptografada — <em>hash</em>)</td><td>Informados no cadastro</td></tr>
+<tr><td>Nome, e-mail e identificador da conta Google ou Facebook</td><td>Fornecidos pelo provedor, <strong>somente</strong> se você escolher entrar com essas contas</td></tr>
+<tr><td>Dados da clínica: nome, CNPJ, endereço e telefone (opcionais)</td><td>Informados no perfil</td></tr>
+<tr><td>Logotipo da clínica e imagem da assinatura (opcionais)</td><td>Enviados por você no perfil</td></tr>
+<tr><td>Idioma preferido</td><td>Configuração do app</td></tr>
+<tr><td>Plano contratado (mensal ou anual), situação da assinatura, data de renovação e identificadores do cliente e da assinatura no processador de pagamentos</td><td>Gerados na contratação e atualizados pelo processador de pagamentos</td></tr>
+<tr><td>Quantidade de laudos usados no teste grátis</td><td>Gerado pelo uso do serviço</td></tr>
+<tr><td>Histórico de eventos de pagamento enviados pelo processador (ex.: pagamento confirmado, atrasado, estornado; valor, forma de pagamento e datas)</td><td>Recebido automaticamente do processador de pagamentos</td></tr>
+<tr><td>Registros de auditoria (ex.: laudo finalizado, laudo editado, conta excluída), com data e hora</td><td>Gerados automaticamente pelo uso</td></tr>
+</tbody>
+</table></div>
+<p><strong>CPF ou CNPJ para cobrança:</strong> ao assinar, pedimos o CPF ou CNPJ do titular da assinatura, exigido pelo processador de pagamentos e para a emissão da nota fiscal. Esse número é repassado diretamente ao processador (Asaas) e <strong>não fica armazenado no banco de dados do MicroLaudo</strong>.</p>
+<h3 id="4-2-dados-do-paciente-inseridos-pelo-medico">4.2 Dados do Paciente (inseridos pelo Médico)</h3>
+<p>São <strong>dados pessoais sensíveis referentes à saúde</strong> (art. 5º, II, e art. 11 da LGPD):</p>
+<div class="table"><table>
+<thead><tr><th scope="col">Dado</th><th scope="col">Observação</th></tr></thead>
+<tbody>
+<tr><td>Nome do Paciente</td><td>Obrigatório no laudo</td></tr>
+<tr><td>Data de nascimento</td><td>Opcional</td></tr>
+<tr><td>CPF e número do Cartão Nacional de Saúde (SUS)</td><td>Opcionais</td></tr>
+<tr><td>Nome do médico solicitante</td><td>Opcional</td></tr>
+<tr><td>Datas da coleta e da avaliação</td><td>—</td></tr>
+<tr><td>Achados do exame: microscopia, escores de Nugent e Amsel, pH, medidas e descrição da ultrassonografia, conclusão</td><td>Conteúdo clínico do laudo</td></tr>
+<tr><td>Fotografias das lâminas (até 3 por laudo)</td><td>Imagens microscópicas; não são fotos do Paciente</td></tr>
+<tr><td>Arquivo PDF do laudo</td><td>Gerado pelo app</td></tr>
+</tbody>
+</table></div>
+<h3 id="4-3-o-que-nao-coletamos">4.3 O que <strong>não</strong> coletamos</h3>
+<ul>
+<li>Não usamos ferramentas de análise de uso (<em>analytics</em>), rastreamento de publicidade ou anúncios.</li>
+<li>Não acessamos sua localização, contatos ou microfone.</li>
+<li>A câmera e a galeria são acessadas <strong>apenas</strong> quando você escolhe fotografar ou anexar a imagem de uma lâmina ou enviar seu logotipo/assinatura.</li>
+<li>Não recebemos nem armazenamos dados de cartão de crédito (ver seção 9).</li>
+</ul>
+<h2 id="5-para-que-usamos-os-dados-e-com-qual-base-legal">5. Para que usamos os dados e com qual base legal</h2>
+<h3 id="5-1-dados-do-medico">5.1 Dados do Médico</h3>
+<div class="table"><table>
+<thead><tr><th scope="col">Finalidade</th><th scope="col">Base legal (LGPD)</th></tr></thead>
+<tbody>
+<tr><td>Criar e manter sua conta, autenticar seu acesso e recuperar sua senha</td><td>Execução de contrato (art. 7º, V)</td></tr>
+<tr><td>Gerar os laudos com seu nome, CRM, RQE, dados da clínica, logotipo e assinatura</td><td>Execução de contrato (art. 7º, V)</td></tr>
+<tr><td>Controlar o teste grátis, processar a assinatura, liberar ou suspender o acesso conforme a situação do pagamento</td><td>Execução de contrato (art. 7º, V)</td></tr>
+<tr><td>Emitir nota fiscal e manter registros contábeis e fiscais dos pagamentos</td><td>Cumprimento de obrigação legal (art. 7º, II)</td></tr>
+<tr><td>Prevenir fraude e uso indevido do teste grátis e da cobrança</td><td>Legítimo interesse (art. 7º, IX)</td></tr>
+<tr><td>Proteger a plataforma contra abuso e acesso automatizado (CAPTCHA)</td><td>Legítimo interesse (art. 7º, IX)</td></tr>
+<tr><td>Manter registros de auditoria para segurança, rastreabilidade de alterações em laudos e defesa em processos</td><td>Exercício regular de direitos (art. 7º, VI) e legítimo interesse (art. 7º, IX)</td></tr>
+<tr><td>Enviar comunicações operacionais (confirmação de cadastro, recuperação de senha, avisos sobre o serviço)</td><td>Execução de contrato (art. 7º, V)</td></tr>
+<tr><td>Cumprir obrigações legais e regulatórias e atender autoridades</td><td>Cumprimento de obrigação legal (art. 7º, II)</td></tr>
+</tbody>
+</table></div>
+<h3 id="5-2-dados-do-paciente">5.2 Dados do Paciente</h3>
+<p>A IGARATECH trata esses dados <strong>apenas para prestar o serviço ao Médico</strong>: armazenar o laudo, exibi-lo, gerar o PDF e permitir que o Médico o consulte, edite, compartilhe e exclua. Para controlar o teste grátis, o sistema guarda, junto ao laudo, um código irreversível (<em>hash</em>) gerado a partir dos dados de identificação do Paciente, que não permite recuperar esses dados e é apagado junto com o laudo. A base legal é definida pelo Médico, como controlador, e normalmente corresponde à <strong>tutela da saúde, exclusivamente, em procedimento realizado por profissionais de saúde</strong> (art. 11, II, &quot;f&quot;, da LGPD).</p>
+<p>Os dados dos Pacientes <strong>nunca</strong> são vendidos, usados para publicidade, para treinar modelos de inteligência artificial, para criação de perfis ou compartilhados com terceiros para finalidades próprias da IGARATECH.</p>
+<h2 id="6-com-quem-compartilhamos-os-dados">6. Com quem compartilhamos os dados</h2>
+<p>Para funcionar, o MicroLaudo depende de prestadores de serviço (suboperadores), contratados com obrigações de segurança e confidencialidade. Os dados são compartilhados somente na medida necessária:</p>
+<div class="table"><table>
+<thead><tr><th scope="col">Prestador</th><th scope="col">Finalidade</th><th scope="col">Dados envolvidos</th></tr></thead>
+<tbody>
+<tr><td><strong>Supabase</strong></td><td>Banco de dados, autenticação, armazenamento de arquivos e funções de servidor. <strong>Os dados ficam armazenados em servidores na região de São Paulo (Brasil).</strong></td><td>Todos os dados descritos na seção 4</td></tr>
+<tr><td><strong>Cloudflare</strong></td><td>Hospedagem da versão web e verificação anti-robô (Turnstile) nas telas de login e cadastro da versão web</td><td>Endereço IP e dados técnicos do navegador; nenhum dado de Paciente</td></tr>
+<tr><td><strong>Asaas</strong> (Asaas Gestão Financeira Instituição de Pagamento S.A.)</td><td>Processamento das assinaturas e cobranças (cartão de crédito, Pix ou boleto) e emissão de nota fiscal. Os dados de pagamento são digitados diretamente na página de fatura do Asaas</td><td>Nome, e-mail e CPF/CNPJ do Médico; plano e valores. <strong>Nenhum dado de Paciente</strong></td></tr>
+<tr><td><strong>Brevo</strong></td><td>Envio de e-mails transacionais (confirmação de cadastro, recuperação de senha)</td><td>E-mail e nome do Médico; nenhum dado de Paciente</td></tr>
+<tr><td><strong>Google</strong></td><td>Login com conta Google, se você escolher; recebimento dos e-mails enviados aos nossos endereços de contato</td><td>Dados do perfil Google; conteúdo das mensagens que você nos enviar</td></tr>
+<tr><td><strong>Meta (Facebook)</strong></td><td>Login com conta Facebook, se você escolher</td><td>Dados do perfil Facebook</td></tr>
+<tr><td><strong>ProDoctor</strong></td><td>Integração opcional com o sistema de prontuário/agenda do consultório, para preencher automaticamente nome e data de nascimento do Paciente. <strong>Disponível apenas para Médicos habilitados</strong> pela IGARATECH a pedido do consultório que já usa o ProDoctor</td><td>Nome pesquisado; retorno de nome, data de nascimento e médico do último atendimento</td></tr>
+<tr><td><strong>Apple e Google (lojas de aplicativos)</strong></td><td>Distribuição do aplicativo e, quando disponível, processamento das assinaturas feitas dentro do app (ver seção 9)</td><td>Conforme as políticas próprias de cada loja</td></tr>
+</tbody>
+</table></div>
+<p>Também poderemos compartilhar dados:</p>
+<ul>
+<li>quando exigido por lei, ordem judicial ou requisição de autoridade competente;</li>
+<li>para proteger direitos da IGARATECH em processos judiciais, administrativos ou arbitrais;</li>
+<li>em caso de reorganização societária (fusão, aquisição), hipótese em que o sucessor ficará sujeito a esta Política.</li>
+</ul>
+<p><strong>O Médico</strong> pode, por iniciativa própria, compartilhar o PDF do laudo (por e-mail, aplicativos de mensagem etc.). Esse compartilhamento é feito pelo Médico, sob sua responsabilidade.</p>
+<h2 id="7-transferencia-internacional-de-dados">7. Transferência internacional de dados</h2>
+<p>O banco de dados e os arquivos do MicroLaudo ficam armazenados no Brasil (São Paulo). Ainda assim, alguns prestadores listados na seção 6 são empresas estrangeiras ou operam infraestrutura global (por exemplo, a rede da Cloudflare, os serviços do Google e da Meta, o envio de e-mails pela Brevo, empresa sediada na União Europeia, e o processamento de algumas funções de servidor), o que pode envolver tratamento fora do Brasil.</p>
+<p>Nesses casos, a transferência ocorre com base no art. 33 da LGPD, com prestadores que adotam cláusulas contratuais de proteção de dados e padrões de segurança reconhecidos internacionalmente.</p>
+<h2 id="8-como-protegemos-os-dados">8. Como protegemos os dados</h2>
+<p>Adotamos medidas técnicas e administrativas para proteger os dados contra acesso não autorizado, perda, alteração ou divulgação, entre elas:</p>
+<ul>
+<li><strong>Isolamento por médico:</strong> cada Médico só consegue acessar os próprios laudos, imagens e arquivos. Esse isolamento é imposto no próprio banco de dados (<em>Row Level Security</em>), e não apenas no aplicativo.</li>
+<li><strong>Arquivos privados:</strong> fotos, PDFs, logotipos e assinaturas ficam em repositórios privados. O acesso é feito por links temporários que expiram em até 10 minutos.</li>
+<li><strong>Criptografia em trânsito:</strong> toda comunicação entre o app e os servidores usa HTTPS/TLS.</li>
+<li><strong>Criptografia em repouso</strong> dos dados armazenados pelo provedor de infraestrutura.</li>
+<li><strong>Senhas</strong> armazenadas apenas em forma de <em>hash</em>; a sessão de login no celular fica no armazenamento seguro do sistema (Keychain/Keystore).</li>
+<li><strong>Credenciais de integrações</strong> (como a do ProDoctor) ficam somente no servidor, nunca no aplicativo.</li>
+<li><strong>Proteção contra robôs</strong> (CAPTCHA) nas telas de login, cadastro e recuperação de senha da versão web.</li>
+<li><strong>Registros de auditoria</strong> de ações relevantes, sem conteúdo clínico.</li>
+</ul>
+<p>Nenhum sistema é totalmente imune a falhas. Se ocorrer um incidente de segurança que possa acarretar risco ou dano relevante, comunicaremos a Autoridade Nacional de Proteção de Dados (ANPD) e os titulares afetados — e, no caso de dados de Pacientes, o Médico controlador — nos termos do art. 48 da LGPD.</p>
+<p><strong>Responsabilidade do Médico:</strong> manter a senha em sigilo, não compartilhar a conta, proteger o aparelho com bloqueio de tela e encerrar a sessão em dispositivos de terceiros.</p>
+<h2 id="9-pagamentos-e-assinatura">9. Pagamentos e assinatura</h2>
+<p>O MicroLaudo oferece <strong>1 laudo gratuito</strong> para teste. Para finalizar outros laudos, é necessário contratar um plano pago (mensal ou anual).</p>
+<ul>
+<li><strong>Versão web:</strong> as cobranças são processadas pelo <strong>Asaas</strong>, instituição de pagamento autorizada pelo Banco Central do Brasil. Você escolhe pagar por cartão de crédito, Pix ou boleto, e os dados de pagamento são digitados <strong>diretamente na página de fatura do Asaas</strong>. A IGARATECH <strong>não recebe nem armazena</strong> número de cartão, código de segurança ou dados bancários.</li>
+<li><strong>Aplicativos para iOS e Android:</strong> quando a assinatura dentro do app estiver disponível, o pagamento será processado pela Apple App Store ou pelo Google Play, conforme as políticas de cada loja.</li>
+</ul>
+<p>Recebemos do processador apenas o necessário para liberar o acesso e cumprir obrigações fiscais: situação da assinatura, plano, valores, forma de pagamento, datas e identificadores da cobrança. Para criar a cobrança, enviamos ao Asaas seu nome, e-mail e o CPF ou CNPJ informado na contratação.</p>
+<p>O Asaas trata esses dados também como <strong>controlador independente</strong>, para cumprir suas próprias obrigações legais e regulatórias (por exemplo, prevenção à lavagem de dinheiro e normas do Banco Central), conforme a política de privacidade dele.</p>
+<p>Ao excluir sua conta, a assinatura no Asaas é cancelada automaticamente e não haverá novas cobranças.</p>
+<h2 id="10-por-quanto-tempo-guardamos-os-dados">10. Por quanto tempo guardamos os dados</h2>
+<div class="table"><table>
+<thead><tr><th scope="col">Dados</th><th scope="col">Prazo</th></tr></thead>
+<tbody>
+<tr><td>Dados da conta do Médico e laudos (incluindo dados de Pacientes, fotos e PDFs)</td><td>Enquanto a conta estiver ativa, ou até que o Médico exclua o laudo ou a conta</td></tr>
+<tr><td>Registros de pagamento (histórico de eventos da cobrança, identificadores e valores)</td><td><strong>5 anos</strong> após o pagamento, mesmo após a exclusão da conta, para cumprir a legislação fiscal e tributária (art. 16, I, da LGPD)</td></tr>
+<tr><td>Registros de auditoria</td><td><strong>5 anos</strong> após o evento, mesmo após a exclusão da conta, para segurança e exercício regular de direitos (art. 16, I e II, da LGPD). Não contêm conteúdo clínico</td></tr>
+<tr><td>Cópias de segurança (<em>backups</em>) do provedor</td><td>Eliminadas automaticamente ao fim do ciclo de retenção do provedor, de até 30 dias</td></tr>
+</tbody>
+</table></div>
+<p><strong>Guarda do prontuário:</strong> a legislação e as normas do Conselho Federal de Medicina impõem ao médico prazos de guarda de prontuário. O MicroLaudo <strong>não substitui o sistema de prontuário</strong> do Médico. Antes de excluir laudos ou a conta, o Médico deve baixar e guardar os PDFs que precise conservar.</p>
+<h2 id="11-exclusao-da-conta">11. Exclusão da conta</h2>
+<p>Você pode excluir sua conta a qualquer momento pelo próprio aplicativo, em <strong>Perfil → Zona de Perigo → Excluir conta</strong>, ou pedindo pelo e-mail <a href="mailto:privacidade@microlaudo.com">privacidade@microlaudo.com</a>.</p>
+<p>Ao excluir a conta, apagamos de forma definitiva e imediata:</p>
+<ul>
+<li>seus dados de cadastro e de autenticação;</li>
+<li>todos os laudos e dados de Pacientes associados;</li>
+<li>todas as fotos de lâminas, PDFs, logotipo e assinatura armazenados.</li>
+</ul>
+<p>A assinatura no processador de pagamentos também é cancelada. Permanecem apenas os registros de auditoria e de pagamento pelos prazos da seção 10, os dados que o Asaas precisa manter por obrigação legal própria e, temporariamente, as cópias de segurança até seu descarte automático. <strong>A exclusão não pode ser desfeita.</strong></p>
+<h2 id="12-seus-direitos">12. Seus direitos</h2>
+<h3 id="12-1-direitos-do-medico">12.1 Direitos do Médico</h3>
+<p>Nos termos do art. 18 da LGPD, você pode, a qualquer momento:</p>
+<ul>
+<li>confirmar se tratamos seus dados e acessá-los;</li>
+<li>corrigir dados incompletos, inexatos ou desatualizados (a maior parte pode ser corrigida diretamente no Perfil);</li>
+<li>pedir a anonimização, o bloqueio ou a eliminação de dados desnecessários ou tratados em desconformidade com a LGPD;</li>
+<li>pedir a portabilidade dos seus dados;</li>
+<li>pedir a eliminação dos dados, ressalvadas as hipóteses de guarda previstas em lei;</li>
+<li>obter informação sobre com quem compartilhamos seus dados;</li>
+<li>revogar consentimentos, quando o tratamento se basear nele;</li>
+<li>opor-se a tratamento realizado com base em legítimo interesse, em caso de descumprimento da LGPD;</li>
+<li>apresentar reclamação à ANPD (<a href="https://www.gov.br/anpd">www.gov.br/anpd</a>).</li>
+</ul>
+<p>Para exercer seus direitos, escreva para <strong><a href="mailto:privacidade@microlaudo.com">privacidade@microlaudo.com</a></strong>. Podemos pedir informações para confirmar sua identidade antes de atender. Respondemos em até 15 dias.</p>
+<h3 id="12-2-direitos-dos-pacientes">12.2 Direitos dos Pacientes</h3>
+<p>Como os dados dos Pacientes são controlados pelo Médico, <strong>pedidos de Pacientes devem ser dirigidos ao Médico ou à clínica responsável pelo exame</strong>. Se recebermos um pedido diretamente de um Paciente, vamos encaminhá-lo ao Médico responsável, quando for possível identificá-lo, e apoiar o Médico no atendimento, conforme o art. 39 da LGPD.</p>
+<h2 id="13-dados-de-criancas-e-adolescentes">13. Dados de crianças e adolescentes</h2>
+<p>O aplicativo não se destina a menores de 18 anos e não permite o cadastro deles como usuários. Laudos de Pacientes crianças ou adolescentes são de responsabilidade do Médico, que deve observar o melhor interesse do menor e o art. 14 da LGPD.</p>
+<h2 id="14-cookies-e-armazenamento-local">14. Cookies e armazenamento local</h2>
+<p>O MicroLaudo não usa cookies de publicidade nem de análise de uso.</p>
+<ul>
+<li><strong>Aplicativo (iOS/Android):</strong> a sessão de login fica no armazenamento seguro do sistema.</li>
+<li><strong>Versão web:</strong> a sessão de login fica no armazenamento local do navegador (<em>localStorage</em>), necessário para manter você conectado. O verificador anti-robô da Cloudflare (Turnstile) pode usar dados técnicos do navegador estritamente para distinguir pessoas de robôs.</li>
+</ul>
+<h2 id="15-encarregado-de-dados-dpo">15. Encarregado de dados (DPO)</h2>
+<p>Por se tratar de agente de tratamento de pequeno porte, a IGARATECH está dispensada da indicação formal de encarregado (Resolução CD/ANPD nº 2/2022, art. 11). Disponibilizamos o canal <strong><a href="mailto:privacidade@microlaudo.com">privacidade@microlaudo.com</a></strong> para comunicação com titulares e com a ANPD.</p>
+<h2 id="16-alteracoes-nesta-politica">16. Alterações nesta Política</h2>
+<p>Podemos atualizar esta Política para refletir mudanças no aplicativo, na legislação ou nos prestadores de serviço. A data da última atualização fica sempre no topo. Mudanças relevantes serão comunicadas no aplicativo ou por e-mail antes de entrarem em vigor.</p>
+<h2 id="17-legislacao-e-foro">17. Legislação e foro</h2>
+<p>Esta Política é regida pelas leis brasileiras. Fica eleito o foro do domicílio do titular para resolver eventuais controvérsias, conforme o Código de Defesa do Consumidor, quando aplicável.</p>
+<h2 id="18-contato">18. Contato</h2>
+<ul>
+<li><strong>IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA</strong></li>
+<li>CNPJ: 66.173.331/0001-31</li>
+<li>Site: <a href="https://microlaudo.com">https://microlaudo.com</a></li>
+<li>Atendimento: <a href="mailto:contato@microlaudo.com">contato@microlaudo.com</a></li>
+<li>Privacidade: <a href="mailto:privacidade@microlaudo.com">privacidade@microlaudo.com</a></li>
+</ul>
+</main>
+<footer><div class="wrap">IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA · CNPJ 66.173.331/0001-31</div></footer>
+</body>
+</html>
