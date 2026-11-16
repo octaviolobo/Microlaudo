@@ -32,6 +32,7 @@ const CHECKOUT_ERRORS: Record<string, string> = {
   invalid_document: 'billing.documentInvalid',
   already_subscribed: 'billing.alreadySubscribed',
   gateway_rejected: 'billing.gatewayRejected',
+  checkout_in_progress: 'billing.checkoutInProgress',
 };
 
 // Tela de planos. Abre de quatro jeitos:

@@ -153,6 +153,7 @@
     "redirecting": "Abrindo a fatura...",
     "gatewayError": "Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.",
     "gatewayRejected": "O sistema de pagamento recusou os dados. Confira o CPF ou CNPJ.",
+    "checkoutInProgress": "Já estamos abrindo o pagamento. Aguarde alguns segundos e tente de novo se a fatura não abrir.",
     "pendingShort": "Assinatura aguardando o pagamento da fatura",
     "pendingBody": "Assim que a fatura for paga, o plano é liberado sozinho (pode levar alguns minutos). Perdeu a fatura? Gere uma nova abaixo.",
     "newInvoice": "Gerar nova fatura",

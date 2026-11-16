@@ -15,13 +15,17 @@
 // novo) em falha nossa de banco; evento sem assinatura conhecida é registrado
 // e respondido com 200.
 //
+// Ativação: o evento pode chegar atrasado (o Asaas reenvia por dias). Antes de
+// ativar, a cobrança é consultada na API e só conta se ainda estiver paga; o
+// vencimento usado é o da API, não o do corpo do evento.
+//
 // Estorno/chargeback: além de cortar o acesso, apaga a assinatura no Asaas.
 // Estornar uma cobrança não cancela a assinatura lá, e a próxima renovação
 // cobraria o cartão de novo (e o webhook reativaria o plano).
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
 import { AsaasError, adminClient, asaas, jsonResponse } from '../_shared/asaas.ts';
-import { actionForEvent, applyAction, safeEqual } from '../_shared/billingLogic.ts';
+import { actionForEvent, applyAction, isPaidPaymentStatus, safeEqual } from '../_shared/billingLogic.ts';
 
 import type { Plan, SubscriptionStatus } from '../_shared/billingLogic.ts';
 
@@ -99,10 +103,28 @@ Deno.serve(async (req: Request) => {
   // Assinatura antiga (checkout refeito) ou de outro sistema: só registra.
   if (!row) return finish('unknown_subscription');
 
+  let payment: { dueDate?: string } | null = event.payment ?? null;
+  if (action.kind === 'activate') {
+    const paymentId = event.payment?.id;
+    if (!paymentId) return finish('no_payment');
+    let fresh: { status?: string; dueDate?: string; subscription?: string };
+    try {
+      fresh = await asaas('GET', `/payments/${encodeURIComponent(paymentId)}`);
+    } catch (err) {
+      if (err instanceof AsaasError && err.status === 404) return finish('activate_skipped:payment_not_found');
+      // Falha de rede/API: devolve erro para o Asaas tentar de novo.
+      console.error('[billing-webhook] falha ao consultar cobrança', paymentId, String(err));
+      return jsonResponse(502, { error: 'gateway_error' });
+    }
+    if (fresh.subscription !== subscriptionId) return finish('activate_skipped:subscription_mismatch');
+    if (!isPaidPaymentStatus(fresh.status)) return finish(`activate_skipped:${fresh.status ?? 'unknown'}`);
+    payment = { dueDate: fresh.dueDate };
+  }
+
   const patch = applyAction(
     action,
     { status: row.status as SubscriptionStatus, plan: row.plan as Plan, current_period_end: row.current_period_end },
-    event.payment ?? null,
+    payment,
   );
   if (!patch) return finish('no_change');
 

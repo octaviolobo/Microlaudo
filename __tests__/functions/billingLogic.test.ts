@@ -6,6 +6,7 @@ import {
   actionForEvent,
   addCycle,
   applyAction,
+  isPaidPaymentStatus,
   isValidCnpj,
   isValidCpf,
   isValidCpfCnpj,
@@ -116,5 +117,16 @@ describe('webhook', () => {
     expect(safeEqual('abc', 'abc')).toBe(true);
     expect(safeEqual('abc', 'abd')).toBe(false);
     expect(safeEqual('abc', 'abcd')).toBe(false);
+  });
+});
+
+describe('cobrança paga', () => {
+  it('só conta como paga cobrança confirmada ou recebida', () => {
+    expect(isPaidPaymentStatus('CONFIRMED')).toBe(true);
+    expect(isPaidPaymentStatus('RECEIVED')).toBe(true);
+    expect(isPaidPaymentStatus('RECEIVED_IN_CASH')).toBe(true);
+    for (const s of ['REFUNDED', 'REFUND_REQUESTED', 'CHARGEBACK_REQUESTED', 'CHARGEBACK_DISPUTE', 'PENDING', 'OVERDUE', '', undefined, null, 1]) {
+      expect(isPaidPaymentStatus(s)).toBe(false);
+    }
   });
 });
