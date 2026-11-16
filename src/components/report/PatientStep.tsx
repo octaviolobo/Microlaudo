@@ -10,7 +10,7 @@ import {
 import { router, type Href } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from '@app/report/_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Input, DatePickerInput, MessageBox } from '@/components/ui';
 import { useReportStore } from '@/stores/reportStore';

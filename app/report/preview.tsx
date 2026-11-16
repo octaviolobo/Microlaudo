@@ -19,8 +19,7 @@ import { canFinalizeNew, useSubscriptionStore } from '@/stores/subscriptionStore
 import { downloadPdfWeb, pdfFileName } from '@/lib/webPdfDownload';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 import { FINDINGS_FIELDS } from '@/constants/findings-options';
-
-import { stepStyles as s } from './_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 
 import type { ReportRow } from '@/types/database';
 

@@ -11,8 +11,7 @@ import { calculateNugentScore } from '@/lib/nugent';
 import { evaluateAmsel } from '@/lib/amsel';
 import { AppError } from '@/lib/errors';
 import { Colors, Typography, Spacing } from '@/constants/theme';
-
-import { stepStyles as s } from './_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 
 import type { SelectOption } from '@/components/ui';
 import type { MorphotypeLevel } from '@/types/report';

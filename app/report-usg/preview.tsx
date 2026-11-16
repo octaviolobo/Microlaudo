@@ -3,7 +3,7 @@ import { ScrollView, View, TouchableOpacity, Text, StyleSheet } from 'react-nati
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from '@app/report/_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Button, MessageBox } from '@/components/ui';
 import { USG_TOTAL_STEPS, USG_TRANSVAGINAL_SIGTAP, USG_TRANSVAGINAL_TITLE } from '@/constants/usg-options';
