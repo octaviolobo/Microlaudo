@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
+import { ActionSheetIOS, Alert, Platform, View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
@@ -47,17 +47,60 @@ export function PhotosScreen() {
     loadImages().catch(() => setError(tc('genericError')));
   }, [loadImages, tc]);
 
+  type PhotoSource = 'camera' | 'gallery';
+
+  // No celular o médico escolhe entre fotografar a lâmina na hora ou pegar da
+  // galeria; no web só existe o seletor de arquivo.
+  function askSource(): Promise<PhotoSource | null> {
+    if (Platform.OS === 'web') return Promise.resolve('gallery');
+    return new Promise((resolve) => {
+      if (Platform.OS === 'ios') {
+        ActionSheetIOS.showActionSheetWithOptions(
+          {
+            options: [t('steps.photos.camera'), t('steps.photos.gallery'), tc('cancel')],
+            cancelButtonIndex: 2,
+          },
+          (index) => resolve(index === 0 ? 'camera' : index === 1 ? 'gallery' : null),
+        );
+        return;
+      }
+      Alert.alert(
+        t('steps.photos.addPhoto'),
+        undefined,
+        [
+          { text: t('steps.photos.camera'), onPress: () => resolve('camera') },
+          { text: t('steps.photos.gallery'), onPress: () => resolve('gallery') },
+          { text: tc('cancel'), style: 'cancel', onPress: () => resolve(null) },
+        ],
+        { cancelable: true, onDismiss: () => resolve(null) },
+      );
+    });
+  }
+
   async function handlePick(sortOrder: 1 | 2 | 3) {
     if (!reportId) return;
     setError(null);
     try {
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permission.granted) return;
+      const source = await askSource();
+      if (!source) return;
 
-      const result = await ImagePicker.launchImageLibraryAsync({
+      const permission =
+        source === 'camera'
+          ? await ImagePicker.requestCameraPermissionsAsync()
+          : await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setError(t(source === 'camera' ? 'steps.photos.cameraDenied' : 'steps.photos.galleryDenied'));
+        return;
+      }
+
+      const options: ImagePicker.ImagePickerOptions = {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.8,
-      });
+      };
+      const result =
+        source === 'camera'
+          ? await ImagePicker.launchCameraAsync(options)
+          : await ImagePicker.launchImageLibraryAsync(options);
       if (result.canceled || !result.assets[0]) return;
 
       setBusySlot(sortOrder);

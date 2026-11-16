@@ -32,7 +32,9 @@
       "camera": "Camera",
       "gallery": "Gallery",
       "maxPhotos": "Maximum 3 photos per report",
-      "minPhotos": "At least 1 photo required"
+      "minPhotos": "At least 1 photo required",
+      "cameraDenied": "Allow camera access in Settings to photograph the slide.",
+      "galleryDenied": "Allow photo access in Settings to choose an image."
     },
     "findings": {
       "title": "Microscopic Findings",

@@ -32,7 +32,9 @@
       "camera": "Câmera",
       "gallery": "Galeria",
       "maxPhotos": "Máximo de 3 fotos por laudo",
-      "minPhotos": "Pelo menos 1 foto obrigatória"
+      "minPhotos": "Pelo menos 1 foto obrigatória",
+      "cameraDenied": "Permita o acesso à câmera em Ajustes para fotografar a lâmina.",
+      "galleryDenied": "Permita o acesso às fotos em Ajustes para escolher uma imagem."
     },
     "findings": {
       "title": "Achados Microscópicos",
