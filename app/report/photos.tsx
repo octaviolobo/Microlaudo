@@ -94,7 +94,7 @@ export function PhotosScreen() {
       }
 
       const options: ImagePicker.ImagePickerOptions = {
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         quality: 0.8,
       };
       const result =

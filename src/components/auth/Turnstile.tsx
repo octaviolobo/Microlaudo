@@ -22,12 +22,13 @@ export type TurnstileProps = {
   resetKey: number;
 };
 
-// Altura do widget quando o Cloudflare pede interação (caixa "Confirme que é humano").
-const INTERACTIVE_HEIGHT = 72;
+// Altura do widget do Turnstile (tamanho "normal": 300×65) com folga.
+const WIDGET_HEIGHT = 70;
 
 type WidgetMessage =
   | { type: 'token'; token: string }
-  | { type: 'expired' | 'error' | 'load-error' }
+  | { type: 'expired' | 'load-error' }
+  | { type: 'error'; code?: string }
   | { type: 'interactive'; visible: boolean };
 
 function buildHtml(siteKey: string): string {
@@ -41,10 +42,12 @@ function buildHtml(siteKey: string): string {
     window.widgetId = turnstile.render('#cf', {
       sitekey: ${JSON.stringify(siteKey)},
       theme: 'light',
-      appearance: 'interaction-only',
+      // Sempre visível no app: no iOS a WebView não redimensiona de forma confiável
+      // quando o desafio aparece, e no WKWebView o Cloudflare costuma pedir o clique.
+      appearance: 'always',
       callback: function (token) { send({ type: 'token', token: token }); },
       'expired-callback': function () { send({ type: 'expired' }); },
-      'error-callback': function () { send({ type: 'error' }); },
+      'error-callback': function (code) { send({ type: 'error', code: String(code) }); },
       'before-interactive-callback': function () { send({ type: 'interactive', visible: true }); },
       'after-interactive-callback': function () { send({ type: 'interactive', visible: false }); }
     });
@@ -63,7 +66,6 @@ export function Turnstile({ onToken, resetKey }: TurnstileProps) {
   const webViewRef = useRef<WebView>(null);
   const onTokenRef = useRef(onToken);
   onTokenRef.current = onToken;
-  const [interactive, setInteractive] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
 
   const source = useMemo(() => (SITE_KEY ? { html: buildHtml(SITE_KEY), baseUrl: BASE_URL } : null), []);
@@ -90,8 +92,7 @@ export function Turnstile({ onToken, resetKey }: TurnstileProps) {
         onTokenRef.current(msg.token);
         break;
       case 'interactive':
-        setInteractive(msg.visible);
-        break;
+        return;
       case 'load-error':
         setLoadFailed(true);
         onTokenRef.current(null);
@@ -111,7 +112,10 @@ export function Turnstile({ onToken, resetKey }: TurnstileProps) {
         onError={() => setLoadFailed(true)}
         javaScriptEnabled
         scrollEnabled={false}
-        style={[styles.webView, { height: interactive ? INTERACTIVE_HEIGHT : 1 }]}
+        // O tamanho vai no containerStyle: o contêiner interno da WebView tem flex: 1
+        // e, num formulário sem altura definida, ficaria com 0px.
+        containerStyle={styles.webViewContainer}
+        style={styles.webView}
         // A página principal não deve navegar para fora (links do Cloudflare de
         // privacidade/termos ficam bloqueados). O iframe do desafio é liberado.
         onShouldStartLoadWithRequest={(req) =>
@@ -131,10 +135,14 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     alignItems: 'center',
   },
-  // Com appearance 'interaction-only' o widget costuma ficar oculto; a WebView fica
-  // com 1px (0 pode suspender o JS) e só cresce quando o Cloudflare pede um clique.
-  webView: {
+  webViewContainer: {
+    flex: 0,
     width: 300,
+    height: WIDGET_HEIGHT,
+    marginBottom: Spacing.sm,
+  },
+  webView: {
+    flex: 1,
     backgroundColor: 'transparent',
   },
   error: {

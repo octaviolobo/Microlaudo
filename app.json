@@ -13,6 +13,12 @@
       "usesAppleSignIn": true,
       "config": {
         "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "pt-BR",
+        "CFBundleLocalizations": [
+          "pt-BR"
+        ]
       }
     },
     "android": {
