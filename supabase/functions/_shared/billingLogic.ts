@@ -167,6 +167,15 @@ export function applyAction(
   }
 }
 
+// Status de cobrança do Asaas que contam como pago. Antes de ativar, o webhook
+// consulta a cobrança na API: um evento atrasado de pagamento que depois foi
+// estornado (REFUNDED, CHARGEBACK_*) não pode reativar o plano.
+const PAID_PAYMENT_STATUSES = new Set(['CONFIRMED', 'RECEIVED', 'RECEIVED_IN_CASH']);
+
+export function isPaidPaymentStatus(status: unknown): boolean {
+  return typeof status === 'string' && PAID_PAYMENT_STATUSES.has(status);
+}
+
 // Comparação em tempo constante para o token do webhook.
 export function safeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

@@ -8,6 +8,9 @@
 //
 // Fluxo:
 //   1. JWT → usuário → linha de doctors (client admin).
+//   1b. Trava de checkout do médico (migration 017): dois cliques/abas ao mesmo
+//      tempo → o segundo recebe 409 checkout_in_progress em vez de criar uma
+//      segunda assinatura no Asaas. A trava é solta no fim (sucesso ou erro).
 //   2. Já tem acesso (assinatura ativa/cortesia/cancelada no prazo) → 409.
 //   3. Assinatura Asaas anterior sem acesso (pendente, expirada, estornada) →
 //      apagada no Asaas (evita duas cobranças abertas).
@@ -43,6 +46,24 @@ async function firstInvoiceUrl(subscriptionId: string): Promise<string | null> {
   return null;
 }
 
+// Solta a trava. Se o checkout falhou antes de criar a assinatura no Asaas, a
+// linha `pending` vazia criada pela trava é apagada (senão a tela mostraria
+// "pagamento pendente" sem cobrança nenhuma).
+async function releaseCheckoutLock(admin: ReturnType<typeof adminClient>, doctorId: string): Promise<void> {
+  try {
+    await admin
+      .from('subscriptions')
+      .delete()
+      .eq('doctor_id', doctorId)
+      .eq('status', 'pending')
+      .is('provider_subscription_id', null);
+    await admin.from('subscriptions').update({ checkout_lock_until: null }).eq('doctor_id', doctorId);
+  } catch (err) {
+    // A trava expira sozinha em 2 minutos.
+    console.error('[billing-checkout] falha ao soltar a trava', String(err));
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS_HEADERS });
   if (req.method !== 'POST') return jsonResponse(405, { error: 'method_not_allowed' });
@@ -62,6 +83,7 @@ Deno.serve(async (req: Request) => {
   if (!isValidCpfCnpj(cpfCnpj)) return jsonResponse(400, { error: 'invalid_document' });
 
   const admin = adminClient();
+  let lockedDoctorId: string | null = null;
 
   try {
     const { data: doctor, error: doctorError } = await admin
@@ -70,6 +92,14 @@ Deno.serve(async (req: Request) => {
       .eq('user_id', user.id)
       .single();
     if (doctorError || !doctor) return jsonResponse(404, { error: 'profile_not_found' });
+
+    const { data: claimed, error: claimError } = await admin.rpc('claim_checkout_lock', {
+      p_doctor_id: doctor.id,
+      p_plan: plan,
+    });
+    if (claimError) throw new Error(`Falha ao travar o checkout: ${claimError.message}`);
+    if (!claimed) return jsonResponse(409, { error: 'checkout_in_progress' });
+    lockedDoctorId = doctor.id;
 
     const { data: current } = await admin
       .from('subscriptions')
@@ -131,7 +161,11 @@ Deno.serve(async (req: Request) => {
       },
       { onConflict: 'doctor_id' },
     );
-    if (upsertError) throw new Error(`Falha ao gravar subscriptions: ${upsertError.message}`);
+    if (upsertError) {
+      // Sem a linha gravada o webhook não reconheceria o pagamento: desfaz no Asaas.
+      await asaas('DELETE', `/subscriptions/${subscription.id}`).catch(() => undefined);
+      throw new Error(`Falha ao gravar subscriptions: ${upsertError.message}`);
+    }
 
     const invoiceUrl = await firstInvoiceUrl(subscription.id);
     if (!invoiceUrl) throw new Error(`Assinatura ${subscription.id} sem fatura`);
@@ -146,5 +180,7 @@ Deno.serve(async (req: Request) => {
       console.error('[billing-checkout]', err instanceof Error ? err.message : String(err));
     }
     return jsonResponse(502, { error: 'gateway_error' });
+  } finally {
+    if (lockedDoctorId) await releaseCheckoutLock(admin, lockedDoctorId);
   }
 });
