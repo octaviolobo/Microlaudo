@@ -128,7 +128,7 @@ Cloudflare Access; `localhost` não funciona porque o Turnstile o recusa):
 
 ## Custos (tabela padrão do Asaas, conferir na conta)
 
-Sem mensalidade. Cartão à vista: R$ 0,49 + 2,99% (≈ R$ 1,96 no mensal de R$ 49);
+Sem mensalidade. Cartão à vista: R$ 0,49 + 2,99% (≈ R$ 1,68 no mensal de R$ 39,90);
 Pix/boleto: R$ 1,99 por pagamento recebido. Cartão cai em ~30 dias (antecipação
 opcional, ~1,25% a.m.). NFS-e pode ter tarifa por nota.
 
