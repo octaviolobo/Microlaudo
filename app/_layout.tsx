@@ -19,6 +19,7 @@ import {
 } from '@expo-google-fonts/noto-sans';
 
 import { getSession, subscribeToAuthChanges } from '@/services/auth';
+import { identifyPurchaser } from '@/services/purchases';
 import { getProfile } from '@/services/profile';
 import { useAuthStore } from '@/stores/authStore';
 import { useDoctorStore } from '@/stores/doctorStore';
@@ -62,6 +63,7 @@ export function RootLayout() {
     getSession()
       .then((session) => {
         syncUserScopedState(session?.user.id ?? null);
+        void identifyPurchaser(session?.user.id ?? null);
         setSession(session);
         setUser(session?.user ?? null);
         if (!session) return;
@@ -85,6 +87,7 @@ export function RootLayout() {
       // Antes de publicar a nova sessão: rascunho/perfil do usuário anterior somem
       // antes de qualquer tela renderizar com o novo usuário.
       syncUserScopedState(session?.user.id ?? null);
+      void identifyPurchaser(session?.user.id ?? null);
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {

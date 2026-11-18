@@ -13,15 +13,26 @@ export const PLAN_PRICES_CENTS: Record<Plan, number> = {
 };
 
 // Desconto do anual sobre 12 mensalidades, arredondado para baixo (R$399 vs R$478,80 → 16%).
-export function annualDiscountPercent(): number {
-  const twelveMonths = PLAN_PRICES_CENTS.monthly * 12;
-  return Math.floor(((twelveMonths - PLAN_PRICES_CENTS.annual) / twelveMonths) * 100);
+// No iOS a tela passa os preços da App Store, que podem ter centavos diferentes.
+export function annualDiscountPercent(
+  monthlyCents: number = PLAN_PRICES_CENTS.monthly,
+  annualCents: number = PLAN_PRICES_CENTS.annual,
+): number {
+  const twelveMonths = monthlyCents * 12;
+  return Math.floor(((twelveMonths - annualCents) / twelveMonths) * 100);
 }
 
 // Quanto o anual sai por mês, em centavos (R$399 / 12 = R$33,25).
-export function annualMonthlyEquivalentCents(): number {
-  return Math.round(PLAN_PRICES_CENTS.annual / 12);
+export function annualMonthlyEquivalentCents(annualCents: number = PLAN_PRICES_CENTS.annual): number {
+  return Math.round(annualCents / 12);
 }
+
+// Produtos de assinatura do App Store Connect (grupo "MicroLaudo Pro"). Os mesmos
+// de supabase/functions/_shared/appleBilling.ts. Não mudam depois de criados.
+export const APPLE_PRODUCT_IDS: Record<Plan, string> = {
+  monthly: 'com.microlaudo.app.mensal',
+  annual: 'com.microlaudo.app.anual',
+};
 
 // Liga o checkout (Edge Function billing-checkout → fatura do Asaas). Desligado, a
 // tela de planos mostra os preços e um aviso de "em breve". Controlado por env para
