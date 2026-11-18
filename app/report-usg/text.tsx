@@ -3,7 +3,7 @@ import { ScrollView, View, TouchableOpacity, Text, StyleSheet } from 'react-nati
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { stepStyles as s } from '@app/report/_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing } from '@/constants/theme';

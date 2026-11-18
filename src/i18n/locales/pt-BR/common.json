@@ -53,6 +53,7 @@
     "fillRequired": "Preencha todos os campos obrigatórios.",
     "continueWithGoogle": "Continuar com Google",
     "continueWithFacebook": "Continuar com Facebook",
+    "appleLoginFailed": "Não foi possível entrar com a Apple. Tente de novo.",
     "orDivider": "ou",
     "passwordIssue": {
       "tooShort": "A senha deve ter pelo menos 10 caracteres.",
@@ -70,7 +71,8 @@
     "resetLinkInvalid": "Este link de redefinição é inválido ou expirou. Peça um novo em \"Esqueci minha senha\", no mesmo aparelho em que vai abrir o e-mail.",
     "captchaRequired": "Confirme que você não é um robô.",
     "captchaFailed": "A verificação anti-robô falhou ou expirou. Tente de novo.",
-    "captchaLoadFailed": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e recarregue a página."
+    "captchaLoadFailed": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e recarregue a página.",
+    "captchaLoadFailedNative": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e tente de novo."
   },
   "completeProfile": {
     "title": "Complete seu cadastro",

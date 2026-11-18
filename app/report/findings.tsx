@@ -12,8 +12,7 @@ import { calculateNugentScore } from '@/lib/nugent';
 import { evaluateAmsel } from '@/lib/amsel';
 import { classifyConclusionCase } from '@/lib/conclusionTemplates';
 import { FINDING_LEVELS, FINDINGS_FIELDS, type FindingsField } from '@/constants/findings-options';
-
-import { stepStyles as s } from './_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 
 import type { SelectOption } from '@/components/ui';
 import type { FindingLevel } from '@/types/report';

@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { signIn, signInWithOAuth } from '@/services/auth';
+import { isAppleSignInAvailable, signIn, signInWithApple, signInWithOAuth } from '@/services/auth';
 import { AppError, ErrorCodes } from '@/lib/errors';
 import { LegalNotice } from '@/components/legal/LegalNotice';
 import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
-import { Colors, Typography, Spacing } from '@/constants/theme';
+import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 
 import type { OAuthProvider } from '@/services/auth';
 
@@ -18,10 +19,33 @@ export function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | 'apple' | null>(null);
+  const [appleAvailable, setAppleAvailable] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaReset, setCaptchaReset] = useState(0);
+
+  useEffect(() => {
+    isAppleSignInAvailable().then(setAppleAvailable).catch(() => setAppleAvailable(false));
+  }, []);
+
+  async function handleAppleLogin() {
+    if (oauthLoading || isLoading) return;
+    try {
+      setOauthLoading('apple');
+      setError(null);
+      await signInWithApple(captchaToken ?? undefined);
+    } catch (err) {
+      if (err instanceof AppError && err.code === ErrorCodes.AUTH_CAPTCHA_FAILED) {
+        setError(t('auth.captchaFailed'));
+      } else {
+        setError(t('auth.appleLoginFailed'));
+      }
+    } finally {
+      setOauthLoading(null);
+      setCaptchaReset((n) => n + 1);
+    }
+  }
 
   async function handleLogin() {
     if (!email.trim() || !password) {
@@ -100,6 +124,16 @@ export function LoginScreen() {
 
       <Text style={styles.orDivider}>{t('auth.orDivider')}</Text>
 
+      {appleAvailable && (
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={Radius.md}
+          style={styles.appleButton}
+          onPress={handleAppleLogin}
+        />
+      )}
+
       <Button
         label={t('auth.continueWithGoogle')}
         onPress={() => handleOAuthLogin('google')}
@@ -169,6 +203,12 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     marginBottom: Spacing.xl,
     textAlign: 'center',
+  },
+  // Botão nativo da Apple (exigência de layout da Apple); mesma altura dos outros.
+  appleButton: {
+    width: '100%',
+    height: 48,
+    marginBottom: Spacing.sm,
   },
   orDivider: {
     fontSize: 13,

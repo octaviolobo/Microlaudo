@@ -53,6 +53,7 @@
     "fillRequired": "Please fill in all required fields.",
     "continueWithGoogle": "Continue with Google",
     "continueWithFacebook": "Continue with Facebook",
+    "appleLoginFailed": "Could not sign in with Apple. Please try again.",
     "orDivider": "or",
     "passwordIssue": {
       "tooShort": "Password must be at least 10 characters.",
@@ -70,7 +71,8 @@
     "resetLinkInvalid": "This reset link is invalid or has expired. Request a new one via \"Forgot password\" on the same device where you will open the email.",
     "captchaRequired": "Please confirm you are not a robot.",
     "captchaFailed": "The anti-bot check failed or expired. Please try again.",
-    "captchaLoadFailed": "Could not load the anti-bot check. Check your connection and reload the page."
+    "captchaLoadFailed": "Could not load the anti-bot check. Check your connection and reload the page.",
+    "captchaLoadFailedNative": "Could not load the anti-bot check. Check your connection and try again."
   },
   "completeProfile": {
     "title": "Complete your profile",

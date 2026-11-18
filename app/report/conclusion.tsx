@@ -13,8 +13,7 @@ import { REFERENCE_DEFAULT } from '@/constants/report-defaults';
 import { calculateNugentScore } from '@/lib/nugent';
 import { evaluateAmsel } from '@/lib/amsel';
 import { classifyConclusionCase } from '@/lib/conclusionTemplates';
-
-import { stepStyles as s } from './_stepStyles';
+import { stepStyles as s } from '@/components/report/stepStyles';
 
 export function ConclusionScreen() {
   const { t } = useTranslation('report');

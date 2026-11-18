@@ -1,5 +1,7 @@
 import { Platform } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import * as AuthSession from 'expo-auth-session';
+import * as Crypto from 'expo-crypto';
 import * as WebBrowser from 'expo-web-browser';
 
 import { AppError, ErrorCodes } from '@/lib/errors';
@@ -97,6 +99,62 @@ export async function signInWithOAuth(provider: OAuthProvider): Promise<void> {
 
   const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
   if (exchangeError) throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, exchangeError.message, exchangeError);
+}
+
+// "Entrar com Apple" (só iOS). Obrigatório pela App Store (regra 4.8) porque o app
+// oferece login com Google/Facebook. Fluxo nativo: a Apple devolve um identityToken
+// assinado e o Supabase valida com signInWithIdToken — não há navegador nem secret
+// no app. No Supabase, o provedor Apple precisa ter o bundle id (com.microlaudo.app)
+// em "Client IDs". O nonce bruto vai para o Supabase e o hash SHA-256 para a Apple.
+export async function isAppleSignInAvailable(): Promise<boolean> {
+  if (Platform.OS !== 'ios') return false;
+  return AppleAuthentication.isAvailableAsync();
+}
+
+export async function signInWithApple(captchaToken?: string): Promise<void> {
+  const rawNonce = Crypto.randomUUID();
+  const hashedNonce = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, rawNonce);
+
+  let credential: AppleAuthentication.AppleAuthenticationCredential;
+  try {
+    credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+      nonce: hashedNonce,
+    });
+  } catch (err) {
+    // Usuário fechou a folha da Apple: não é erro.
+    if ((err as { code?: string })?.code === 'ERR_REQUEST_CANCELED') return;
+    throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, 'Falha no login com a Apple', err);
+  }
+
+  if (!credential.identityToken) {
+    throw new AppError(ErrorCodes.AUTH_LOGIN_FAILED, 'A Apple não devolveu o token de identidade');
+  }
+
+  const { error } = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: credential.identityToken,
+    nonce: rawNonce,
+    options: { captchaToken },
+  });
+  if (error) {
+    const code = isCaptchaError(error) ? ErrorCodes.AUTH_CAPTCHA_FAILED : ErrorCodes.AUTH_LOGIN_FAILED;
+    throw new AppError(code, error.message, error);
+  }
+
+  // A Apple só manda o nome no PRIMEIRO login e ele não vem no token. Guardamos no
+  // user_metadata para a tela "Completar cadastro" já trazer o nome preenchido.
+  const fullName = [credential.fullName?.givenName, credential.fullName?.familyName]
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+  if (fullName) {
+    // Falhar aqui não impede o login; o médico digita o nome no cadastro.
+    await supabase.auth.updateUser({ data: { full_name: fullName } });
+  }
 }
 
 // Para onde o link de confirmação do e-mail leva.
