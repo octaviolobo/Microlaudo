@@ -10,7 +10,7 @@ export type PaymentMethod = 'card' | 'invoice';
 export type SubscriptionStatus = 'pending' | 'active' | 'past_due' | 'canceled' | 'expired';
 
 export const PLAN_CONFIG: Record<Plan, { value: number; cycle: 'MONTHLY' | 'YEARLY'; description: string }> = {
-  monthly: { value: 49, cycle: 'MONTHLY', description: 'MicroLaudo — plano mensal' },
+  monthly: { value: 39.9, cycle: 'MONTHLY', description: 'MicroLaudo — plano mensal' },
   annual: { value: 399, cycle: 'YEARLY', description: 'MicroLaudo — plano anual' },
 };
 

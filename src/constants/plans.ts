@@ -5,14 +5,14 @@ import type { Plan } from '@/types/subscription';
 // get_billing_status(). Este valor só é usado antes do status carregar.
 export const TRIAL_REPORT_LIMIT = 1;
 
-// Preços de lançamento (decididos em 12/11/2026). Em centavos para não ter
+// Preços de lançamento (decididos em 12/11/2026; mensal reduzido para R$39,90 em 17/11/2026). Em centavos para não ter
 // conta de ponto flutuante; a cobrança de verdade usa o valor do gateway.
 export const PLAN_PRICES_CENTS: Record<Plan, number> = {
-  monthly: 4900,
+  monthly: 3990,
   annual: 39900,
 };
 
-// Desconto do anual sobre 12 mensalidades, arredondado para baixo (R$399 vs R$588 → 32%).
+// Desconto do anual sobre 12 mensalidades, arredondado para baixo (R$399 vs R$478,80 → 16%).
 export function annualDiscountPercent(): number {
   const twelveMonths = PLAN_PRICES_CENTS.monthly * 12;
   return Math.floor(((twelveMonths - PLAN_PRICES_CENTS.annual) / twelveMonths) * 100);
