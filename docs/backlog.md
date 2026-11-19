@@ -198,7 +198,7 @@ Pronto para a médica parceira testar.
 | U08 | 🟡 **Keep-alive do projeto Supabase de dev** | 🤖 Cloudflare Worker com Cron Trigger fazendo uma consulta leve a cada ~3 dias para evitar a pausa do plano Free. **Só para dev** — produção fica no Pro. 👤 Deploy do Worker (`wrangler deploy`) e secret da anon key. | (junto com U07) | 15 min |
 
 **Status (06/11/2026):** ✅ código pronto (U01–U06) · 🟡 U07/U08: arquivos prontos no repo, faltam os passos 👤 em [`deploy-cloudflare.md`](deploy-cloudflare.md).
-Decisões de implementação: PDF do USG reaproveita o estilo do PDF de microscopia, mas em arquivo próprio (`src/lib/usgReportPdf.ts`) — a extração das partes comuns de `reportPdf.ts` ficou para depois, para não arriscar o PDF de microscopia agora. PDF do USG só existe na web (jsPDF); a versão HTML/expo-print entra no lançamento mobile.
+Decisões de implementação: PDF do USG reaproveita o estilo do PDF de microscopia, mas em arquivo próprio (`src/lib/usgReportPdf.ts`) — a extração das partes comuns de `reportPdf.ts` ficou para depois, para não arriscar o PDF de microscopia agora. PDF do USG na web via jsPDF; no mobile, versão HTML/expo-print (`buildUsgReportPdfHtml`) — **USG liberado no app em 19/11/2026**.
 
 **Sprint USG-Web: ~5-7 sessões · ~2h20 do seu tempo · ~1-2 semanas**
 

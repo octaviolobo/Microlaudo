@@ -35,7 +35,7 @@ import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import type { AppleOffer } from '@/services/purchases';
 import type { PaymentMethod, Plan } from '@/types/subscription';
 
-// O USG só existe onde o tipo está liberado (hoje, só na web). No app, a lista
+// O USG só aparece onde o tipo está liberado (src/constants/features.ts). A lista
 // não pode prometer o que o app não entrega (App Store 2.3.1/3.1.2).
 const BENEFITS = [
   isReportTypeEnabled('usg_transvaginal') ? 'benefitUnlimited' : 'benefitUnlimitedMicroscopy',

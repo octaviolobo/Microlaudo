@@ -4,7 +4,8 @@ import { pdfFileName } from '@/lib/webPdfDownload';
 
 describe('pdfFileName', () => {
   it('remove acentos e caracteres especiais do nome', () => {
-    expect(pdfFileName('laudo-usg', 'Maria José da Conceição')).toBe('laudo-usg-maria-jose-da-conceicao.pdf');
+    expect(pdfFileName('laudo-usg', 'Maria José da Conceição')).toBe('laudo-usg-Maria-Jose-da-Conceicao.pdf');
+    expect(pdfFileName('laudo-microscopia', 'Ana Campos')).toBe('laudo-microscopia-Ana-Campos.pdf');
   });
 
   it('não deixa barras ou pontos passarem para o nome do arquivo', () => {

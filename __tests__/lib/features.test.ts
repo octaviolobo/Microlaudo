@@ -9,14 +9,14 @@ describe('trava de tipos de laudo por plataforma', () => {
     expect(isReportTypeEnabled('microscopia', 'android')).toBe(true);
   });
 
-  it('USG transvaginal só na web até o lançamento oficial', () => {
+  it('USG transvaginal está liberado em todas as plataformas', () => {
     expect(isReportTypeEnabled('usg_transvaginal', 'web')).toBe(true);
-    expect(isReportTypeEnabled('usg_transvaginal', 'ios')).toBe(false);
-    expect(isReportTypeEnabled('usg_transvaginal', 'android')).toBe(false);
+    expect(isReportTypeEnabled('usg_transvaginal', 'ios')).toBe(true);
+    expect(isReportTypeEnabled('usg_transvaginal', 'android')).toBe(true);
   });
 
   it('lista os tipos habilitados por plataforma', () => {
     expect(enabledReportTypes('web')).toEqual(['microscopia', 'usg_transvaginal']);
-    expect(enabledReportTypes('ios')).toEqual(['microscopia']);
+    expect(enabledReportTypes('ios')).toEqual(['microscopia', 'usg_transvaginal']);
   });
 });
