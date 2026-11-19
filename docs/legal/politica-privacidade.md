@@ -6,7 +6,7 @@
 > internas**: o gerador (`scripts/build-legal.js`) não os publica na página
 > `microlaudo.com/privacidade`.
 
-**Última atualização:** 14 de novembro de 2026
+**Última atualização:** 18 de novembro de 2026
 
 Esta Política de Privacidade explica como o **MicroLaudo** (aplicativo para iOS,
 Android e versão web) coleta, usa, armazena, compartilha e elimina dados
@@ -73,7 +73,7 @@ Isso significa que:
 |---|---|
 | Nome completo, CRM e RQE (opcional) | Informados no cadastro |
 | E-mail e senha (armazenada apenas em forma criptografada — *hash*) | Informados no cadastro |
-| Nome, e-mail e identificador da conta Google ou Facebook | Fornecidos pelo provedor, **somente** se você escolher entrar com essas contas |
+| Nome, e-mail e identificador da conta Google, Facebook ou Apple | Fornecidos pelo provedor, **somente** se você escolher entrar com essas contas. Ao entrar com a Apple, você pode ocultar seu e-mail: recebemos então um endereço de encaminhamento criado pela Apple |
 | Dados da clínica: nome, CNPJ, endereço e telefone (opcionais) | Informados no perfil |
 | Logotipo da clínica e imagem da assinatura (opcionais) | Enviados por você no perfil |
 | Idioma preferido | Configuração do app |
@@ -158,6 +158,8 @@ Os dados são compartilhados somente na medida necessária:
 | **Brevo** | Envio de e-mails transacionais (confirmação de cadastro, recuperação de senha) | E-mail e nome do Médico; nenhum dado de Paciente |
 | **Google** | Login com conta Google, se você escolher; recebimento dos e-mails enviados aos nossos endereços de contato | Dados do perfil Google; conteúdo das mensagens que você nos enviar |
 | **Meta (Facebook)** | Login com conta Facebook, se você escolher | Dados do perfil Facebook |
+| **Apple** | Login com conta Apple ("Entrar com a Apple"), se você escolher | Nome e e-mail (ou e-mail de encaminhamento) da conta Apple |
+| **RevenueCat** (RevenueCat, Inc., EUA) | Validação e acompanhamento das assinaturas compradas pela App Store no iPhone | Identificador interno da sua conta no MicroLaudo, histórico e situação das compras na App Store e dados técnicos do aparelho (modelo, versão do sistema, país da loja). **Nenhum dado de Paciente**, nome, e-mail ou CRM |
 | **ProDoctor** | Integração opcional com o sistema de prontuário/agenda do consultório, para preencher automaticamente nome e data de nascimento do Paciente. **Disponível apenas para Médicos habilitados** pela IGARATECH a pedido do consultório que já usa o ProDoctor | Nome pesquisado; retorno de nome, data de nascimento e médico do último atendimento |
 | **Apple e Google (lojas de aplicativos)** | Distribuição do aplicativo e, quando disponível, processamento das assinaturas feitas dentro do app (ver seção 9) | Conforme as políticas próprias de cada loja |
 
@@ -180,7 +182,7 @@ O banco de dados e os arquivos do MicroLaudo ficam armazenados no Brasil (São
 Paulo). Ainda assim, alguns prestadores listados na seção 6 são empresas
 estrangeiras ou operam infraestrutura global (por exemplo, a rede da
 Cloudflare, os serviços do Google e da Meta, o envio de e-mails pela Brevo,
-empresa sediada na União Europeia, e o processamento de algumas funções de
+empresa sediada na União Europeia, a validação de assinaturas pela RevenueCat, e o processamento de algumas funções de
 servidor), o que pode envolver tratamento fora do Brasil.
 
 Nesses casos, a transferência ocorre com base no art. 33 da LGPD, com
@@ -230,9 +232,16 @@ laudos, é necessário contratar um plano pago (mensal ou anual).
   cartão de crédito, Pix ou boleto, e os dados de pagamento são digitados
   **diretamente na página de fatura do Asaas**. A IGARATECH **não recebe nem
   armazena** número de cartão, código de segurança ou dados bancários.
-- **Aplicativos para iOS e Android:** quando a assinatura dentro do app estiver
-  disponível, o pagamento será processado pela Apple App Store ou pelo Google
-  Play, conforme as políticas de cada loja.
+- **Aplicativo para iPhone:** a assinatura é comprada pela **App Store**, com
+  a forma de pagamento cadastrada na sua conta Apple. A Apple processa a
+  cobrança, e a IGARATECH não recebe dados de cartão nem o seu Apple ID. Para
+  validar a compra, usamos a **RevenueCat**, que recebe da Apple a situação da
+  assinatura e a associa apenas ao identificador interno da sua conta. A
+  renovação, a troca de plano e o cancelamento são feitos nos Ajustes do
+  iPhone (Ajustes → [seu nome] → Assinaturas).
+- **Aplicativo para Android:** quando a assinatura dentro do app estiver
+  disponível, o pagamento será processado pelo Google Play, conforme as
+  políticas da loja.
 
 Recebemos do processador apenas o necessário para liberar o acesso e cumprir
 obrigações fiscais: situação da assinatura, plano, valores, forma de pagamento,
@@ -245,7 +254,9 @@ cumprir suas próprias obrigações legais e regulatórias (por exemplo, preven�
 privacidade dele.
 
 Ao excluir sua conta, a assinatura no Asaas é cancelada automaticamente e não
-haverá novas cobranças.
+haverá novas cobranças. **Assinaturas feitas pela App Store só podem ser
+canceladas pela Apple:** cancele nos Ajustes do iPhone antes de excluir a conta,
+ou a Apple continuará cobrando.
 
 ## 10. Por quanto tempo guardamos os dados
 
