@@ -134,6 +134,7 @@
     "annualEquivalent": "equivale a {{price}}/mês",
     "annualBadge": "Economize {{percent}}%",
     "benefitUnlimited": "Laudos ilimitados de microscopia e USG",
+    "benefitUnlimitedMicroscopy": "Laudos ilimitados de microscopia",
     "benefitPdf": "PDF com logo, assinatura e dados da clínica",
     "benefitHistory": "Histórico e revisões de todos os laudos",
     "benefitCancel": "Sem fidelidade: cancele quando quiser",

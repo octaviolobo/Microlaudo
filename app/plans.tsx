@@ -15,6 +15,7 @@ import {
   annualDiscountPercent,
   annualMonthlyEquivalentCents,
 } from '@/constants/plans';
+import { isReportTypeEnabled } from '@/constants/features';
 import { Colors, Radius, Spacing, Typography, TouchTarget } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { AppError } from '@/lib/errors';
@@ -34,7 +35,14 @@ import { useSubscriptionStore } from '@/stores/subscriptionStore';
 import type { AppleOffer } from '@/services/purchases';
 import type { PaymentMethod, Plan } from '@/types/subscription';
 
-const BENEFITS = ['benefitUnlimited', 'benefitPdf', 'benefitHistory', 'benefitCancel'] as const;
+// O USG só existe onde o tipo está liberado (hoje, só na web). No app, a lista
+// não pode prometer o que o app não entrega (App Store 2.3.1/3.1.2).
+const BENEFITS = [
+  isReportTypeEnabled('usg_transvaginal') ? 'benefitUnlimited' : 'benefitUnlimitedMicroscopy',
+  'benefitPdf',
+  'benefitHistory',
+  'benefitCancel',
+] as const;
 
 // Motivo devolvido pela Edge Function → chave de texto.
 const CHECKOUT_ERRORS: Record<string, string> = {

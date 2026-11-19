@@ -134,6 +134,7 @@
     "annualEquivalent": "same as {{price}}/mo",
     "annualBadge": "Save {{percent}}%",
     "benefitUnlimited": "Unlimited microscopy and ultrasound reports",
+    "benefitUnlimitedMicroscopy": "Unlimited microscopy reports",
     "benefitPdf": "PDF with your logo, signature and clinic details",
     "benefitHistory": "History and revisions of every report",
     "benefitCancel": "No lock-in: cancel anytime",
