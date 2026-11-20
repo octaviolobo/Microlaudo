@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 import { createDefaultUsgContent, usgContentToJson } from '@/lib/usgContent';
-import { buildUsgReportPdfBlob } from '@/lib/usgReportPdf';
+import { buildUsgReportPdfBlob, buildUsgReportPdfHtml } from '@/lib/usgReportPdf';
 
 import type { DoctorRow, ReportRow } from '@/types/database';
 
@@ -89,5 +89,33 @@ describe('buildUsgReportPdfBlob', () => {
     report.content = usgContentToJson(c);
     const raw = await pdfText(await buildUsgReportPdfBlob(report, doctor));
     expect(raw).toContain('TEXTO REVISADO MANUALMENTE.');
+  });
+});
+
+describe('buildUsgReportPdfHtml (PDF nativo via expo-print)', () => {
+  it('tem as mesmas seções e dados do PDF da web', async () => {
+    const html = await buildUsgReportPdfHtml(usgReport(), doctor, {}, new Date(2026, 9, 22, 10, 49));
+
+    expect(html).toContain('IDENTIFICAÇÃO DO PACIENTE');
+    expect(html).toContain('PROCEDIMENTOS REALIZADOS');
+    expect(html).toContain('02.05.02.018-6');
+    expect(html).toContain('ULTRASSONOGRAFIA P');
+    expect(html).toContain('6,3 X 2,7 X 3,8 CM');
+    expect(html).toContain('529.982.247-25');
+    expect(html).toContain('PACIENTE FICTÍCIA');
+    expect(html).toContain('OPINIÃO DO RELATÓRIO:');
+    expect(html).toContain('22 de outubro de 2026 às 10:49');
+    expect(html).toContain('CRM 123456/RJ');
+    expect(html).toContain('Revisão 1');
+  });
+
+  it('usa o texto da análise editado pela médica e escapa HTML', async () => {
+    const report = usgReport();
+    const c = createDefaultUsgContent();
+    c.analysis_text = 'Texto <b>revisado</b> & conferido.';
+    report.content = usgContentToJson(c);
+    const html = await buildUsgReportPdfHtml(report, doctor);
+    expect(html).toContain('TEXTO &lt;B&gt;REVISADO&lt;/B&gt; &amp; CONFERIDO.');
+    expect(html).not.toContain('<B>');
   });
 });

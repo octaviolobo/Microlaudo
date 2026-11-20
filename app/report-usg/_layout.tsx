@@ -9,7 +9,7 @@ import { useReportStore } from '@/stores/reportStore';
 
 // Fluxo do laudo de USG transvaginal (docs/spec-usg-transvaginal.md §4).
 // Guardas:
-// - Tipo desabilitado nesta plataforma (mobile antes do lançamento): volta para o início,
+// - Tipo desabilitado nesta plataforma (src/constants/features.ts): volta para o início,
 //   mesmo vindo de deep link.
 // - Store sem laudo de USG carregado (ex.: recarregar a página no meio do fluxo na web —
 //   o store vive só em memória): volta para o início em vez de abrir telas vazias.

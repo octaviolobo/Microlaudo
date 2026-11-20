@@ -3,8 +3,6 @@ import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet, Platform }
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 // Aliased para não confundir com o `File` global do DOM.
-import { File as ExpoFile, Paths } from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 
 import { StepIndicator } from '@/components/report/StepIndicator';
 import { Button, MessageBox } from '@/components/ui';
@@ -17,6 +15,7 @@ import { evaluateAmsel } from '@/lib/amsel';
 import { AppError, ErrorCodes } from '@/lib/errors';
 import { canFinalizeNew, useSubscriptionStore } from '@/stores/subscriptionStore';
 import { downloadPdfWeb, pdfFileName } from '@/lib/webPdfDownload';
+import { shareReportPdfNative } from '@/lib/nativePdfShare';
 import { Colors, Typography, Spacing } from '@/constants/theme';
 import { FINDINGS_FIELDS } from '@/constants/findings-options';
 import { stepStyles as s } from '@/components/report/stepStyles';
@@ -137,17 +136,6 @@ export function PreviewScreen() {
     }
   }
 
-  // Mobile: baixa o PDF assinado para um
-  // arquivo local (a folha de compartilhamento nativa do iOS/Android exige
-  // uma URI de arquivo, não aceita URLs remotas) e abre a folha do sistema.
-  async function shareReportPdfNative(url: string): Promise<void> {
-    const destination = new ExpoFile(Paths.cache, `laudo-${report?.id ?? 'microlaudo'}.pdf`);
-    const file = await ExpoFile.downloadFileAsync(url, destination, { idempotent: true });
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(file.uri, { mimeType: 'application/pdf', UTI: 'com.adobe.pdf' });
-    }
-  }
-
   async function handleDownloadPdf() {
     if (!report) return;
     try {
@@ -156,10 +144,11 @@ export function PreviewScreen() {
       const path = report.pdf_url ?? (await generateAndUploadReportPdf(report, photoUrls));
       setReport((prev) => (prev ? { ...prev, pdf_url: path } : prev));
       const url = await getSignedPdfUrl(path);
+      const fileName = pdfFileName('laudo-microscopia', report.patient_name);
       if (Platform.OS === 'web') {
-        await downloadPdfWeb(url, pdfFileName('laudo', report.patient_name));
+        await downloadPdfWeb(url, fileName);
       } else {
-        await shareReportPdfNative(url);
+        await shareReportPdfNative(url, fileName);
       }
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));

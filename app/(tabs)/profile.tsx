@@ -7,6 +7,7 @@ import { getProfile, updateProfile } from '@/services/profile';
 import { signOut } from '@/services/auth';
 import { deleteAccount } from '@/services/account';
 import { cancelSubscription } from '@/services/billing';
+import { APPLE_IAP_ENABLED, openManageSubscriptions } from '@/services/purchases';
 import { clearUserScopedState } from '@/stores/userScopedState';
 import { AppError } from '@/lib/errors';
 import { Button, Input, MessageBox, Select } from '@/components/ui';
@@ -62,6 +63,8 @@ export function ProfileScreen() {
   const [cancelMessage, setCancelMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const canCancel =
     billing?.provider === 'asaas' && (billing.status === 'active' || billing.status === 'past_due');
+  // Assinatura da App Store: só a Apple cancela (Ajustes do iPhone).
+  const isAppleSubscription = billing?.provider === 'apple' && billing.hasActiveSubscription;
 
   async function handleCancelSubscription() {
     try {
@@ -273,6 +276,20 @@ export function ProfileScreen() {
         </View>
       )}
       {cancelMessage && <MessageBox message={cancelMessage.text} type={cancelMessage.type} />}
+      {isAppleSubscription &&
+        (APPLE_IAP_ENABLED ? (
+          <View style={styles.cancelRow}>
+            <Button
+              label={t('billing.manageApple')}
+              onPress={() => void openManageSubscriptions()}
+              variant="secondary"
+              fullWidth
+              icon="settings-outline"
+            />
+          </View>
+        ) : (
+          <MessageBox message={t('billing.appleManagedOnIphone')} type="info" />
+        ))}
 
       {/* ── Dados Pessoais ─────────────────────────────── */}
       <Text style={styles.sectionTitle}>{t('profile.personalData')}</Text>
@@ -432,6 +449,7 @@ export function ProfileScreen() {
           <View style={styles.confirmBox}>
             <Text style={styles.confirmTitle}>{t('profile.deleteAccountConfirmTitle')}</Text>
             <Text style={styles.confirmBody}>{t('profile.deleteAccountConfirmBody')}</Text>
+            {isAppleSubscription && <MessageBox message={t('profile.deleteAccountAppleNote')} type="warning" />}
 
             {deleteError && <MessageBox message={deleteError} type="error" />}
 

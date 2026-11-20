@@ -114,7 +114,8 @@
     "deleteAccountConfirmButton": "Sim, excluir minha conta",
     "deleteAccountCancel": "Cancelar",
     "deleteAccountError": "Falha ao excluir a conta. Tente novamente.",
-    "deletingAccount": "Excluindo conta..."
+    "deletingAccount": "Excluindo conta...",
+    "deleteAccountAppleNote": "Você assina pela App Store: excluir a conta não cancela a cobrança da Apple. Cancele antes em Ajustes → [seu nome] → Assinaturas."
   },
   "billing": {
     "title": "Planos",
@@ -133,6 +134,7 @@
     "annualEquivalent": "equivale a {{price}}/mês",
     "annualBadge": "Economize {{percent}}%",
     "benefitUnlimited": "Laudos ilimitados de microscopia e USG",
+    "benefitUnlimitedMicroscopy": "Laudos ilimitados de microscopia",
     "benefitPdf": "PDF com logo, assinatura e dados da clínica",
     "benefitHistory": "Histórico e revisões de todos os laudos",
     "benefitCancel": "Sem fidelidade: cancele quando quiser",
@@ -165,7 +167,19 @@
     "cancelConfirmButton": "Sim, cancelar",
     "cancelKeep": "Manter assinatura",
     "cancelDone": "Assinatura cancelada. O acesso continua até o fim do período pago.",
-    "cancelError": "Não foi possível cancelar agora. Tente de novo."
+    "cancelError": "Não foi possível cancelar agora. Tente de novo.",
+    "purchasing": "Abrindo a App Store...",
+    "applePurchased": "Assinatura confirmada! Obrigado.",
+    "appleRestored": "Compra restaurada. Seu plano está ativo.",
+    "appleProcessing": "Compra feita! A liberação do plano pode levar alguns segundos.",
+    "applePending": "Compra aguardando aprovação (por exemplo, em Compras Solicitadas). O plano é liberado assim que for aprovada.",
+    "appleNothingToRestore": "Nenhuma assinatura do MicroLaudo encontrada nesta conta Apple.",
+    "appleUnavailable": "A App Store não respondeu. Verifique a conexão e tente de novo.",
+    "appleError": "Não foi possível concluir a compra. Nenhum valor foi cobrado. Tente de novo.",
+    "appleRestore": "Restaurar compras",
+    "appleRestoring": "Restaurando...",
+    "manageApple": "Gerenciar assinatura na App Store",
+    "appleManagedOnIphone": "Sua assinatura foi feita pela App Store. Para trocar de plano ou cancelar, use no iPhone: Ajustes → [seu nome] → Assinaturas."
   },
   "legal": {
     "termsOfUse": "Termos de Uso",
@@ -175,6 +189,7 @@
       "register": "Ao criar sua conta, você concorda com os [terms] e declara que leu a [privacy].",
       "social": "Ao continuar com Google ou Facebook, você concorda com os [terms] e declara que leu a [privacy].",
       "subscribe": "Ao assinar, você concorda com a renovação automática e as regras de cancelamento e reembolso dos [terms]. Seu CPF/CNPJ, nome e e-mail vão para o Asaas para a cobrança e a nota fiscal ([privacy]).",
+      "subscribeApple": "Assinatura com renovação automática. O valor é cobrado na sua conta Apple ao confirmar a compra e renova pelo mesmo valor e período, a menos que a renovação seja desligada até 24 horas antes do fim do período atual. Gerencie ou cancele em Ajustes → [seu nome] → Assinaturas. Ao assinar, você concorda com os [terms] e declara que leu a [privacy].",
       "standalone": "[terms] · [privacy]"
     }
   }

@@ -15,17 +15,34 @@ import {
   annualDiscountPercent,
   annualMonthlyEquivalentCents,
 } from '@/constants/plans';
+import { isReportTypeEnabled } from '@/constants/features';
 import { Colors, Radius, Spacing, Typography, TouchTarget } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { AppError } from '@/lib/errors';
 import { formatCentsBRL } from '@/lib/format';
 import { isValidCpfCnpj } from '@/lib/validation';
 import { openInvoice, startCheckout } from '@/services/billing';
+import {
+  APPLE_IAP_ENABLED,
+  getAppleOffers,
+  openManageSubscriptions,
+  purchaseApplePlan,
+  restoreApplePurchases,
+  syncAppleSubscription,
+} from '@/services/purchases';
 import { useSubscriptionStore } from '@/stores/subscriptionStore';
 
+import type { AppleOffer } from '@/services/purchases';
 import type { PaymentMethod, Plan } from '@/types/subscription';
 
-const BENEFITS = ['benefitUnlimited', 'benefitPdf', 'benefitHistory', 'benefitCancel'] as const;
+// O USG só aparece onde o tipo está liberado (src/constants/features.ts). A lista
+// não pode prometer o que o app não entrega (App Store 2.3.1/3.1.2).
+const BENEFITS = [
+  isReportTypeEnabled('usg_transvaginal') ? 'benefitUnlimited' : 'benefitUnlimitedMicroscopy',
+  'benefitPdf',
+  'benefitHistory',
+  'benefitCancel',
+] as const;
 
 // Motivo devolvido pela Edge Function → chave de texto.
 const CHECKOUT_ERRORS: Record<string, string> = {
@@ -35,7 +52,12 @@ const CHECKOUT_ERRORS: Record<string, string> = {
   checkout_in_progress: 'billing.checkoutInProgress',
 };
 
-// Tela de planos. Abre de quatro jeitos:
+// Tela de planos. No iPhone (APPLE_IAP_ENABLED) a compra é pela App Store, com
+// preço e nome vindos da Apple, "Restaurar compras" e o aviso de renovação
+// automática; nada de Asaas, CPF ou link para pagar fora do app (regra 3.1.1).
+// No site, a compra é pelo Asaas.
+//
+// Abre de quatro jeitos:
 //  - pelo paywall ao finalizar (?reason=paywall) → mostra o aviso no topo;
 //  - pelo Perfil / aviso da Home;
 //  - na volta do Asaas depois de pagar (?checkout=done, se ASAAS_CALLBACK_URL estiver configurado);
@@ -43,7 +65,7 @@ const CHECKOUT_ERRORS: Record<string, string> = {
 export function PlansScreen() {
   const { t } = useTranslation('common');
   const { reason, checkout } = useLocalSearchParams<{ reason?: string; checkout?: string }>();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const billing = useSubscriptionStore((s) => s.billing);
   const refresh = useSubscriptionStore((s) => s.refresh);
 
@@ -54,6 +76,26 @@ export function PlansScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [appleOffers, setAppleOffers] = useState<Partial<Record<Plan, AppleOffer>>>({});
+  const userId = user?.id ?? null;
+
+  // iPhone: busca na App Store o preço e o nome de cada plano.
+  useEffect(() => {
+    if (!APPLE_IAP_ENABLED || !userId) return;
+    let cancelled = false;
+    getAppleOffers(userId)
+      .then((offers) => {
+        if (!cancelled) setAppleOffers(offers);
+      })
+      .catch(() => {
+        // Sem conexão com a App Store: os cards mostram o preço de referência e
+        // a compra avisa o erro.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -66,7 +108,72 @@ export function PlansScreen() {
 
   const isSubscriber = billing?.hasActiveSubscription === true;
   const isPending = !isSubscriber && billing?.status === 'pending';
+  const isAppleSubscriber = isSubscriber && billing?.provider === 'apple';
   const planLabel = (plan: Plan) => t(plan === 'annual' ? 'billing.planAnnual' : 'billing.planMonthly');
+
+  // Preços exibidos: os da App Store no iPhone (quando já carregaram), senão os de referência.
+  const monthlyCents = appleOffers.monthly?.priceCents ?? PLAN_PRICES_CENTS.monthly;
+  const annualCents = appleOffers.annual?.priceCents ?? PLAN_PRICES_CENTS.annual;
+  const priceLabel = (plan: Plan) =>
+    appleOffers[plan]?.priceString ?? formatCentsBRL(plan === 'annual' ? annualCents : monthlyCents);
+  const cardLabel = (plan: Plan) => appleOffers[plan]?.title || planLabel(plan);
+
+  // Depois da compra/restauração: o servidor relê a RevenueCat e libera o plano.
+  // Se ainda não refletiu (RevenueCat atrasada), o webhook libera em seguida.
+  async function confirmApplePurchase(successKey: string) {
+    await syncAppleSubscription().catch(() => undefined);
+    const updated = await refresh();
+    if (updated?.hasActiveSubscription) {
+      setNotice(t(successKey));
+      return;
+    }
+    setNotice(t('billing.appleProcessing'));
+    [4000, 10000, 20000].forEach((ms) => setTimeout(() => void refresh(), ms));
+  }
+
+  async function handleApplePurchase() {
+    if (!userId) return;
+    setError(null);
+    setNotice(null);
+    const offer = appleOffers[selected];
+    if (!offer) {
+      setError(t('billing.appleUnavailable'));
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      const outcome = await purchaseApplePlan(offer, userId);
+      if (outcome === 'cancelled') return;
+      if (outcome === 'pending') {
+        setNotice(t('billing.applePending'));
+        return;
+      }
+      await confirmApplePurchase('billing.applePurchased');
+    } catch {
+      setError(t('billing.appleError'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleAppleRestore() {
+    if (!userId) return;
+    setError(null);
+    setNotice(null);
+    try {
+      setIsRestoring(true);
+      const found = await restoreApplePurchases(userId);
+      if (!found) {
+        setNotice(t('billing.appleNothingToRestore'));
+        return;
+      }
+      await confirmApplePurchase('billing.appleRestored');
+    } catch {
+      setError(t('billing.appleError'));
+    } finally {
+      setIsRestoring(false);
+    }
+  }
 
   function handleBack() {
     if (router.canGoBack()) router.back();
@@ -76,6 +183,10 @@ export function PlansScreen() {
   async function handleSubscribe() {
     if (!isAuthenticated) {
       router.push('/(auth)/register');
+      return;
+    }
+    if (APPLE_IAP_ENABLED) {
+      await handleApplePurchase();
       return;
     }
     if (!BILLING_CHECKOUT_ENABLED) {
@@ -103,7 +214,8 @@ export function PlansScreen() {
     }
   }
 
-  const showCheckoutForm = isAuthenticated && BILLING_CHECKOUT_ENABLED && !isSubscriber;
+  const showCheckoutForm = !APPLE_IAP_ENABLED && isAuthenticated && BILLING_CHECKOUT_ENABLED && !isSubscriber;
+  const showAppleTerms = APPLE_IAP_ENABLED && isAuthenticated && !isSubscriber;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -126,21 +238,23 @@ export function PlansScreen() {
 
       {checkout === 'done' && !isSubscriber && <MessageBox message={t('billing.checkoutDone')} type="success" />}
       {billing && <BillingStatusBanner billing={billing} showPlansLink={false} />}
-      {isPending && <Text style={styles.helper}>{t('billing.pendingBody')}</Text>}
+      {isPending && !APPLE_IAP_ENABLED && <Text style={styles.helper}>{t('billing.pendingBody')}</Text>}
 
       <View style={styles.options} accessibilityRole="radiogroup">
         <OptionCard
-          label={planLabel('annual')}
-          price={formatCentsBRL(PLAN_PRICES_CENTS.annual)}
+          label={cardLabel('annual')}
+          price={priceLabel('annual')}
           period={t('billing.perYear')}
-          detail={t('billing.annualEquivalent', { price: formatCentsBRL(annualMonthlyEquivalentCents()) })}
-          badge={t('billing.annualBadge', { percent: annualDiscountPercent() })}
+          detail={t('billing.annualEquivalent', {
+            price: formatCentsBRL(annualMonthlyEquivalentCents(annualCents)),
+          })}
+          badge={t('billing.annualBadge', { percent: annualDiscountPercent(monthlyCents, annualCents) })}
           selected={selected === 'annual'}
           onSelect={() => setSelected('annual')}
         />
         <OptionCard
-          label={planLabel('monthly')}
-          price={formatCentsBRL(PLAN_PRICES_CENTS.monthly)}
+          label={cardLabel('monthly')}
+          price={priceLabel('monthly')}
           period={t('billing.perMonth')}
           selected={selected === 'monthly'}
           onSelect={() => setSelected('monthly')}
@@ -190,26 +304,50 @@ export function PlansScreen() {
         </>
       )}
 
+      {showAppleTerms && <LegalNotice context="subscribeApple" />}
+
       {notice && <MessageBox message={notice} type="info" />}
       {error && <MessageBox message={error} type="error" />}
 
       {isSubscriber ? (
-        <MessageBox message={t('billing.alreadySubscribed')} type="success" />
+        <>
+          <MessageBox message={t('billing.alreadySubscribed')} type="success" />
+          {isAppleSubscriber && APPLE_IAP_ENABLED && (
+            <Button
+              label={t('billing.manageApple')}
+              onPress={() => void openManageSubscriptions()}
+              variant="secondary"
+              fullWidth
+              icon="settings-outline"
+            />
+          )}
+        </>
       ) : (
         <Button
           label={
             !isAuthenticated
               ? t('billing.createAccount')
               : isSubmitting
-                ? t('billing.redirecting')
-                : isPending && BILLING_CHECKOUT_ENABLED
+                ? t(APPLE_IAP_ENABLED ? 'billing.purchasing' : 'billing.redirecting')
+                : isPending && BILLING_CHECKOUT_ENABLED && !APPLE_IAP_ENABLED
                   ? t('billing.newInvoice')
                   : t('billing.subscribe', { plan: planLabel(selected) })
           }
           onPress={handleSubscribe}
           loading={isSubmitting}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isRestoring}
           size="lg"
+          fullWidth
+        />
+      )}
+
+      {APPLE_IAP_ENABLED && isAuthenticated && !isSubscriber && (
+        <Button
+          label={isRestoring ? t('billing.appleRestoring') : t('billing.appleRestore')}
+          onPress={handleAppleRestore}
+          loading={isRestoring}
+          disabled={isSubmitting || isRestoring}
+          variant="secondary"
           fullWidth
         />
       )}

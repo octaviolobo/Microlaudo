@@ -3,13 +3,14 @@ import { USG_TRANSVAGINAL_SIGTAP, USG_TRANSVAGINAL_TITLE } from '@/constants/usg
 import { calculateAge, formatDateBR, formatDateTimeLongBR } from './date';
 import { formatCpf, formatSusCard } from './format';
 import { loadJsPdf } from './jspdfLoader';
-import { loadImageAsDataUrl, type ReportPdfAssets } from './reportPdf';
+import { escapeHtml, loadImageAsDataUrl, type ReportPdfAssets } from './reportPdf';
 import { parseUsgContent } from './usgContent';
 import { resolveUsgAnalysisText } from './usgText';
 
 import type { DoctorRow, ReportRow } from '@/types/database';
 
-// PDF do laudo de USG transvaginal (jsPDF — só web nesta sprint; ver services/pdf.ts).
+// PDF do laudo de USG transvaginal. Web: jsPDF (buildUsgReportPdfBlob). Nativo: HTML
+// renderizado pelo expo-print (buildUsgReportPdfHtml) — jsPDF não roda no Hermes.
 // Layout segue o modelo da médica (docs/spec-usg-transvaginal.md §1):
 // cabeçalho → identificação do paciente → procedimentos (SIGTAP) → achados/descrição
 // (título, técnica, análise, opinião) em CAIXA ALTA → data/hora + assinatura + CRM.
@@ -32,6 +33,31 @@ function upper(text: string): string {
 
 function doctorLine(doctor: DoctorRow): string {
   return `${doctor.full_name} — CRM ${doctor.crm}${doctor.rqe ? ` — RQE ${doctor.rqe}` : ''}`;
+}
+
+type Field = { label: string; value: string };
+
+function patientFields(report: ReportRow): Field[] {
+  const age = calculateAge(report.patient_birth_date, report.collection_date);
+  const fields: Field[] = [{ label: 'Paciente', value: report.patient_name }];
+  if (report.patient_birth_date) {
+    fields.push({
+      label: 'Nascimento',
+      value: `${formatDateBR(report.patient_birth_date)}${age != null ? ` (${age} anos)` : ''}`,
+    });
+  }
+  if (report.patient_cpf) fields.push({ label: 'CPF', value: formatCpf(report.patient_cpf) });
+  if (report.patient_sus_card) fields.push({ label: 'Cartão SUS', value: formatSusCard(report.patient_sus_card) });
+  fields.push({ label: 'Data do exame', value: formatDateBR(report.collection_date) });
+  if (report.requesting_doctor) fields.push({ label: 'Médico solicitante', value: report.requesting_doctor });
+  return fields;
+}
+
+function analysisParagraphs(content: ReturnType<typeof parseUsgContent>): string[] {
+  return resolveUsgAnalysisText(content)
+    .split(/\n\s*\n/)
+    .map((p) => p.trim().replace(/\n/g, ' '))
+    .filter(Boolean);
 }
 
 export async function buildUsgReportPdfBlob(
@@ -82,7 +108,7 @@ export async function buildUsgReportPdfBlob(
   }
 
   // Grade de 2 colunas (rótulo pequeno em cima, valor embaixo), como no modelo.
-  function fieldGrid(fields: { label: string; value: string }[]) {
+  function fieldGrid(fields: Field[]) {
     const colWidth = contentWidth / 2;
     for (let i = 0; i < fields.length; i += 2) {
       ensureSpace(28);
@@ -144,19 +170,7 @@ export async function buildUsgReportPdfBlob(
 
   // ─── Identificação do paciente ─────────────────────────────────
   heading('Identificação do paciente');
-  const age = calculateAge(report.patient_birth_date, report.collection_date);
-  const fields: { label: string; value: string }[] = [{ label: 'Paciente', value: report.patient_name }];
-  if (report.patient_birth_date) {
-    fields.push({
-      label: 'Nascimento',
-      value: `${formatDateBR(report.patient_birth_date)}${age != null ? ` (${age} anos)` : ''}`,
-    });
-  }
-  if (report.patient_cpf) fields.push({ label: 'CPF', value: formatCpf(report.patient_cpf) });
-  if (report.patient_sus_card) fields.push({ label: 'Cartão SUS', value: formatSusCard(report.patient_sus_card) });
-  fields.push({ label: 'Data do exame', value: formatDateBR(report.collection_date) });
-  if (report.requesting_doctor) fields.push({ label: 'Médico solicitante', value: report.requesting_doctor });
-  fieldGrid(fields);
+  fieldGrid(patientFields(report));
   y += 4;
 
   // ─── Procedimentos realizados (SIGTAP) ─────────────────────────
@@ -175,9 +189,7 @@ export async function buildUsgReportPdfBlob(
     paragraph(content.technique, { gapAfter: 10 });
   }
   paragraph('Análise:', { bold: true, gapAfter: 4 });
-  for (const p of resolveUsgAnalysisText(content).split(/\n\s*\n/)) {
-    if (p.trim()) paragraph(p.trim().replace(/\n/g, ' '));
-  }
+  for (const p of analysisParagraphs(content)) paragraph(p);
   if (report.conclusion?.trim()) {
     y += 2;
     paragraph('Opinião do relatório:', { bold: true, gapAfter: 4 });
@@ -222,4 +234,152 @@ export async function buildUsgReportPdfBlob(
   }
 
   return doc.output('blob');
+}
+
+// Margens da página no nativo (pt). Passadas ao expo-print (`margins`, só iOS): assim
+// valem em todas as páginas — padding no <body> só afastaria o topo da 1ª página.
+export const USG_PDF_PAGE_MARGINS = { top: 40, bottom: 40, left: 40, right: 40 };
+
+// Versão HTML do mesmo laudo para o nativo (expo-print), com o mesmo conteúdo e ordem
+// do jsPDF acima. Diferença: o expo-print não tem rodapé por página, então
+// "Revisão N" vai uma vez, no fim do documento (como no PDF nativo da microscopia).
+export async function buildUsgReportPdfHtml(
+  report: ReportRow,
+  doctor: DoctorRow,
+  assets: ReportPdfAssets = {},
+  signedAt: Date = new Date(report.updated_at),
+): Promise<string> {
+  const content = parseUsgContent(report.content);
+  const esc = (text: string) => escapeHtml(text);
+  const escUpper = (text: string) => escapeHtml(upper(text));
+
+  const heading = (text: string) => `<div class="heading">${escUpper(text)}</div>`;
+  const paragraph = (text: string, bold = false) => `<p class="paragraph${bold ? ' bold' : ''}">${escUpper(text)}</p>`;
+  const label = (text: string) => `<p class="paragraph bold label">${escUpper(text)}</p>`;
+
+  let logoImg = '';
+  if (assets.logoUrl) {
+    try {
+      logoImg = `<img src="${await loadImageAsDataUrl(assets.logoUrl)}" class="logo" />`;
+    } catch (err) {
+      console.warn('[usgReportPdf] falha ao embutir logo no PDF:', err);
+    }
+  }
+
+  let signatureImg = '';
+  if (assets.signatureUrl) {
+    try {
+      signatureImg = `<img src="${await loadImageAsDataUrl(assets.signatureUrl)}" class="signature-img" />`;
+    } catch (err) {
+      console.warn('[usgReportPdf] falha ao embutir assinatura no PDF:', err);
+    }
+  }
+
+  const addressLine = [doctor.clinic_address, doctor.clinic_phone].filter(Boolean).join(' — ');
+
+  const fieldsHtml = patientFields(report)
+    .map(
+      (f) =>
+        `<div class="field"><div class="field-label">${escUpper(f.label)}</div><div class="field-value">${escUpper(f.value)}</div></div>`,
+    )
+    .join('');
+
+  const techniqueHtml = content.technique.trim()
+    ? `${label('Técnica:')}${paragraph(content.technique)}<div class="gap"></div>`
+    : '';
+  const analysisHtml = analysisParagraphs(content)
+    .map((p) => paragraph(p))
+    .join('');
+  const opinionHtml = report.conclusion?.trim()
+    ? `${label('Opinião do relatório:')}${paragraph(report.conclusion.trim())}`
+    : '';
+
+  return `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: Helvetica, Arial, sans-serif; color: #1e293b; margin: 0; font-size: 10pt; }
+      .header { display: flex; align-items: flex-start; gap: 12px; }
+      .logo { width: 50px; height: 50px; object-fit: contain; }
+      .header-text { flex: 1; }
+      .header-title { text-align: right; }
+      .clinic-name { font-size: 16pt; font-weight: bold; color: #0891b2; margin: 0 0 4px; }
+      .doctor-line { font-size: 10pt; color: #164e63; margin: 0 0 4px; }
+      .address-line { font-size: 9pt; color: #64748b; margin: 0; }
+      .report-title { font-size: 13pt; font-weight: bold; margin: 0 0 4px; }
+      .report-subtitle { font-size: 8pt; font-weight: bold; color: #64748b; margin: 0; }
+      .divider { border: none; border-top: 1.2pt solid #0891b2; margin: 10px 0 20px; }
+      .heading {
+        font-size: 9pt; font-weight: bold; color: #0891b2;
+        border-bottom: 0.8pt solid #a5f3fc; padding-bottom: 3px; margin: 16px 0 10px;
+        page-break-after: avoid;
+      }
+      .fields { display: flex; flex-wrap: wrap; }
+      .field { width: 50%; padding-right: 10px; margin-bottom: 10px; }
+      .field-label { font-size: 7pt; font-weight: bold; color: #64748b; }
+      .field-value { font-size: 10pt; font-weight: bold; margin-top: 2px; }
+      .procedure { display: flex; font-size: 10pt; }
+      .procedure-code { width: 110px; }
+      .paragraph { font-size: 10pt; line-height: 1.3; margin: 0 0 8px; }
+      .paragraph.bold { font-weight: bold; }
+      .paragraph.label { margin-bottom: 4px; page-break-after: avoid; }
+      .gap { height: 4px; }
+      .signature-block { page-break-inside: avoid; margin-top: 28px; }
+      .signed-at { text-align: right; font-size: 10pt; margin-bottom: 8px; }
+      .signature { text-align: center; }
+      .signature-img { width: 160px; height: 60px; object-fit: contain; }
+      .signature-space { height: 60px; }
+      .signature-line { width: 200px; border-top: 0.5pt solid #94a3b8; margin: 4px auto 6px; }
+      .signature-name { font-size: 10pt; font-weight: bold; }
+      .signature-crm { font-size: 9pt; color: #64748b; margin-top: 2px; }
+      .footer { font-size: 8pt; color: #94a3b8; margin-top: 24px; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      ${logoImg}
+      <div class="header-text">
+        <p class="clinic-name">${esc(doctor.clinic_name || 'MicroLaudo')}</p>
+        <p class="doctor-line">${esc(doctorLine(doctor))}</p>
+        ${addressLine ? `<p class="address-line">${esc(addressLine)}</p>` : ''}
+      </div>
+      <div class="header-title">
+        <p class="report-title">LAUDO MÉDICO</p>
+        <p class="report-subtitle">ULTRASSONOGRAFIA</p>
+      </div>
+    </div>
+    <hr class="divider" />
+
+    ${heading('Identificação do paciente')}
+    <div class="fields">${fieldsHtml}</div>
+
+    ${heading('Procedimentos realizados')}
+    <div class="procedure">
+      <div class="procedure-code">${esc(USG_TRANSVAGINAL_SIGTAP.code)}</div>
+      <div>${escUpper(USG_TRANSVAGINAL_SIGTAP.name)}</div>
+    </div>
+
+    ${heading('Achados / Descrição')}
+    ${paragraph(USG_TRANSVAGINAL_TITLE, true)}
+    <div class="gap"></div>
+    ${techniqueHtml}
+    ${label('Análise:')}
+    ${analysisHtml}
+    ${opinionHtml}
+
+    <div class="signature-block">
+      <div class="signed-at">${esc(formatDateTimeLongBR(signedAt))}</div>
+      <div class="signature">
+        ${signatureImg || '<div class="signature-space"></div>'}
+        <div class="signature-line"></div>
+        <div class="signature-name">${escUpper(doctor.full_name)}</div>
+        <div class="signature-crm">${esc(`CRM ${doctor.crm}${doctor.rqe ? ` — RQE ${doctor.rqe}` : ''}`)}</div>
+      </div>
+    </div>
+
+    <div class="footer">Revisão ${report.revision_number}</div>
+  </body>
+</html>`;
 }

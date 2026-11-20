@@ -2,13 +2,12 @@ import { Platform } from 'react-native';
 
 import type { ReportType } from '@/types/report';
 
-// Trava por plataforma dos tipos de laudo (Sprint USG-Web, docs/backlog.md).
-// O USG transvaginal está no código desde já, mas só aparece na web até o lançamento
-// oficial. Para liberar no mobile: trocar a regra do usg_transvaginal para `true`
-// (e testar câmera/PDF no nativo — hoje o PDF do USG só é gerado na web).
+// Trava por plataforma dos tipos de laudo. Hoje todos estão liberados em todas as
+// plataformas (o USG ganhou PDF nativo via expo-print); a estrutura fica para travar
+// um tipo novo numa plataforma antes do lançamento dele.
 const REPORT_TYPE_RULES: Record<ReportType, (platform: typeof Platform.OS) => boolean> = {
   microscopia: () => true,
-  usg_transvaginal: (platform) => platform === 'web',
+  usg_transvaginal: () => true,
 };
 
 export function isReportTypeEnabled(type: ReportType, platform: typeof Platform.OS = Platform.OS): boolean {

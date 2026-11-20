@@ -18,7 +18,8 @@ export async function openLegalPage(page: LegalPage): Promise<void> {
 
 type Props = {
   // Frase com os links: cadastro, login social, assinatura ou só os links (perfil).
-  context: 'register' | 'social' | 'subscribe' | 'standalone';
+  // subscribeApple: assinatura pela App Store (renovação automática, gerenciar nos Ajustes).
+  context: 'register' | 'social' | 'subscribe' | 'subscribeApple' | 'standalone';
 };
 
 // As traduções marcam onde entra cada link com [terms] e [privacy].

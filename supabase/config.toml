@@ -44,3 +44,7 @@ enabled = false
 # Webhook do Asaas: autenticado pelo header asaas-access-token, não por JWT.
 [functions.billing-webhook]
 verify_jwt = false
+
+# Webhook da RevenueCat (App Store): autenticado pelo header Authorization, não por JWT.
+[functions.revenuecat-webhook]
+verify_jwt = false

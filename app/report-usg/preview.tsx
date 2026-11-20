@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
@@ -18,12 +18,13 @@ import { formatCpf, formatSusCard } from '@/lib/format';
 import { parseUsgContent } from '@/lib/usgContent';
 import { resolveUsgAnalysisText } from '@/lib/usgText';
 import { downloadPdfWeb, pdfFileName } from '@/lib/webPdfDownload';
+import { shareReportPdfNative } from '@/lib/nativePdfShare';
 
 import type { ReportRow } from '@/types/database';
 
 // Step 4 do USG. Mesmo comportamento do preview da microscopia (app/report/preview.tsx):
 // finalizar (gera e sobe o PDF), baixar PDF e, vindo do histórico, "Editar" (volta para
-// rascunho e cria nova revisão ao re-finalizar). Só roda na web (ver _layout.tsx).
+// rascunho e cria nova revisão ao re-finalizar).
 export function UsgPreviewScreen() {
   const { t } = useTranslation('report');
   const { t: tc } = useTranslation('common');
@@ -108,7 +109,12 @@ export function UsgPreviewScreen() {
       const path = report.pdf_url ?? (await generateAndUploadReportPdf(report, []));
       setReport((prev) => (prev ? { ...prev, pdf_url: path } : prev));
       const url = await getSignedPdfUrl(path);
-      await downloadPdfWeb(url, pdfFileName('laudo-usg', report.patient_name));
+      const fileName = pdfFileName('laudo-usg-transvaginal', report.patient_name);
+      if (Platform.OS === 'web') {
+        await downloadPdfWeb(url, fileName);
+      } else {
+        await shareReportPdfNative(url, fileName);
+      }
     } catch (err) {
       setError(err instanceof AppError ? err.message : tc('genericError'));
     } finally {

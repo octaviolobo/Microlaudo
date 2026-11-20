@@ -6,13 +6,15 @@
 // Antes usava navigator.share, mas no desktop (Windows/macOS) isso abre a janela
 // de compartilhar do sistema em vez de baixar.
 
+// Ex.: pdfFileName('laudo-microscopia', 'Ana Campos') → 'laudo-microscopia-Ana-Campos.pdf'.
+// Sem acentos nem caracteres especiais (alguns apps de mensagem/e-mail estragam), mas
+// mantém as maiúsculas do nome como foi digitado. Usado na web e no app.
 export function pdfFileName(prefix: string, patientName: string | null | undefined): string {
   const safeName = (patientName ?? '')
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
+    .replace(/^-+|-+$/g, '');
   return `${prefix}${safeName ? `-${safeName}` : ''}.pdf`;
 }
 

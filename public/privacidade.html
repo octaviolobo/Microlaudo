@@ -66,7 +66,7 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14
 <header><div class="wrap"><a class="brand" href="/">MicroLaudo</a></div></header>
 <main class="wrap">
 <h1>Política de Privacidade do MicroLaudo</h1>
-<p><strong>Última atualização:</strong> 14 de novembro de 2026</p>
+<p><strong>Última atualização:</strong> 18 de novembro de 2026</p>
 <p>Esta Política de Privacidade explica como o <strong>MicroLaudo</strong> (aplicativo para iOS, Android e versão web) coleta, usa, armazena, compartilha e elimina dados pessoais, em conformidade com a Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018 — &quot;LGPD&quot;).</p>
 <p>Ao criar uma conta e usar o MicroLaudo, você declara que leu e compreendeu esta Política.</p>
 <nav class="toc" aria-label="Sumário"><strong>Sumário</strong><ol>
@@ -123,7 +123,7 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14
 <tbody>
 <tr><td>Nome completo, CRM e RQE (opcional)</td><td>Informados no cadastro</td></tr>
 <tr><td>E-mail e senha (armazenada apenas em forma criptografada — <em>hash</em>)</td><td>Informados no cadastro</td></tr>
-<tr><td>Nome, e-mail e identificador da conta Google ou Facebook</td><td>Fornecidos pelo provedor, <strong>somente</strong> se você escolher entrar com essas contas</td></tr>
+<tr><td>Nome, e-mail e identificador da conta Google, Facebook ou Apple</td><td>Fornecidos pelo provedor, <strong>somente</strong> se você escolher entrar com essas contas. Ao entrar com a Apple, você pode ocultar seu e-mail: recebemos então um endereço de encaminhamento criado pela Apple</td></tr>
 <tr><td>Dados da clínica: nome, CNPJ, endereço e telefone (opcionais)</td><td>Informados no perfil</td></tr>
 <tr><td>Logotipo da clínica e imagem da assinatura (opcionais)</td><td>Enviados por você no perfil</td></tr>
 <tr><td>Idioma preferido</td><td>Configuração do app</td></tr>
@@ -186,6 +186,8 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14
 <tr><td><strong>Brevo</strong></td><td>Envio de e-mails transacionais (confirmação de cadastro, recuperação de senha)</td><td>E-mail e nome do Médico; nenhum dado de Paciente</td></tr>
 <tr><td><strong>Google</strong></td><td>Login com conta Google, se você escolher; recebimento dos e-mails enviados aos nossos endereços de contato</td><td>Dados do perfil Google; conteúdo das mensagens que você nos enviar</td></tr>
 <tr><td><strong>Meta (Facebook)</strong></td><td>Login com conta Facebook, se você escolher</td><td>Dados do perfil Facebook</td></tr>
+<tr><td><strong>Apple</strong></td><td>Login com conta Apple (&quot;Entrar com a Apple&quot;), se você escolher</td><td>Nome e e-mail (ou e-mail de encaminhamento) da conta Apple</td></tr>
+<tr><td><strong>RevenueCat</strong> (RevenueCat, Inc., EUA)</td><td>Validação e acompanhamento das assinaturas compradas pela App Store no iPhone</td><td>Identificador interno da sua conta no MicroLaudo, histórico e situação das compras na App Store e dados técnicos do aparelho (modelo, versão do sistema, país da loja). <strong>Nenhum dado de Paciente</strong>, nome, e-mail ou CRM</td></tr>
 <tr><td><strong>ProDoctor</strong></td><td>Integração opcional com o sistema de prontuário/agenda do consultório, para preencher automaticamente nome e data de nascimento do Paciente. <strong>Disponível apenas para Médicos habilitados</strong> pela IGARATECH a pedido do consultório que já usa o ProDoctor</td><td>Nome pesquisado; retorno de nome, data de nascimento e médico do último atendimento</td></tr>
 <tr><td><strong>Apple e Google (lojas de aplicativos)</strong></td><td>Distribuição do aplicativo e, quando disponível, processamento das assinaturas feitas dentro do app (ver seção 9)</td><td>Conforme as políticas próprias de cada loja</td></tr>
 </tbody>
@@ -198,7 +200,7 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14
 </ul>
 <p><strong>O Médico</strong> pode, por iniciativa própria, compartilhar o PDF do laudo (por e-mail, aplicativos de mensagem etc.). Esse compartilhamento é feito pelo Médico, sob sua responsabilidade.</p>
 <h2 id="7-transferencia-internacional-de-dados">7. Transferência internacional de dados</h2>
-<p>O banco de dados e os arquivos do MicroLaudo ficam armazenados no Brasil (São Paulo). Ainda assim, alguns prestadores listados na seção 6 são empresas estrangeiras ou operam infraestrutura global (por exemplo, a rede da Cloudflare, os serviços do Google e da Meta, o envio de e-mails pela Brevo, empresa sediada na União Europeia, e o processamento de algumas funções de servidor), o que pode envolver tratamento fora do Brasil.</p>
+<p>O banco de dados e os arquivos do MicroLaudo ficam armazenados no Brasil (São Paulo). Ainda assim, alguns prestadores listados na seção 6 são empresas estrangeiras ou operam infraestrutura global (por exemplo, a rede da Cloudflare, os serviços do Google e da Meta, o envio de e-mails pela Brevo, empresa sediada na União Europeia, a validação de assinaturas pela RevenueCat, e o processamento de algumas funções de servidor), o que pode envolver tratamento fora do Brasil.</p>
 <p>Nesses casos, a transferência ocorre com base no art. 33 da LGPD, com prestadores que adotam cláusulas contratuais de proteção de dados e padrões de segurança reconhecidos internacionalmente.</p>
 <h2 id="8-como-protegemos-os-dados">8. Como protegemos os dados</h2>
 <p>Adotamos medidas técnicas e administrativas para proteger os dados contra acesso não autorizado, perda, alteração ou divulgação, entre elas:</p>
@@ -218,11 +220,12 @@ footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14
 <p>O MicroLaudo oferece <strong>1 laudo gratuito</strong> para teste. Para finalizar outros laudos, é necessário contratar um plano pago (mensal ou anual).</p>
 <ul>
 <li><strong>Versão web:</strong> as cobranças são processadas pelo <strong>Asaas</strong>, instituição de pagamento autorizada pelo Banco Central do Brasil. Você escolhe pagar por cartão de crédito, Pix ou boleto, e os dados de pagamento são digitados <strong>diretamente na página de fatura do Asaas</strong>. A IGARATECH <strong>não recebe nem armazena</strong> número de cartão, código de segurança ou dados bancários.</li>
-<li><strong>Aplicativos para iOS e Android:</strong> quando a assinatura dentro do app estiver disponível, o pagamento será processado pela Apple App Store ou pelo Google Play, conforme as políticas de cada loja.</li>
+<li><strong>Aplicativo para iPhone:</strong> a assinatura é comprada pela <strong>App Store</strong>, com a forma de pagamento cadastrada na sua conta Apple. A Apple processa a cobrança, e a IGARATECH não recebe dados de cartão nem o seu Apple ID. Para validar a compra, usamos a <strong>RevenueCat</strong>, que recebe da Apple a situação da assinatura e a associa apenas ao identificador interno da sua conta. A renovação, a troca de plano e o cancelamento são feitos nos Ajustes do iPhone (Ajustes → [seu nome] → Assinaturas).</li>
+<li><strong>Aplicativo para Android:</strong> quando a assinatura dentro do app estiver disponível, o pagamento será processado pelo Google Play, conforme as políticas da loja.</li>
 </ul>
 <p>Recebemos do processador apenas o necessário para liberar o acesso e cumprir obrigações fiscais: situação da assinatura, plano, valores, forma de pagamento, datas e identificadores da cobrança. Para criar a cobrança, enviamos ao Asaas seu nome, e-mail e o CPF ou CNPJ informado na contratação.</p>
 <p>O Asaas trata esses dados também como <strong>controlador independente</strong>, para cumprir suas próprias obrigações legais e regulatórias (por exemplo, prevenção à lavagem de dinheiro e normas do Banco Central), conforme a política de privacidade dele.</p>
-<p>Ao excluir sua conta, a assinatura no Asaas é cancelada automaticamente e não haverá novas cobranças.</p>
+<p>Ao excluir sua conta, a assinatura no Asaas é cancelada automaticamente e não haverá novas cobranças. <strong>Assinaturas feitas pela App Store só podem ser canceladas pela Apple:</strong> cancele nos Ajustes do iPhone antes de excluir a conta, ou a Apple continuará cobrando.</p>
 <h2 id="10-por-quanto-tempo-guardamos-os-dados">10. Por quanto tempo guardamos os dados</h2>
 <div class="table"><table>
 <thead><tr><th scope="col">Dados</th><th scope="col">Prazo</th></tr></thead>

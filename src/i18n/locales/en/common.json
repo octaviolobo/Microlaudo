@@ -114,7 +114,8 @@
     "deleteAccountConfirmButton": "Yes, delete my account",
     "deleteAccountCancel": "Cancel",
     "deleteAccountError": "Failed to delete account. Please try again.",
-    "deletingAccount": "Deleting account..."
+    "deletingAccount": "Deleting account...",
+    "deleteAccountAppleNote": "You subscribe through the App Store: deleting your account does not cancel Apple billing. Cancel first in Settings → [your name] → Subscriptions."
   },
   "billing": {
     "title": "Plans",
@@ -133,6 +134,7 @@
     "annualEquivalent": "same as {{price}}/mo",
     "annualBadge": "Save {{percent}}%",
     "benefitUnlimited": "Unlimited microscopy and ultrasound reports",
+    "benefitUnlimitedMicroscopy": "Unlimited microscopy reports",
     "benefitPdf": "PDF with your logo, signature and clinic details",
     "benefitHistory": "History and revisions of every report",
     "benefitCancel": "No lock-in: cancel anytime",
@@ -165,7 +167,19 @@
     "cancelConfirmButton": "Yes, cancel",
     "cancelKeep": "Keep subscription",
     "cancelDone": "Subscription canceled. Access continues until the end of the paid period.",
-    "cancelError": "Couldn't cancel right now. Please try again."
+    "cancelError": "Couldn't cancel right now. Please try again.",
+    "purchasing": "Opening the App Store...",
+    "applePurchased": "Subscription confirmed! Thank you.",
+    "appleRestored": "Purchase restored. Your plan is active.",
+    "appleProcessing": "Purchase complete! Your plan may take a few seconds to unlock.",
+    "applePending": "Purchase awaiting approval (e.g. Ask to Buy). Your plan unlocks as soon as it is approved.",
+    "appleNothingToRestore": "No MicroLaudo subscription found on this Apple Account.",
+    "appleUnavailable": "The App Store did not respond. Check your connection and try again.",
+    "appleError": "The purchase could not be completed. You were not charged. Please try again.",
+    "appleRestore": "Restore purchases",
+    "appleRestoring": "Restoring...",
+    "manageApple": "Manage subscription in the App Store",
+    "appleManagedOnIphone": "Your subscription was purchased through the App Store. To change plans or cancel, on your iPhone go to Settings → [your name] → Subscriptions."
   },
   "legal": {
     "termsOfUse": "Terms of Use",
@@ -175,6 +189,7 @@
       "register": "By creating your account, you agree to the [terms] and acknowledge that you have read the [privacy].",
       "social": "By continuing with Google or Facebook, you agree to the [terms] and acknowledge that you have read the [privacy].",
       "subscribe": "By subscribing, you agree to automatic renewal and to the cancellation and refund rules in the [terms]. Your CPF/CNPJ, name and email are sent to Asaas for billing and invoicing ([privacy]).",
+      "subscribeApple": "Auto-renewing subscription. Payment is charged to your Apple Account at confirmation of purchase and renews at the same price and period unless auto-renew is turned off at least 24 hours before the end of the current period. Manage or cancel in Settings → [your name] → Subscriptions. By subscribing you agree to the [terms] and confirm you have read the [privacy].",
       "standalone": "[terms] · [privacy]"
     }
   }
