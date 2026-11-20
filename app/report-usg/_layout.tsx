@@ -1,6 +1,7 @@
 import { Redirect, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { ExitReportButton } from '@/components/report/ExitReportButton';
 import { Colors, Typography } from '@/constants/theme';
 import { isReportTypeEnabled } from '@/constants/features';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,7 +34,10 @@ export function ReportUsgLayout() {
         headerTitleStyle: { fontFamily: Typography.headingSemiBold },
       }}
     >
-      <Stack.Screen name="patient" options={{ title: t('usg.steps.patient') }} />
+      <Stack.Screen
+        name="patient"
+        options={{ title: t('usg.steps.patient'), headerLeft: () => <ExitReportButton /> }}
+      />
       <Stack.Screen name="analysis" options={{ title: t('usg.steps.analysis') }} />
       <Stack.Screen name="text" options={{ title: t('usg.steps.text') }} />
       <Stack.Screen name="preview" options={{ title: t('usg.steps.preview') }} />
