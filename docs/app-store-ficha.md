@@ -82,10 +82,29 @@ com renovação automática.
 
 ## Classificação etária (Age Rating)
 
-Responda "Não/Nenhum" para tudo, exceto:
-- **Conteúdo médico ou de tratamento:** Sim (é um app para médicos). A classificação
-  resultante maior (ex.: 16+/18+) não atrapalha, porque o público é profissional.
-- **Conteúdo gerado por usuários / web sem restrição / chat:** Não.
+Questionário em 7 etapas. Responda **Não / Nenhum (None)** em tudo, exceto o
+bloco médico:
+
+| Pergunta | Resposta | Por quê |
+|---|---|---|
+| Parental Controls | Não | Não há controle parental |
+| Age Assurance | Não | Não verifica idade (o CRM é dado de perfil, não verificação de idade) |
+| Unrestricted Web Access | Não | Só abre links fixos (Termos, Política, gerenciar assinatura) |
+| User-Generated Content | Não | Os laudos são privados de cada médico; nada é publicado para outros usuários |
+| Social Media | Não | Sem feed |
+| Messaging and Chat | Não | Sem chat entre usuários |
+| Advertising | Não | Sem anúncios |
+| Palavrões, horror, álcool/tabaco/drogas | Nenhum | |
+| **Medical or Treatment Information** | **Frequente (Frequent)** | O app inteiro é sobre laudos médicos |
+| **Health or Wellness Topics** | **Sim** | Saúde ginecológica |
+| Sexualidade, nudez | Nenhum | Imagens são lâminas de microscopia e textos clínicos |
+| Violência | Nenhum | |
+| Apostas, sorteios, concursos, loot box | Nenhum / Não | |
+| Faixa etária manual (age override) | Não alterar | Fica a calculada pela Apple |
+| Feito para crianças (Kids) | Não | |
+
+A classificação resultante pode subir por causa do conteúdo médico; não atrapalha,
+porque o público é profissional.
 
 ## App Privacy (Privacidade do app)
 
