@@ -7,7 +7,7 @@ Textos e respostas para copiar no App Store Connect. Atualize aqui quando mudar 
 | Campo | Valor |
 |---|---|
 | Nome | MicroLaudo |
-| Subtítulo (30) | Laudos de microscopia vaginal |
+| Subtítulo (30) | Laudos de microscopia e USG |
 | Categoria principal | Medicina (Medical) |
 | Categoria secundária | Produtividade (Productivity) |
 | Idioma principal | Português (Brasil) |
@@ -18,17 +18,23 @@ Textos e respostas para copiar no App Store Connect. Atualize aqui quando mudar 
 
 **Texto promocional (170, pode mudar sem nova versão)**
 
-> Da lâmina ao laudo em PDF em poucos minutos, com Nugent e Amsel calculados automaticamente. 1 laudo grátis para testar.
+> Microscopia com Nugent e Amsel automáticos e USG transvaginal com volumes calculados: laudo em PDF em poucos minutos. 1 laudo grátis para testar.
 
 **Descrição**
 
-> O MicroLaudo transforma o exame de microscopia de conteúdo vaginal em um laudo em PDF profissional e padronizado, direto do celular. Sem passar fotos para o computador, sem modelo de Word, sem formatar à mão.
+> O MicroLaudo transforma a microscopia de conteúdo vaginal e a USG pélvica transvaginal em laudos em PDF profissionais e padronizados, direto do celular. Sem passar fotos para o computador, sem modelo de Word, sem formatar à mão.
 >
-> FEITO PARA O CONSULTÓRIO DE GINECOLOGIA
+> MICROSCOPIA DE CONTEÚDO VAGINAL
 > • Fotografe a lâmina pela câmera do microscópio ou escolha da galeria (até 3 imagens por laudo).
 > • Registre os achados da microscopia em poucos toques.
 > • Score de Nugent e Critérios de Amsel calculados automaticamente.
 > • Conclusão sugerida a partir dos achados, sempre editável por você.
+>
+> USG PÉLVICA TRANSVAGINAL
+> • Útero, colo, endométrio, ovários e cavidade pélvica em campos rápidos de preencher.
+> • Volumes do útero e dos ovários calculados automaticamente, com valores de referência editáveis.
+> • O texto da análise é escrito pelo app a partir dos campos, e você edita como quiser.
+> • Opinião do relatório sugerida e laudo pronto com código SIGTAP.
 >
 > PDF COM A SUA IDENTIDADE
 > • Logotipo, dados da clínica e sua assinatura em todos os laudos.
@@ -51,7 +57,7 @@ Textos e respostas para copiar no App Store Connect. Atualize aqui quando mudar 
 **Palavras-chave (100, separadas por vírgula, sem espaço)**
 
 ```
-laudo,microscopia,ginecologia,nugent,amsel,vaginose,candidíase,lâmina,pdf,consultório,ginecologista
+laudo,microscopia,ginecologia,nugent,amsel,vaginose,candidíase,usg,ultrassom,transvaginal,pdf
 ```
 
 | Campo | Valor |
@@ -70,7 +76,8 @@ com renovação automática.
 - Obrigatório: iPhone 6,9" (**1320×2868**) ou 6,7" (**1290×2796**). Mínimo 3, máximo 10.
 - iPad: não precisa (`supportsTablet: false`).
 - Tirar no build de **produção/TestFlight**, que não tem o botão "Tools" do modo desenvolvimento.
-- Sugestão de sequência: Início → foto da lâmina → achados → Nugent/Amsel → PDF pronto → Histórico.
+- Sugestão de sequência: Início → foto da lâmina → achados → Nugent/Amsel → PDF pronto →
+  USG: Análise com o útero preenchido (volume calculado) → USG: preview do PDF → Histórico.
 - Usar um paciente **fictício** (ex.: "Maria Exemplo"). Nunca dados reais.
 
 ## Classificação etária (Age Rating)
@@ -128,7 +135,9 @@ crashlytics/analytics), ID do dispositivo, informações sensíveis
 >
 > How to test:
 > 1. Log in (a Cloudflare Turnstile check may appear: tap the checkbox).
-> 2. Tap "Novo Laudo" → enter any patient name → take or choose any photo (any image works; in practice it is a microscope slide) → fill in the findings → the Nugent score and Amsel criteria are calculated automatically → "Finalizar" to generate the PDF.
+> 2. Tap "Novo Laudo" → "Microscopia vaginal" → enter any patient name → take or choose any photo (any image works; in practice it is a microscope slide) → fill in the findings → the Nugent score and Amsel criteria are calculated automatically → "Finalizar" to generate the PDF.
+>
+>    There is also a transvaginal ultrasound report: "Novo Laudo" → "USG transvaginal" → patient → fill in the measurements (volumes are calculated automatically) → the analysis text is generated and editable → PDF. No photos are needed for this report type. The free report can be used on either type.
 > 3. After the free report, the app shows the plans screen. Subscriptions are auto-renewable in-app purchases (monthly and annual) and unlock unlimited reports. "Restaurar compras" restores purchases.
 >
 > Sign in with Apple is available on the login screen. Account deletion: Perfil → "Excluir conta".
