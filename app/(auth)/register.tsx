@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { signUp } from '@/services/auth';
 import { AppError, ErrorCodes } from '@/lib/errors';
 import { getPasswordIssue } from '@/lib/validation';
+import { InAppBrowserNotice } from '@/components/auth/InAppBrowserNotice';
 import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { LegalNotice } from '@/components/legal/LegalNotice';
@@ -84,6 +85,7 @@ export function RegisterScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <InAppBrowserNotice />
       <Text style={styles.title}>{t('auth.register')}</Text>
 
       {error && <MessageBox message={error} type="error" />}

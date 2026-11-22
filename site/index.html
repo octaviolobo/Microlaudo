@@ -170,6 +170,13 @@ footer a:hover { text-decoration: underline; }
 footer nav { display: flex; gap: 20px; flex-wrap: wrap; }
 footer p { margin: 0; }
 
+/* Aviso do navegador interno (Instagram etc.), inserido por public/inicio.js */
+.iab { background: var(--bg); border-bottom: 2px solid var(--primary); padding: 16px max(20px, calc((100% - 560px) / 2)) 18px; }
+.iab strong { display: block; color: var(--heading); font-size: 17px; margin-bottom: 4px; }
+.iab p { margin: 0 0 12px; font-size: 15px; line-height: 1.45; color: var(--text); }
+.iab .btn { width: 100%; }
+.iab .iab-steps { margin: 10px 0 0; font-size: 13.5px; color: var(--muted); }
+
 /* ── Responsivo ─────────────────────────────────────── */
 @media (max-width: 960px) {
   .nav { display: none; }

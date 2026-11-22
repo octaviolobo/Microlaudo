@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { isAppleSignInAvailable, signIn, signInWithApple, signInWithOAuth } from '@/services/auth';
 import { AppError, ErrorCodes } from '@/lib/errors';
 import { LegalNotice } from '@/components/legal/LegalNotice';
+import { InAppBrowserNotice } from '@/components/auth/InAppBrowserNotice';
 import { CAPTCHA_ENABLED, Turnstile } from '@/components/auth/Turnstile';
 import { Button, Input, MessageBox } from '@/components/ui';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
@@ -86,6 +87,7 @@ export function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <InAppBrowserNotice />
       <Text style={styles.title}>{t('title')}</Text>
       <Text style={styles.subtitle}>{t('subtitle')}</Text>
 
