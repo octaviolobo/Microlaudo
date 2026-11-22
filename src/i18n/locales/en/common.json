@@ -72,7 +72,14 @@
     "captchaRequired": "Please confirm you are not a robot.",
     "captchaFailed": "The anti-bot check failed or expired. Please try again.",
     "captchaLoadFailed": "Could not load the anti-bot check. Check your connection and reload the page.",
-    "captchaLoadFailedNative": "Could not load the anti-bot check. Check your connection and try again."
+    "captchaLoadFailedNative": "Could not load the anti-bot check. Check your connection and try again.",
+    "inAppBrowser": {
+      "title": "Open in your browser to sign in",
+      "body": "You are in the {{app}} in-app browser. Google sign-in may fail here and your account won't stay signed in.",
+      "openSafari": "Open in Safari",
+      "openChrome": "Open in Chrome",
+      "steps": "If it doesn't open, tap the three dots (··· or ⋮) in the corner of the screen and choose \"Open in browser\"."
+    }
   },
   "completeProfile": {
     "title": "Complete your profile",

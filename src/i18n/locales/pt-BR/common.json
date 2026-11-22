@@ -72,7 +72,14 @@
     "captchaRequired": "Confirme que você não é um robô.",
     "captchaFailed": "A verificação anti-robô falhou ou expirou. Tente de novo.",
     "captchaLoadFailed": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e recarregue a página.",
-    "captchaLoadFailedNative": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e tente de novo."
+    "captchaLoadFailedNative": "Não foi possível carregar a verificação anti-robô. Verifique sua conexão e tente de novo.",
+    "inAppBrowser": {
+      "title": "Abra no navegador para entrar",
+      "body": "Você está no navegador interno do {{app}}. Aqui o login com o Google pode falhar e a sua conta não fica salva.",
+      "openSafari": "Abrir no Safari",
+      "openChrome": "Abrir no Chrome",
+      "steps": "Se não abrir, toque nos três pontinhos (··· ou ⋮) no canto da tela e escolha \"Abrir no navegador\"."
+    }
   },
   "completeProfile": {
     "title": "Complete seu cadastro",
