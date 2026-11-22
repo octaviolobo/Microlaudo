@@ -8,7 +8,7 @@
     "build:ios": "eas build --platform ios",
     "build:android": "eas build --platform android",
     "build:legal": "node scripts/build-legal.js",
-    "build:web": "node scripts/build-legal.js && expo export --platform web && node scripts/fix-web-assets.js",
+    "build:web": "node scripts/build-legal.js && expo export --platform web && node scripts/fix-web-assets.js && node scripts/install-landing.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint . --ext .ts,.tsx",

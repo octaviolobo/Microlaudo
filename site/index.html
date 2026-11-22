@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MicroLaudo — laudos de microscopia vaginal e USG transvaginal</title>
+<meta name="description" content="MicroLaudo é um aplicativo para médicos emitirem laudos de microscopia de secreção vaginal e de ultrassonografia transvaginal: foto da lâmina, escores de Nugent e Amsel calculados e PDF com a identidade da clínica.">
+<link rel="canonical" href="https://microlaudo.com/">
+<link rel="icon" href="/favicon.ico">
+<meta property="og:title" content="MicroLaudo">
+<meta property="og:description" content="Da lâmina ao PDF assinado, em minutos. Laudos de microscopia vaginal e USG transvaginal.">
+<meta property="og:url" content="https://microlaudo.com/">
+<meta property="og:type" content="website">
+<!-- Quem já está logado (ou volta de um login/confirmação de e-mail) vai direto
+     para o app. Fica no <head>, síncrono, para não piscar a página inicial. -->
+<script src="/inicio.js"></script>
+<style>
+:root {
+  --bg: #ffffff; --surface: #f4f8fa; --text: #1b2428; --muted: #55656c;
+  --border: #dbe4e8; --primary: #0891b2; --primary-strong: #0e7490; --accent: #059669;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1719; --surface: #172226; --text: #e4ecef; --muted: #9db0b7;
+    --border: #2a3a40; --primary: #22b8d6; --primary-strong: #5ccde6; --accent: #34d399;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+}
+a { color: var(--primary-strong); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; padding-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; color: var(--text); text-decoration: none; }
+.brand svg { width: 34px; height: 34px; border-radius: 8px; flex: none; }
+.btn { display: inline-block; padding: 12px 22px; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 16px; line-height: 1.2; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { border: 1px solid var(--border); color: var(--text); }
+.btn-small { padding: 9px 16px; font-size: 15px; }
+.hero { padding: 56px 0 48px; text-align: center; }
+.hero h1 { font-size: clamp(30px, 6vw, 48px); line-height: 1.15; margin: 0 auto 16px; max-width: 760px; letter-spacing: -0.02em; }
+.hero p.lead { font-size: clamp(17px, 2.4vw, 20px); color: var(--muted); max-width: 680px; margin: 0 auto 28px; }
+.ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.note { margin-top: 14px; font-size: 15px; color: var(--muted); }
+section { padding: 48px 0; border-top: 1px solid var(--border); }
+h2 { font-size: clamp(24px, 4vw, 32px); line-height: 1.2; margin: 0 0 12px; letter-spacing: -0.01em; }
+.sub { color: var(--muted); margin: 0 0 28px; max-width: 680px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+.card h3 { margin: 0 0 6px; font-size: 18px; }
+.card p { margin: 0; color: var(--muted); font-size: 16px; }
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.steps li { counter-increment: s; display: flex; gap: 14px; align-items: flex-start; }
+.steps li::before { content: counter(s); flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 15px; margin-top: 1px; }
+.price { font-size: 32px; font-weight: 700; margin: 6px 0 2px; }
+.price small { font-size: 16px; font-weight: 500; color: var(--muted); }
+.tag { display: inline-block; font-size: 13px; font-weight: 600; color: var(--accent); }
+ul.plain { margin: 0; padding-left: 20px; }
+ul.plain li { margin-bottom: 6px; }
+footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; padding: 24px 0 40px; }
+footer p { margin: 0 0 6px; }
+@media (max-width: 520px) {
+  .hero { padding-top: 36px; }
+  .ctas .btn { width: 100%; text-align: center; }
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/" aria-label="MicroLaudo — início">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="#0891B2"/><g transform="translate(109.3 117.3) scale(7.97)"><g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="4" d="M29 14 H60 V23 a7 7 0 0 0 7 7 H78 V79 a7 7 0 0 1 -7 7 H29 a7 7 0 0 1 -7 -7 V21 a7 7 0 0 1 7 -7 Z"/><path stroke-width="2" fill="#FFFFFF" d="M66 13 L79 25 H68 a2 2 0 0 1 -2 -2 Z"/><circle cx="50" cy="46" r="14" stroke-width="3.5"/><g stroke-width="3.6"><line x1="42" y1="41" x2="50" y2="37"/><line x1="55" y1="40" x2="58" y2="46"/><line x1="41" y1="50" x2="48" y2="53"/><line x1="52" y1="55" x2="57" y2="52" stroke="#059669"/></g><g stroke-width="3.5"><line x1="33" y1="70" x2="67" y2="70"/><line x1="33" y1="77" x2="57" y2="77"/></g></g></g></svg>
+    MicroLaudo
+  </a>
+  <a class="btn btn-ghost btn-small" href="/login">Entrar</a>
+</div></header>
+
+<main>
+  <div class="hero wrap">
+    <h1>Laudos de microscopia vaginal e USG transvaginal, da lâmina ao PDF em minutos</h1>
+    <p class="lead">O MicroLaudo é um aplicativo para médicos ginecologistas emitirem laudos de microscopia de secreção vaginal e de ultrassonografia transvaginal, sem Word, sem copiar e colar fotos e sem fazer contas à mão.</p>
+    <div class="ctas">
+      <a class="btn btn-primary" href="/register">Criar conta grátis</a>
+      <a class="btn btn-ghost" href="/login">Já tenho conta</a>
+    </div>
+    <p class="note">O seu primeiro laudo é grátis. Funciona no navegador do computador ou do celular, sem instalar nada.</p>
+  </div>
+
+  <section id="recursos"><div class="wrap">
+    <h2>O que o MicroLaudo faz</h2>
+    <p class="sub">Tudo o que hoje fica espalhado entre o celular, o computador e um modelo antigo no Word, em um único fluxo.</p>
+    <div class="grid">
+      <div class="card"><h3>Foto da lâmina direto no laudo</h3><p>Fotografe a lâmina pelo app (até 3 imagens). Sem cabo, sem WhatsApp, sem mandar e-mail para si mesma.</p></div>
+      <div class="card"><h3>Nugent e Amsel calculados</h3><p>Marque os achados da microscopia e o app calcula os escores na hora.</p></div>
+      <div class="card"><h3>Conclusão sugerida, revisada por você</h3><p>O texto da conclusão vem pronto a partir dos achados, e você edita o que quiser antes de finalizar.</p></div>
+      <div class="card"><h3>USG transvaginal</h3><p>Informe as medidas: os volumes são calculados e o texto da análise é montado a partir dos campos.</p></div>
+      <div class="card"><h3>PDF com a sua clínica</h3><p>Laudo em PDF com seu nome, CRM, RQE, logotipo e assinatura, pronto para imprimir ou enviar.</p></div>
+      <div class="card"><h3>Histórico sempre à mão</h3><p>Consulte, edite e compartilhe de novo os laudos já emitidos, no computador ou no celular.</p></div>
+    </div>
+  </div></section>
+
+  <section id="como-funciona"><div class="wrap">
+    <h2>Como funciona</h2>
+    <ol class="steps">
+      <li><div><strong>Crie sua conta</strong> com e-mail ou com a sua conta Google e informe seu CRM.</div></li>
+      <li><div><strong>Preencha os dados da paciente</strong> e registre os achados do exame.</div></li>
+      <li><div><strong>Revise a conclusão</strong> sugerida pelo app.</div></li>
+      <li><div><strong>Gere o PDF</strong> com a identidade da sua clínica e compartilhe.</div></li>
+    </ol>
+  </div></section>
+
+  <section id="planos"><div class="wrap">
+    <h2>Planos</h2>
+    <p class="sub">Comece com um laudo grátis. Depois, escolha o plano que fizer mais sentido. Sem fidelidade: cancele quando quiser.</p>
+    <div class="grid">
+      <div class="card"><h3>Mensal</h3><p class="price">R$ 39,90 <small>/ mês</small></p><p>Laudos ilimitados de microscopia e USG.</p></div>
+      <div class="card"><span class="tag">Economize 16%</span><h3>Anual</h3><p class="price">R$ 399 <small>/ ano</small></p><p>Equivale a R$ 33,25 por mês.</p></div>
+    </div>
+  </div></section>
+
+  <section id="privacidade"><div class="wrap">
+    <h2>Seus dados e os das suas pacientes</h2>
+    <ul class="plain">
+      <li>O MicroLaudo é destinado exclusivamente a médicos com CRM ativo.</li>
+      <li>Os dados ficam armazenados em servidores no Brasil (região de São Paulo), com acesso restrito à sua conta.</li>
+      <li>Não vendemos dados, não exibimos anúncios e não usamos os laudos para treinar inteligência artificial.</li>
+      <li>Ao entrar com o Google, recebemos apenas seu nome, e-mail e foto do perfil, usados só para criar e identificar sua conta.</li>
+    </ul>
+    <p style="margin-top:14px">Detalhes na <a href="/privacidade">Política de Privacidade</a> e nos <a href="/termos">Termos de Uso</a>.</p>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <p><a href="/privacidade">Política de Privacidade</a> · <a href="/termos">Termos de Uso</a> · <a href="mailto:contato@microlaudo.com">contato@microlaudo.com</a></p>
+  <p>MicroLaudo é desenvolvido por IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA · CNPJ 66.173.331/0001-31</p>
+</div></footer>
+</body>
+</html>
