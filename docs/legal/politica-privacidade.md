@@ -6,7 +6,7 @@
 > internas**: o gerador (`scripts/build-legal.js`) não os publica na página
 > `microlaudo.com/privacidade`.
 
-**Última atualização:** 18 de novembro de 2026
+**Última atualização:** 21 de novembro de 2026
 
 Esta Política de Privacidade explica como o **MicroLaudo** (aplicativo para iOS,
 Android e versão web) coleta, usa, armazena, compartilha e elimina dados
@@ -111,6 +111,42 @@ LGPD):
 - A câmera e a galeria são acessadas **apenas** quando você escolhe fotografar
   ou anexar a imagem de uma lâmina ou enviar seu logotipo/assinatura.
 - Não recebemos nem armazenamos dados de cartão de crédito (ver seção 9).
+
+### 4.4 Dados recebidos do Google (Login com o Google)
+
+Se você escolher **Fazer login com o Google**, o Google nos envia apenas os
+dados básicos do seu perfil, que você autoriza na tela de consentimento do
+próprio Google:
+
+- **nome** e **foto do perfil**;
+- **endereço de e-mail** (e a confirmação de que ele foi verificado pelo Google);
+- **identificador da conta Google**, um código que liga a sua conta Google à sua
+  conta no MicroLaudo.
+
+**Como usamos:** somente para criar a sua conta, identificar você nos próximos
+acessos e preencher o seu nome no cadastro. O e-mail também é usado para as
+comunicações operacionais descritas na seção 5. Não pedimos acesso ao Gmail,
+Google Drive, Agenda, contatos ou a qualquer outro serviço do Google, e não
+publicamos nada em seu nome.
+
+**Como guardamos:** os dados ficam no serviço de autenticação do Supabase, em
+servidores na região de São Paulo (Brasil), protegidos como descrito na
+seção 8. Não guardamos a sua senha do Google, que nunca passa pelo MicroLaudo.
+
+**Com quem compartilhamos:** com ninguém além dos prestadores necessários para
+o serviço funcionar (seção 6). Os dados recebidos do Google **não** são
+vendidos, **não** são usados para publicidade, **não** são usados para treinar
+modelos de inteligência artificial e **não** são transferidos a terceiros para
+outras finalidades.
+
+**Como remover:** você pode excluir a sua conta a qualquer momento (seção 11),
+o que apaga esses dados, e também pode revogar o acesso do MicroLaudo em
+https://myaccount.google.com/permissions.
+
+O uso e a transferência, pelo MicroLaudo, de informações recebidas das APIs do
+Google seguem a Política de Dados do Usuário dos Serviços de API do Google
+(https://developers.google.com/terms/api-services-user-data-policy), incluindo
+os requisitos de Uso Limitado.
 
 ## 5. Para que usamos os dados e com qual base legal
 
