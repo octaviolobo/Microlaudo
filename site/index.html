@@ -50,15 +50,18 @@ header .wrap { display: flex; align-items: center; justify-content: space-betwee
 section { padding: 48px 0; border-top: 1px solid var(--border); }
 h2 { font-size: clamp(24px, 4vw, 32px); line-height: 1.2; margin: 0 0 12px; letter-spacing: -0.01em; }
 .sub { color: var(--muted); margin: 0 0 28px; max-width: 680px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 360px)); }
+@media (max-width: 820px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .grid, .grid.two { grid-template-columns: 1fr; } }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
 .card h3 { margin: 0 0 6px; font-size: 18px; }
 .card p { margin: 0; color: var(--muted); font-size: 16px; }
 .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
 .steps li { counter-increment: s; display: flex; gap: 14px; align-items: flex-start; }
 .steps li::before { content: counter(s); flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 15px; margin-top: 1px; }
-.price { font-size: 32px; font-weight: 700; margin: 6px 0 2px; }
-.price small { font-size: 16px; font-weight: 500; color: var(--muted); }
+.card .price { font-size: 32px; color: var(--text); font-weight: 700; margin: 6px 0 2px; }
+.card .price small { font-size: 16px; font-weight: 500; color: var(--muted); }
 .tag { display: inline-block; font-size: 13px; font-weight: 600; color: var(--accent); }
 ul.plain { margin: 0; padding-left: 20px; }
 ul.plain li { margin-bottom: 6px; }
@@ -116,7 +119,7 @@ footer p { margin: 0 0 6px; }
   <section id="planos"><div class="wrap">
     <h2>Planos</h2>
     <p class="sub">Comece com um laudo grátis. Depois, escolha o plano que fizer mais sentido. Sem fidelidade: cancele quando quiser.</p>
-    <div class="grid">
+    <div class="grid two">
       <div class="card"><h3>Mensal</h3><p class="price">R$ 39,90 <small>/ mês</small></p><p>Laudos ilimitados de microscopia e USG.</p></div>
       <div class="card"><span class="tag">Economize 16%</span><h3>Anual</h3><p class="price">R$ 399 <small>/ ano</small></p><p>Equivale a R$ 33,25 por mês.</p></div>
     </div>
