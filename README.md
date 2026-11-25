@@ -203,7 +203,7 @@ npm run dev:web     # atalho direto para a web
 O desenvolvimento é sessão a sessão, com progresso registrado de forma transparente em [`docs/PROGRESSO.md`](docs/PROGRESSO.md) — incluindo bugs encontrados, decisões revertidas e pendências reais, não só o que "deu certo".
 
 **Concluído:**
-- ✅ Autenticação (Supabase Auth) com guards de rota + login social Google/Facebook (OAuth PKCE) e tela de completar perfil
+- ✅ Autenticação (Supabase Auth) com guards de rota + login social Google (OAuth PKCE) e Entrar com Apple e tela de completar perfil
 - ✅ Schema completo no Postgres com RLS `FORCE` + 3 buckets de Storage privados
 - ✅ Colunas administrativas de `doctors` (`subscription_status`, `trial_reports_used`, `prodoctor_enabled`) protegidas por trigger contra alteração pelo próprio médico
 - ✅ Design system próprio (WCAG AAA) com tokens em `src/constants/theme.ts`

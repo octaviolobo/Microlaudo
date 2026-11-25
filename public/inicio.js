@@ -1,6 +1,6 @@
 /* eslint-env browser */
 // Página inicial pública (site/index.html, publicada como dist/index.html).
-// Quem já tem sessão salva, ou está voltando de um login com Google/Facebook ou
+// Quem já tem sessão salva, ou está voltando de um login com Google ou
 // do link de confirmação de e-mail (?code=... no fluxo PKCE), vai direto para o
 // app. O /home carrega o app, o supabase-js troca o código pela sessão
 // (detectSessionInUrl) e, sem sessão, o (tabs)/_layout manda para o /login.

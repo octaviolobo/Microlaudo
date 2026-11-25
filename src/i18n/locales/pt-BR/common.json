@@ -52,7 +52,6 @@
     "emailInUse": "Este e-mail já está em uso.",
     "fillRequired": "Preencha todos os campos obrigatórios.",
     "continueWithGoogle": "Continuar com Google",
-    "continueWithFacebook": "Continuar com Facebook",
     "appleLoginFailed": "Não foi possível entrar com a Apple. Tente de novo.",
     "orDivider": "ou",
     "passwordIssue": {
@@ -194,7 +193,7 @@
     "opensInBrowser": "Abre no navegador",
     "notice": {
       "register": "Ao criar sua conta, você concorda com os [terms] e declara que leu a [privacy].",
-      "social": "Ao continuar com Google ou Facebook, você concorda com os [terms] e declara que leu a [privacy].",
+      "social": "Ao continuar com Google ou Apple, você concorda com os [terms] e declara que leu a [privacy].",
       "subscribe": "Ao assinar, você concorda com a renovação automática e as regras de cancelamento e reembolso dos [terms]. Seu CPF/CNPJ, nome e e-mail vão para o Asaas para a cobrança e a nota fiscal ([privacy]).",
       "subscribeApple": "Assinatura com renovação automática. O valor é cobrado na sua conta Apple ao confirmar a compra e renova pelo mesmo valor e período, a menos que a renovação seja desligada até 24 horas antes do fim do período atual. Gerencie ou cancele em Ajustes → [seu nome] → Assinaturas. Ao assinar, você concorda com os [terms] e declara que leu a [privacy].",
       "standalone": "[terms] · [privacy]"
