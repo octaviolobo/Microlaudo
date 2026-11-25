@@ -147,17 +147,6 @@ export function LoginScreen() {
         accessibilityLabel={t('auth.continueWithGoogle')}
       />
 
-      <Button
-        label={t('auth.continueWithFacebook')}
-        onPress={() => handleOAuthLogin('facebook')}
-        variant="secondary"
-        icon="logo-facebook"
-        loading={oauthLoading === 'facebook'}
-        disabled={isLoading || (!!oauthLoading && oauthLoading !== 'facebook')}
-        fullWidth
-        accessibilityLabel={t('auth.continueWithFacebook')}
-      />
-
       <LegalNotice context="social" />
 
       <Button

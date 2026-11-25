@@ -30,7 +30,7 @@ export function hasRecoverySession(): boolean {
   return recoverySessionActive;
 }
 
-export type OAuthProvider = 'google' | 'facebook';
+export type OAuthProvider = 'google';
 
 export type RegisterInput = {
   email: string;
@@ -63,7 +63,7 @@ export async function signIn(email: string, password: string, captchaToken?: str
   }
 }
 
-// Login/cadastro via provedor social (Google/Facebook). Mesmo fluxo cobre
+// Login/cadastro via provedor social (Google). Mesmo fluxo cobre
 // login e signup — o handle_new_user (migration 001/007) cria o perfil
 // automaticamente no primeiro acesso, com crm vazio até completar o cadastro.
 export async function signInWithOAuth(provider: OAuthProvider): Promise<void> {
@@ -102,7 +102,7 @@ export async function signInWithOAuth(provider: OAuthProvider): Promise<void> {
 }
 
 // "Entrar com Apple" (só iOS). Obrigatório pela App Store (regra 4.8) porque o app
-// oferece login com Google/Facebook. Fluxo nativo: a Apple devolve um identityToken
+// oferece login com Google. Fluxo nativo: a Apple devolve um identityToken
 // assinado e o Supabase valida com signInWithIdToken — não há navegador nem secret
 // no app. No Supabase, o provedor Apple precisa ter o bundle id (com.microlaudo.app)
 // em "Client IDs". O nonce bruto vai para o Supabase e o hash SHA-256 para a Apple.

@@ -99,7 +99,7 @@ Com o CAPTCHA ligado no Supabase:
   Antes de publicar builds nativos: widget do Turnstile numa WebView em `Turnstile.tsx`.
 - Dev local precisa da site key real (com `localhost` nos hostnames do widget). Para testar só a
   renderização com o CAPTCHA desligado, a chave de teste `1x00000000000000000000AA` sempre aprova.
-- Login social (Google/Facebook) e troca de senha pelo link não pedem CAPTCHA.
+- Login social (Google/Apple) e troca de senha pelo link não pedem CAPTCHA.
 - Os erros de console vindos do iframe `challenges.cloudflare.com` (Permissions-Policy,
   TrustedScript, sandbox `about:blank`) são internos do Turnstile e não são violações da nossa CSP.
 

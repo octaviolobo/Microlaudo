@@ -92,7 +92,7 @@ Functionality), **vinculado à identidade do usuário** (Linked to the user),
 
 | Categoria Apple | Tipo | De onde vem |
 |---|---|---|
-| Informações de contato | Nome | Cadastro do médico (e Entrar com Apple/Google/Facebook) |
+| Informações de contato | Nome | Cadastro do médico (e Entrar com Apple/Google) |
 | Informações de contato | E-mail | Login e recuperação de senha |
 | Informações de contato | Número de telefone | Telefone da clínica (opcional) |
 | Informações de contato | Endereço físico | Endereço da clínica (opcional) |

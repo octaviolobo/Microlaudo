@@ -6,7 +6,7 @@
 > internas**: o gerador (`scripts/build-legal.js`) não os publica na página
 > `microlaudo.com/privacidade`.
 
-**Última atualização:** 21 de novembro de 2026
+**Última atualização:** 25 de novembro de 2026
 
 Esta Política de Privacidade explica como o **MicroLaudo** (aplicativo para iOS,
 Android e versão web) coleta, usa, armazena, compartilha e elimina dados
@@ -73,7 +73,7 @@ Isso significa que:
 |---|---|
 | Nome completo, CRM e RQE (opcional) | Informados no cadastro |
 | E-mail e senha (armazenada apenas em forma criptografada — *hash*) | Informados no cadastro |
-| Nome, e-mail e identificador da conta Google, Facebook ou Apple | Fornecidos pelo provedor, **somente** se você escolher entrar com essas contas. Ao entrar com a Apple, você pode ocultar seu e-mail: recebemos então um endereço de encaminhamento criado pela Apple |
+| Nome, e-mail e identificador da conta Google ou Apple | Fornecidos pelo provedor, **somente** se você escolher entrar com essas contas. Ao entrar com a Apple, você pode ocultar seu e-mail: recebemos então um endereço de encaminhamento criado pela Apple |
 | Dados da clínica: nome, CNPJ, endereço e telefone (opcionais) | Informados no perfil |
 | Logotipo da clínica e imagem da assinatura (opcionais) | Enviados por você no perfil |
 | Idioma preferido | Configuração do app |
@@ -193,7 +193,6 @@ Os dados são compartilhados somente na medida necessária:
 | **Asaas** (Asaas Gestão Financeira Instituição de Pagamento S.A.) | Processamento das assinaturas e cobranças (cartão de crédito, Pix ou boleto) e emissão de nota fiscal. Os dados de pagamento são digitados diretamente na página de fatura do Asaas | Nome, e-mail e CPF/CNPJ do Médico; plano e valores. **Nenhum dado de Paciente** |
 | **Brevo** | Envio de e-mails transacionais (confirmação de cadastro, recuperação de senha) | E-mail e nome do Médico; nenhum dado de Paciente |
 | **Google** | Login com conta Google, se você escolher; recebimento dos e-mails enviados aos nossos endereços de contato | Dados do perfil Google; conteúdo das mensagens que você nos enviar |
-| **Meta (Facebook)** | Login com conta Facebook, se você escolher | Dados do perfil Facebook |
 | **Apple** | Login com conta Apple ("Entrar com a Apple"), se você escolher | Nome e e-mail (ou e-mail de encaminhamento) da conta Apple |
 | **RevenueCat** (RevenueCat, Inc., EUA) | Validação e acompanhamento das assinaturas compradas pela App Store no iPhone | Identificador interno da sua conta no MicroLaudo, histórico e situação das compras na App Store e dados técnicos do aparelho (modelo, versão do sistema, país da loja). **Nenhum dado de Paciente**, nome, e-mail ou CRM |
 | **ProDoctor** | Integração opcional com o sistema de prontuário/agenda do consultório, para preencher automaticamente nome e data de nascimento do Paciente. **Disponível apenas para Médicos habilitados** pela IGARATECH a pedido do consultório que já usa o ProDoctor | Nome pesquisado; retorno de nome, data de nascimento e médico do último atendimento |

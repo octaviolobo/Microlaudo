@@ -52,7 +52,6 @@
     "emailInUse": "This email is already in use.",
     "fillRequired": "Please fill in all required fields.",
     "continueWithGoogle": "Continue with Google",
-    "continueWithFacebook": "Continue with Facebook",
     "appleLoginFailed": "Could not sign in with Apple. Please try again.",
     "orDivider": "or",
     "passwordIssue": {
@@ -194,7 +193,7 @@
     "opensInBrowser": "Opens in the browser",
     "notice": {
       "register": "By creating your account, you agree to the [terms] and acknowledge that you have read the [privacy].",
-      "social": "By continuing with Google or Facebook, you agree to the [terms] and acknowledge that you have read the [privacy].",
+      "social": "By continuing with Google or Apple, you agree to the [terms] and acknowledge that you have read the [privacy].",
       "subscribe": "By subscribing, you agree to automatic renewal and to the cancellation and refund rules in the [terms]. Your CPF/CNPJ, name and email are sent to Asaas for billing and invoicing ([privacy]).",
       "subscribeApple": "Auto-renewing subscription. Payment is charged to your Apple Account at confirmation of purchase and renews at the same price and period unless auto-renew is turned off at least 24 hours before the end of the current period. Manage or cancel in Settings → [your name] → Subscriptions. By subscribing you agree to the [terms] and confirm you have read the [privacy].",
       "standalone": "[terms] · [privacy]"
