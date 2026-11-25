@@ -51,6 +51,8 @@ Textos e respostas para copiar no App Store Connect. Atualize aqui quando mudar 
 >
 > O MicroLaudo é uma ferramenta de apoio à elaboração de laudos e não substitui o julgamento clínico. O conteúdo de cada laudo é de responsabilidade do médico que o assina.
 >
+> O MicroLaudo é um produto desenvolvido e operado pela IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA (CNPJ 66.173.331/0001-31).
+>
 > Termos de Uso: https://microlaudo.com/termos
 > Política de Privacidade: https://microlaudo.com/privacidade
 
@@ -65,7 +67,7 @@ laudo,microscopia,ginecologia,nugent,amsel,vaginose,candidíase,usg,ultrassom,tr
 | URL de suporte | https://microlaudo.com |
 | URL de marketing | https://microlaudo.com |
 | URL da Política de Privacidade | https://microlaudo.com/privacidade |
-| Copyright | 2026 IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA |
+| Copyright | 2026 IGARATECH SISTEMAS E DESENVOLVIMENTO LTDA (sem o "©": a Apple já coloca) |
 
 O link dos **Termos de Uso** precisa estar na descrição (acima) ou no campo
 "License Agreement" (EULA personalizado). É exigência da Apple para assinatura
