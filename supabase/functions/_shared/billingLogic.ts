@@ -11,7 +11,7 @@ export type SubscriptionStatus = 'pending' | 'active' | 'past_due' | 'canceled' 
 
 export const PLAN_CONFIG: Record<Plan, { value: number; cycle: 'MONTHLY' | 'YEARLY'; description: string }> = {
   monthly: { value: 39.9, cycle: 'MONTHLY', description: 'MicroLaudo — plano mensal' },
-  annual: { value: 399, cycle: 'YEARLY', description: 'MicroLaudo — plano anual' },
+  annual: { value: 399.9, cycle: 'YEARLY', description: 'MicroLaudo — plano anual' },
 };
 
 // card: cartão salvo na 1ª fatura, renovação debitada automaticamente.

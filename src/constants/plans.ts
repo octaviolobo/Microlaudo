@@ -5,14 +5,15 @@ import type { Plan } from '@/types/subscription';
 // get_billing_status(). Este valor só é usado antes do status carregar.
 export const TRIAL_REPORT_LIMIT = 1;
 
-// Preços de lançamento (decididos em 12/11/2026; mensal reduzido para R$39,90 em 17/11/2026). Em centavos para não ter
+// Preços de lançamento (decididos em 12/11/2026; mensal reduzido para R$39,90 em 17/11/2026;
+// anual R$399,90 em 27/11/2026, igual ao da App Store). Em centavos para não ter
 // conta de ponto flutuante; a cobrança de verdade usa o valor do gateway.
 export const PLAN_PRICES_CENTS: Record<Plan, number> = {
   monthly: 3990,
-  annual: 39900,
+  annual: 39990,
 };
 
-// Desconto do anual sobre 12 mensalidades, arredondado para baixo (R$399 vs R$478,80 → 16%).
+// Desconto do anual sobre 12 mensalidades, arredondado para baixo (R$399,90 vs R$478,80 → 16,47% → 16%).
 // No iOS a tela passa os preços da App Store, que podem ter centavos diferentes.
 export function annualDiscountPercent(
   monthlyCents: number = PLAN_PRICES_CENTS.monthly,
@@ -22,7 +23,7 @@ export function annualDiscountPercent(
   return Math.floor(((twelveMonths - annualCents) / twelveMonths) * 100);
 }
 
-// Quanto o anual sai por mês, em centavos (R$399 / 12 = R$33,25).
+// Quanto o anual sai por mês, em centavos (R$399,90 / 12 = R$33,325, arredondado para R$33,33).
 export function annualMonthlyEquivalentCents(annualCents: number = PLAN_PRICES_CENTS.annual): number {
   return Math.round(annualCents / 12);
 }

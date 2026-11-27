@@ -104,14 +104,15 @@ describe('preços', () => {
   it('formata em reais', () => {
     expect(formatCentsBRL(4900)).toBe('R$ 49');
     expect(formatCentsBRL(39900)).toBe('R$ 399');
+    expect(formatCentsBRL(39990)).toBe('R$ 399,90');
     expect(formatCentsBRL(3990)).toBe('R$ 39,90');
     expect(formatCentsBRL(3325)).toBe('R$ 33,25');
     expect(formatCentsBRL(123405)).toBe('R$ 1.234,05');
   });
 
-  it('anual: 16% de desconto e R$33,25/mês', () => {
+  it('anual: 16% de desconto e R$33,33/mês', () => {
     expect(annualDiscountPercent()).toBe(16);
-    expect(annualMonthlyEquivalentCents()).toBe(3325);
+    expect(annualMonthlyEquivalentCents()).toBe(3333);
   });
 });
 

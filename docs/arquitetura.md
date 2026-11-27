@@ -387,7 +387,7 @@ Análise completa: `docs/analise-seguranca.md`
 |-------|---------------|--------|
 | **Teste grátis** | Grátis | 1 laudo finalizado (lifetime) |
 | **Mensal** | R$ 39,90/mês | Ilimitados |
-| **Anual** | R$ 399/ano (32% desc., R$ 33,25/mês) | Ilimitados |
+| **Anual** | R$ 399,90/ano (16% desc., R$ 33,33/mês) | Ilimitados |
 
 Preços de lançamento decididos em 12/11/2026 (baratos enquanto não há base de usuários).
 O paywall trava só **finalizar** (o PDF só sai de laudo finalizado). Regras no servidor:

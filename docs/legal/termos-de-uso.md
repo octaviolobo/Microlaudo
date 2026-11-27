@@ -5,7 +5,7 @@
 > este são **notas internas**: o gerador (`scripts/build-legal.js`) não os
 > publica na página `microlaudo.com/termos`.
 
-**Última atualização:** 17 de novembro de 2026
+**Última atualização:** 27 de novembro de 2026
 
 Estes Termos de Uso ("Termos") regem o acesso e o uso do **MicroLaudo**
 (versão web em https://microlaudo.com e aplicativos para iOS e Android). Leia
@@ -127,7 +127,7 @@ bloqueio de tela e por encerrar a sessão em computadores compartilhados.
 
 8.1. **Planos.** Oferecemos Assinatura **mensal** e **anual**. Os preços
 vigentes são os exibidos na tela de planos no momento da contratação. Preços
-de lançamento: **R$ 39,90 por mês** ou **R$ 399,00 por ano**.
+de lançamento: **R$ 39,90 por mês** ou **R$ 399,90 por ano**.
 
 8.2. **Forma de pagamento.** Na versão web, as cobranças são processadas pelo
 **Asaas**, instituição de pagamento autorizada pelo Banco Central do Brasil,

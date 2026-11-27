@@ -1,11 +1,14 @@
 import { describe, expect, it } from '@jest/globals';
 
+import { PLAN_PRICES_CENTS } from '@/constants/plans';
+
 // As Edge Functions (Deno) ficam fora do alias @/; o teste importa pelo caminho relativo.
 // eslint-disable-next-line no-restricted-imports
 import {
   actionForEvent,
   addCycle,
   applyAction,
+  PLAN_CONFIG,
   isPaidPaymentStatus,
   isValidCnpj,
   isValidCpf,
@@ -17,6 +20,18 @@ import {
 } from '../../supabase/functions/_shared/billingLogic';
 
 const NOW = new Date('2026-11-12T15:00:00Z');
+
+describe('preços', () => {
+  it('a cobrança do Asaas usa os mesmos preços que a tela de planos mostra', () => {
+    expect(Math.round(PLAN_CONFIG.monthly.value * 100)).toBe(PLAN_PRICES_CENTS.monthly);
+    expect(Math.round(PLAN_CONFIG.annual.value * 100)).toBe(PLAN_PRICES_CENTS.annual);
+  });
+
+  it('anual R$ 399,90 e mensal R$ 39,90', () => {
+    expect(PLAN_CONFIG.annual.value).toBe(399.9);
+    expect(PLAN_CONFIG.monthly.value).toBe(39.9);
+  });
+});
 
 describe('documentos', () => {
   it('CPF', () => {
