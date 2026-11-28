@@ -172,7 +172,7 @@ crashlytics/analytics), ID do dispositivo, informações sensíveis
 | Produto | ID | Duração | Preço | Nome exibido | Descrição |
 |---|---|---|---|---|---|
 | Pro Mensal | com.microlaudo.app.mensal | 1 mês | R$ 39,90 | Pro Mensal | Laudos ilimitados, renovação mensal |
-| Pro Anual | com.microlaudo.app.anual | 1 ano | R$ 399,00 | Pro Anual | Laudos ilimitados, renovação anual |
+| Pro Anual | com.microlaudo.app.anual | 1 ano | R$ 399,90 | Pro Anual | Laudos ilimitados, renovação anual |
 
 - Grupo **MicroLaudo Pro**, com localização pt-BR. Os dois produtos ficam no **mesmo nível**.
 - Print de revisão: tela de Planos do app (1290×2796).
